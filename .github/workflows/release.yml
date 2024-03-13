@@ -1,0 +1,29 @@
+name: 'Build & Publish'
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  release:
+    name: Prepare release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      # Build
+      - name: Build the file
+        run: |
+          npm install
+          npm run build
+
+      # Upload build file to the release as an asset.
+      - name: Upload js to release
+        uses: svenstaro/upload-release-action@2.0.0
+
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: dist/week-planner-card.js
+          asset_name: week-planner-card.js
+          tag: ${{ github.ref }}
+          overwrite: true
