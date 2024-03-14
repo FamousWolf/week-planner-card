@@ -5,6 +5,7 @@ import moment from 'moment';
 export class WeekPlannerCard extends LitElement {
     static styles = styles;
 
+    _initialized = false;
     _loading = 0;
     _events = {};
     _jsonDays = '';
@@ -69,7 +70,10 @@ export class WeekPlannerCard extends LitElement {
      * @return {Object}
      */
     render() {
-        this._waitForHassAndConfig();
+        if (!this._initialized) {
+            this._initialized = true;
+            this._waitForHassAndConfig();
+        }
 
         return html`
             <ha-card class="${this._noCardBackground ? 'nobackground' : ''}" style="--event-background-color: ${this._eventBackground}">
