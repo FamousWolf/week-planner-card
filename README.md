@@ -43,7 +43,7 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
     Add:
     ```yaml
     resources:
-      - url: /local/week-planner-card.js?version=1.0.0
+      - url: /local/week-planner-card.js?version=1.0.1
     type: module
     ```
   - **Using the graphical editor**
