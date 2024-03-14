@@ -52,6 +52,33 @@ export default css`
         color: var(--secondary-text-color, #aaaaaa);
         margin: 0 0 3px 0;
     }
+
+    .loader {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        width: 40px;
+        height: 40px;
+    }
+    .loader:after {
+        content: " ";
+        display: block;
+        width: 24px;
+        height: 24px;
+        margin: 4px;
+        border-radius: 50%;
+        border: 3px solid var(--primary-text-color);
+        border-color: var(--primary-text-color) transparent var(--primary-text-color) transparent;
+        animation: loader 1.2s linear infinite;
+    }
+    @keyframes loader {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
     
     @container weekplanner (width <= 1280px) {
         div.container div.day {
