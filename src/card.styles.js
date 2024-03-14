@@ -25,6 +25,7 @@ export default css`
 
     div.container div.day div.date span.number {
         font-size: 350%;
+        line-height: 1.2em;
     }
 
     div.container div.day div.date span.text {
@@ -44,7 +45,6 @@ export default css`
     }
 
     div.container div.day div.events div.event {
-        cursor: pointer;
         border-left: 5px solid var(--border-color, var(--divider-color, #ffffff));
     }
 
