@@ -5,10 +5,15 @@ import moment from 'moment';
 export class WeekPlannerCard extends LitElement {
     static styles = styles;
 
-    _hass;
     _loading = 0;
     _events = {};
     _jsonDays = '';
+    _calendars;
+    _numberOfDays;
+    _updateInterval;
+    _noCardBackground;
+    _eventBackground;
+    _language;
 
     /**
      * Get properties
@@ -17,13 +22,8 @@ export class WeekPlannerCard extends LitElement {
      */
     static get properties() {
         return {
-            _calendars: { type: Array, state: true },
-            _numberOfDays: { type: Number, state: true },
-            _days: { type: Array, state: true },
-            _updateInterval: { type: Number, state: true },
-            _noCardBackground: { type: Boolean, state: true },
-            _eventBackground: { type: String, state: true },
-            _language: { type: Object, state: true }
+            _days: { type: Array },
+            _config: { type: Object }
         }
     }
 
@@ -33,6 +33,8 @@ export class WeekPlannerCard extends LitElement {
      * @param {Object} config
      */
     setConfig(config) {
+        this._config = config;
+
         if (!config.calendars) {
             throw new Error('No calendars are configured');
         }
@@ -62,22 +64,13 @@ export class WeekPlannerCard extends LitElement {
     }
 
     /**
-     * Set hass
-     *
-     * @param {Object} hass
-     */
-    set hass(hass) {
-        this._hass = hass;
-
-        this._updateEvents();
-    }
-
-    /**
      * Render
      *
      * @return {Object}
      */
     render() {
+        this._waitForHassAndConfig();
+
         return html`
             <ha-card class="${this._noCardBackground ? 'nobackground' : ''}" style="--event-background-color: ${this._eventBackground}">
                 <div class="card-content">
@@ -137,24 +130,31 @@ export class WeekPlannerCard extends LitElement {
         `;
     }
 
+    _waitForHassAndConfig() {
+        if (!this.hass || !this._calendars) {
+            window.setTimeout(() => {
+                this._waitForHassAndConfig();
+            }, 50)
+            return;
+        }
+
+        this._updateEvents();
+    }
+
     _updateEvents() {
         if (this._loading > 0) {
             return;
         }
+
         this._loading++;
-
         this._events = {};
-
-        if (!this._calendars) {
-            return;
-        }
 
         let startDate = moment().startOf('day');
         let endDate = moment().startOf('day').add(this._numberOfDays, 'days');
 
         this._calendars.forEach(calendar => {
             this._loading++;
-            this._hass.callApi(
+            this.hass.callApi(
                 'get',
                 'calendars/' + calendar.entity + '?start=' + startDate.format('YYYY-MM-DD[T]HH:mm:ss[Z]') + '&end=' + endDate.format('YYYY-MM-DD[T]HH:mm:ss[Z]')
             ).then(response => {
