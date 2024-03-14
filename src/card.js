@@ -75,6 +75,7 @@ export class WeekPlannerCard extends LitElement {
             this._initialized = true;
             this._waitForHassAndConfig();
         }
+
         return html`
             <ha-card class="${this._noCardBackground ? 'nobackground' : ''}" style="--event-background-color: ${this._eventBackground}">
                 <div class="card-content">
