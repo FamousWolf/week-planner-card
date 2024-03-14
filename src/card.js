@@ -5,6 +5,7 @@ import moment from 'moment';
 export class WeekPlannerCard extends LitElement {
     static styles = styles;
 
+    _initialized = false;
     _loading = 0;
     _events = {};
     _jsonDays = '';
@@ -23,7 +24,8 @@ export class WeekPlannerCard extends LitElement {
     static get properties() {
         return {
             _days: { type: Array },
-            _config: { type: Object }
+            _config: { type: Object },
+            _isLoading: { type: Boolean }
         }
     }
 
@@ -69,14 +71,20 @@ export class WeekPlannerCard extends LitElement {
      * @return {Object}
      */
     render() {
-        this._waitForHassAndConfig();
-
+        if (!this._initialized) {
+            this._initialized = true;
+            this._waitForHassAndConfig();
+        }
         return html`
             <ha-card class="${this._noCardBackground ? 'nobackground' : ''}" style="--event-background-color: ${this._eventBackground}">
                 <div class="card-content">
                     <div class="container">
                         ${this._renderDays()}
                     </div>
+                    ${this._isLoading ?
+                        html`<div class="loader"></div>` :
+                        ''
+                    }
                 </div>
             </ha-card>
         `;
@@ -147,6 +155,7 @@ export class WeekPlannerCard extends LitElement {
         }
 
         this._loading++;
+        this._isLoading = true;
         this._events = {};
 
         let startDate = moment().startOf('day');
@@ -178,6 +187,7 @@ export class WeekPlannerCard extends LitElement {
             if (this._loading === 0) {
                 clearInterval(checkLoading);
                 this._updateCard();
+                this._isLoading = false;
 
                 window.setTimeout(() => {
                     this._updateEvents();
