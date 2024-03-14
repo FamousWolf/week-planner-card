@@ -25,7 +25,8 @@ export class WeekPlannerCard extends LitElement {
         return {
             _days: { type: Array },
             _config: { type: Object },
-            _isLoading: { type: Boolean }
+            _isLoading: { type: Boolean },
+            _error: { type: String }
         }
     }
 
@@ -79,6 +80,10 @@ export class WeekPlannerCard extends LitElement {
         return html`
             <ha-card class="${this._noCardBackground ? 'nobackground' : ''}" style="--event-background-color: ${this._eventBackground}">
                 <div class="card-content">
+                    ${this._error ?
+                        html`<ha-alert alert-type="error">${this._error}</ha-alert>` :
+                        ''
+                    }
                     <div class="container">
                         ${this._renderDays()}
                     </div>
@@ -157,6 +162,7 @@ export class WeekPlannerCard extends LitElement {
 
         this._loading++;
         this._isLoading = true;
+        this._error = '';
         this._events = {};
 
         let startDate = moment().startOf('day');
@@ -181,13 +187,19 @@ export class WeekPlannerCard extends LitElement {
                 });
 
                 this._loading--;
+            }).catch(error => {
+                this._error = 'Error while fetching calendar: ' + error.error;
+                this._loading = 0;
+                throw new Error(this._error);
             });
         });
 
         let checkLoading = window.setInterval(() => {
             if (this._loading === 0) {
                 clearInterval(checkLoading);
-                this._updateCard();
+                if (!this._error) {
+                    this._updateCard();
+                }
                 this._isLoading = false;
 
                 window.setTimeout(() => {
