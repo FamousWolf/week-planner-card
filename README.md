@@ -4,6 +4,7 @@
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/FamousWolf/week-planner-card/total)
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/y/FamousWolf/week-planner-card)
 ![GitHub License](https://img.shields.io/github/license/FamousWolf/week-planner-card)
+[![Static Badge](https://img.shields.io/badge/-buy_me_a_tea-gray?logo=buy-me-a-coffee)](https://www.buymeacoffee.com/rudygnodde)
 
 Custom Home Assistant card displaying a responsive overview of multiple days with events from one or multiple calendars
 
