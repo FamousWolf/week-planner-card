@@ -20,7 +20,6 @@ export default css`
         background-position:75% top;
         background-repeat:no-repeat;
         background-size:60px;
-
     }
 
     div.container div.day div.date {
