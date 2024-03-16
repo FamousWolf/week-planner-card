@@ -5,7 +5,7 @@ export default css`
         border: none !important;
         background-color: transparent !important;
     }
-    
+
     div.container {
         container-name: weekplanner;
         container-type: inline-size;
@@ -17,6 +17,10 @@ export default css`
     div.container div.day {
         width: calc(100% / 7 - 15px);
         margin: 0 0 20px 0;
+        background-position:75% top;
+        background-repeat:no-repeat;
+        background-size:60px;
+
     }
 
     div.container div.day div.date {
@@ -60,6 +64,7 @@ export default css`
         width: 40px;
         height: 40px;
     }
+    
     .loader:after {
         content: " ";
         display: block;
@@ -71,6 +76,7 @@ export default css`
         border-color: var(--primary-text-color) transparent var(--primary-text-color) transparent;
         animation: loader 1.2s linear infinite;
     }
+    
     @keyframes loader {
         0% {
             transform: rotate(0deg);
@@ -85,13 +91,13 @@ export default css`
             width: calc(100% / 5 - 15px);
         }
     }
-    
+
     @container weekplanner (width <= 1024px) {
         div.container div.day {
             width: calc(100% / 3 - 15px);
         }
     }
-    
+
     @container weekplanner (width <= 640px) {
         div.container div.day {
             width: 100%;

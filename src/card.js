@@ -2,6 +2,57 @@ import { html, LitElement } from 'lit';
 import styles from './card.styles';
 import moment from 'moment';
 
+import clear_night from "./icons/clear_night.png";
+import cloudy from "./icons/cloudy.png";
+import fog from "./icons/fog.png";
+import lightning from "./icons/lightning.png";
+import storm from "./icons/storm.png";
+import storm_night from "./icons/storm_night.png";
+import mostly_cloudy from "./icons/mostly_cloudy.png";
+import mostly_cloudy_night from "./icons/mostly_cloudy_night.png";
+import heavy_rain from "./icons/heavy_rain.png";
+import rainy from "./icons/rainy.png";
+import snowy from "./icons/snowy.png";
+import mixed_rain from "./icons/mixed_rain.png";
+import sunny from "./icons/sunny.png";
+import windy from "./icons/windy.svg";
+import humidity from "./icons/humidity.svg";
+import pressure from "./icons/pressure.svg";
+
+const ICONS = {
+  "clear-day": sunny,
+  "clear-night": clear_night,
+  cloudy,
+  overcast: cloudy,
+  fog,
+  hail: mixed_rain,
+  lightning,
+  "lightning-rainy": storm,
+  "partly-cloudy-day": mostly_cloudy,
+  "partly-cloudy-night": mostly_cloudy_night,
+  partlycloudy: mostly_cloudy,
+  pouring: heavy_rain,
+  rain: rainy,
+  rainy,
+  sleet: mixed_rain,
+  snow: snowy,
+  snowy,
+  "snowy-rainy": mixed_rain,
+  sunny,
+  wind: windy,
+  windy,
+  "windy-variant": windy,
+  humidity,
+  pressure,
+};
+
+const ICONS_NIGHT = {
+  ...ICONS,
+  sunny: clear_night,
+  partlycloudy: mostly_cloudy_night,
+  "lightning-rainy": storm_night,
+};
+
 export class WeekPlannerCard extends LitElement {
     static styles = styles;
 
@@ -41,6 +92,7 @@ export class WeekPlannerCard extends LitElement {
         if (!config.calendars) {
             throw new Error('No calendars are configured');
         }
+        this._weather = config.weather;
 
         this._calendars = config.calendars;
         this._numberOfDays = config.days ?? 7;
@@ -104,7 +156,7 @@ export class WeekPlannerCard extends LitElement {
         return html`
             ${this._days.map((day) => {
                 return html`
-                    <div class="day">
+                    <div class="day weather-icon" style="background-image: url(${this._getWeatherIcon(day.weather)};">
                         <div class="date">
                             <span class="number">${day.date.date()}</span>
                             <span class="text">${this._getWeekDayText(day.date)}</span>
@@ -144,6 +196,11 @@ export class WeekPlannerCard extends LitElement {
         `;
     }
 
+    _getWeatherIcon(weatherState) {
+        const state = weatherState.toLowerCase();
+        return ICONS[state];
+    }
+
     _waitForHassAndConfig() {
         if (!this.hass || !this._calendars) {
             window.setTimeout(() => {
@@ -167,6 +224,7 @@ export class WeekPlannerCard extends LitElement {
 
         let startDate = moment().startOf('day');
         let endDate = moment().startOf('day').add(this._numberOfDays, 'days');
+        this._weather_state = this.hass.states[this._weather];
 
         this._calendars.forEach(calendar => {
             this._loading++;
@@ -243,6 +301,7 @@ export class WeekPlannerCard extends LitElement {
         let startDate = moment().startOf('day');
         let endDate = moment().startOf('day').add(this._numberOfDays, 'days');
 
+        let i = 0;
         while (startDate < endDate) {
             let events = [];
 
@@ -255,9 +314,11 @@ export class WeekPlannerCard extends LitElement {
 
             days.push({
                 date: moment(startDate),
-                events: events
+                events: events,
+                weather: this._weather_state.attributes.forecast[i].condition
             });
             startDate.add(1, 'days');
+            i++;
         }
 
         const jsonDays = JSON.stringify(days)
