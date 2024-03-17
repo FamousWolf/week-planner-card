@@ -17,16 +17,8 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
   - [Manual](#manual)
 - [Configuration](#configuration)
   - [Main options](#main-options)
-  - [Scores](#scores)
-  - [Entities](#entities)
-  - [Entity states](#entity-states)
-  - [Date format](#date-format)
-  - [Actions](#actions)
-- [Examples](#examples)
-  - [Battery charge](#battery-charge)
-  - [Air quality](#air-quality)
-  - [Washing machine and dryer status](#washing-machine-and-dryer-status)
-  - [Garbage pickup dates](#garbage-pickup-dates)
+  - [Calendars](#calendars)
+  - [Texts](#texts)
 
 ## Installation
 
