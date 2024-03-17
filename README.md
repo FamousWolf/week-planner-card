@@ -19,6 +19,8 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
   - [Main options](#main-options)
   - [Calendars](#calendars)
   - [Texts](#texts)
+  - [Weather](#weather)
+- [Example](#example)
 
 ## Installation
 
@@ -59,6 +61,7 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 | `updateInterval`   | number      | 60                                      | Any positive integer number | Seconds between checks for new events          |
 | `calendars`        | object list | **Required**                            | See [Calendars](#calendars) | Calendars shown in this card                   |
 | `texts`            | object list | {}                                      | See [Texts](#texts)         | Texts used in the card                         |
+| `weather`          | object      | optional                                | See [Weather](#weather)     | Configuration for optional weather forecast    |
 
 ### Calendars
 
@@ -82,3 +85,41 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 | `thursday`  | string | `Thursday`   | Any text          | Text shown for Thursdays                            |
 | `friday`    | string | `Friday`     | Any text          | Text shown for Fridays                              |
 | `saturday`  | string | `Saturday`   | Any text          | Text shown for Saturdays                            |
+
+### Weather
+
+| Name                 | Type    | Default      | Supported options            | Description          |
+|----------------------|---------|--------------|------------------------------|----------------------|
+| `entity`             | string  | **Required** | `weather.my_weather_service` | Entity ID            |
+| `showCondition`      | boolean | true         | `false` \| `true`            | Show condition icon  |
+| `showTemperature`    | boolean | true         | `false` \| `true`            | Show temperature     |
+| `showLowTemperature` | boolean | true         | `false` \| `true`            | Show low temperature |
+
+## Example
+
+```yaml
+type: custom:week-planner-card
+calendars:
+  - entity: calendar.my_calendar_1
+    color: '#e6c229'
+  - entity: calendar.my_calendar_2
+    color: '#1a8fe3'
+weather:
+  entity: weather.my_weather_service
+  showLowTemperature: false
+days: 14
+noCardBackground: true
+eventBackground: rgba(0, 0, 0, .75)
+texts:
+  noEvents: Geen activiteiten
+  fullDay: Hele dag
+  today: Vandaag
+  sunday: Zondag
+  monday: Maandag
+  tuesday: Dinsdag
+  wednesday: Woensdag
+  thursday: Donderdag
+  friday: Vrijdag
+  saturday: Zaterdag
+  tomorrow: Morgen
+```
