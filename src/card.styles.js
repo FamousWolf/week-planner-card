@@ -15,17 +15,16 @@ export default css`
     }
 
     div.container div.day {
+        position: relative;
         width: calc(100% / 7 - 15px);
         margin: 0 0 20px 0;
-        background-position:75% top;
-        background-repeat:no-repeat;
-        background-size:60px;
     }
 
     div.container div.day div.date {
-        margin: 0 0 10px 0;
+        position: relative;
+        z-index: 2;
     }
-
+    
     div.container div.day div.date span.number {
         font-size: 350%;
         line-height: 1.2em;
@@ -35,7 +34,37 @@ export default css`
         font-size: 125%;
     }
 
-    div.container div.day div.none,
+    div.container div.day div.weather {
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 1;
+    }
+    
+    div.container div.day div.weather div.icon {
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    div.container div.day div.weather div.icon img {
+        max-height: 30px;
+    }
+
+    div.container div.day div.weather div.temperature {
+        display: inline-block;
+        margin: 0 5px 0 0;
+        vertical-align: middle;
+    }
+    
+    div.container div.day div.weather div.temperature:has(span.high) span.low:before {
+        content: ' / ';
+    }
+
+    div.container div.day div.events {
+        margin-top: 10px;
+    }
+    
+    div.container div.day div.events div.none,
     div.container div.day div.events div.event {
         margin: 0 0 5px 0;
         padding: 10px;
@@ -43,7 +72,7 @@ export default css`
         border-radius: 0 5px 5px 0;
     }
 
-    div.container div.day div.none {
+    div.container div.day div.events div.none {
         border-radius: 5px;
     }
 

@@ -1,35 +1,32 @@
 import { html, LitElement } from 'lit';
-import styles from './card.styles';
 import moment from 'moment';
-
-import clear_night from "./icons/clear_night.png";
-import cloudy from "./icons/cloudy.png";
-import fog from "./icons/fog.png";
-import lightning from "./icons/lightning.png";
-import storm from "./icons/storm.png";
-import storm_night from "./icons/storm_night.png";
-import mostly_cloudy from "./icons/mostly_cloudy.png";
-import mostly_cloudy_night from "./icons/mostly_cloudy_night.png";
-import heavy_rain from "./icons/heavy_rain.png";
-import rainy from "./icons/rainy.png";
-import snowy from "./icons/snowy.png";
-import mixed_rain from "./icons/mixed_rain.png";
-import sunny from "./icons/sunny.png";
-import windy from "./icons/windy.svg";
-import humidity from "./icons/humidity.svg";
-import pressure from "./icons/pressure.svg";
+import styles from './card.styles';
+import clear_night from 'data-url:./icons/clear_night.png';
+import cloudy from 'data-url:./icons/cloudy.png';
+import fog from 'data-url:./icons/fog.png';
+import lightning from 'data-url:./icons/lightning.png';
+import storm from 'data-url:./icons/storm.png';
+import storm_night from 'data-url:./icons/storm_night.png';
+import mostly_cloudy from 'data-url:./icons/mostly_cloudy.png';
+import mostly_cloudy_night from 'data-url:./icons/mostly_cloudy_night.png';
+import heavy_rain from 'data-url:./icons/heavy_rain.png';
+import rainy from 'data-url:./icons/rainy.png';
+import snowy from 'data-url:./icons/snowy.png';
+import mixed_rain from 'data-url:./icons/mixed_rain.png';
+import sunny from 'data-url:./icons/sunny.png';
+import windy from 'data-url:./icons/windy.svg';
 
 const ICONS = {
-  "clear-day": sunny,
-  "clear-night": clear_night,
+  'clear-day': sunny,
+  'clear-night': clear_night,
   cloudy,
   overcast: cloudy,
   fog,
   hail: mixed_rain,
   lightning,
-  "lightning-rainy": storm,
-  "partly-cloudy-day": mostly_cloudy,
-  "partly-cloudy-night": mostly_cloudy_night,
+  'lightning-rainy': storm,
+  'partly-cloudy-day': mostly_cloudy,
+  'partly-cloudy-night': mostly_cloudy_night,
   partlycloudy: mostly_cloudy,
   pouring: heavy_rain,
   rain: rainy,
@@ -37,20 +34,18 @@ const ICONS = {
   sleet: mixed_rain,
   snow: snowy,
   snowy,
-  "snowy-rainy": mixed_rain,
+  'snowy-rainy': mixed_rain,
   sunny,
   wind: windy,
   windy,
-  "windy-variant": windy,
-  humidity,
-  pressure,
+  'windy-variant': windy
 };
 
 const ICONS_NIGHT = {
   ...ICONS,
   sunny: clear_night,
   partlycloudy: mostly_cloudy_night,
-  "lightning-rainy": storm_night,
+  'lightning-rainy': storm_night
 };
 
 export class WeekPlannerCard extends LitElement {
@@ -66,6 +61,7 @@ export class WeekPlannerCard extends LitElement {
     _noCardBackground;
     _eventBackground;
     _language;
+    _weather;
 
     /**
      * Get properties
@@ -92,9 +88,9 @@ export class WeekPlannerCard extends LitElement {
         if (!config.calendars) {
             throw new Error('No calendars are configured');
         }
-        this._weather = config.weather;
 
         this._calendars = config.calendars;
+        this._weather = this._getWeatherConfig(config.weather);
         this._numberOfDays = config.days ?? 7;
         this._updateInterval = config.updateInterval ?? 60;
         this._noCardBackground = config.noCardBackground ?? false;
@@ -148,6 +144,30 @@ export class WeekPlannerCard extends LitElement {
         `;
     }
 
+    _getWeatherConfig(weatherConfiguration) {
+        if (
+            !weatherConfiguration
+            || typeof weatherConfiguration !== 'string'
+            && typeof weatherConfiguration !== 'object'
+        ) {
+            return null;
+        }
+
+        let configuration = {
+            entity: null,
+            showCondition: true,
+            showTemperature: true,
+            showLowTemperature: true
+        };
+        if (typeof weatherConfiguration === 'string') {
+            configuration.entity = weatherConfiguration;
+        } else {
+            Object.assign(configuration, weatherConfiguration);
+        }
+
+        return configuration;
+    }
+
     _renderDays() {
         if (!this._days) {
             return html``;
@@ -156,11 +176,45 @@ export class WeekPlannerCard extends LitElement {
         return html`
             ${this._days.map((day) => {
                 return html`
-                    <div class="day weather-icon" style="background-image: url(${this._getWeatherIcon(day.weather)};">
+                    <div class="day">
                         <div class="date">
                             <span class="number">${day.date.date()}</span>
                             <span class="text">${this._getWeekDayText(day.date)}</span>
                         </div>
+                        ${day.weather ?
+                            html`
+                                <div class="weather">
+                                    ${this._weather.showTemperature || this._weather.showLowTemperature ?
+                                        html`
+                                            <div class="temperature">
+                                                ${this._weather.showTemperature ?
+                                                    html`
+                                                        <span class="high">${day.weather.temperature}</span>
+                                                    ` :
+                                                    ''
+                                                }
+                                                ${this._weather.showLowTemperature ?
+                                                    html`
+                                                            <span class="low">${day.weather.templow}</span>
+                                                    ` :
+                                                    ''
+                                                }
+                                            </div>
+                                        ` :
+                                        ''
+                                    }
+                                    ${this._weather.showCondition ?
+                                        html`
+                                            <div class="icon">
+                                                <img src="${day.weather.icon}" alt="${day.weather.condition}">
+                                            </div>
+                                        ` :
+                                        ''
+                                    }
+                                </div>
+                            ` :
+                            ''
+                        }
                         <div class="events">
                             ${day.events.length === 0 ?
                                 html`
@@ -196,8 +250,13 @@ export class WeekPlannerCard extends LitElement {
         `;
     }
 
-    _getWeatherIcon(weatherState) {
-        const state = weatherState.toLowerCase();
+    _getWeatherIcon(weatherState, dayNumber) {
+        const condition = weatherState?.condition;
+        if (!condition) {
+            return null;
+        }
+
+        const state = condition.toLowerCase();
         return ICONS[state];
     }
 
@@ -224,7 +283,6 @@ export class WeekPlannerCard extends LitElement {
 
         let startDate = moment().startOf('day');
         let endDate = moment().startOf('day').add(this._numberOfDays, 'days');
-        this._weather_state = this.hass.states[this._weather];
 
         this._calendars.forEach(calendar => {
             this._loading++;
@@ -298,10 +356,12 @@ export class WeekPlannerCard extends LitElement {
     _updateCard() {
         let days = [];
 
+        const weatherState = this._weather ? this.hass.states[this._weather.entity] : null;
+
         let startDate = moment().startOf('day');
         let endDate = moment().startOf('day').add(this._numberOfDays, 'days');
 
-        let i = 0;
+        let dayNumber = 0;
         while (startDate < endDate) {
             let events = [];
 
@@ -315,10 +375,15 @@ export class WeekPlannerCard extends LitElement {
             days.push({
                 date: moment(startDate),
                 events: events,
-                weather: this._weather_state.attributes.forecast[i].condition
+                weather: weatherState?.attributes?.forecast[dayNumber] ? {
+                    icon: this._getWeatherIcon(weatherState.attributes.forecast[dayNumber], dayNumber),
+                    condition: this.hass.formatEntityState(weatherState, weatherState.attributes.forecast[dayNumber].condition),
+                    temperature: this.hass.formatEntityAttributeValue(weatherState, 'temperature', weatherState.attributes.forecast[dayNumber].temperature),
+                    templow: this.hass.formatEntityAttributeValue(weatherState, 'templow', weatherState.attributes.forecast[dayNumber].templow)
+                } : null,
             });
             startDate.add(1, 'days');
-            i++;
+            dayNumber++;
         }
 
         const jsonDays = JSON.stringify(days)
