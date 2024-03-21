@@ -84,6 +84,7 @@ export default css`
 
     div.container div.day div.events div.event {
         border-left: 5px solid var(--border-color, var(--divider-color, #ffffff));
+        cursor: pointer;
     }
 
     div.container div.day div.events div.event div.time {
@@ -110,7 +111,31 @@ export default css`
         border-color: var(--primary-text-color) transparent var(--primary-text-color) transparent;
         animation: loader 1.2s linear infinite;
     }
-    
+
+    ha-dialog div.calendar,
+    ha-dialog div.datetime,
+    ha-dialog div.location {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+
+    ha-dialog div.calendar ha-icon,
+    ha-dialog div.datetime ha-icon,
+    ha-dialog div.location ha-icon {
+        margin-right: 8px;
+    }
+
+    ha-dialog div.location div.info a {
+        color: var(--primary-text-color);
+    }
+
+    ha-dialog div.description {
+        border-top: 1px solid var(--primary-text-color);
+        margin-top: 16px;
+        padding-top: 16px;
+    }
+
     @keyframes loader {
         0% {
             transform: rotate(0deg);
