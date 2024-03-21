@@ -92,8 +92,8 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 |----------------------|---------|--------------|------------------------------|----------------------|
 | `entity`             | string  | **Required** | `weather.my_weather_service` | Entity ID            |
 | `showCondition`      | boolean | true         | `false` \| `true`            | Show condition icon  |
-| `showTemperature`    | boolean | true         | `false` \| `true`            | Show temperature     |
-| `showLowTemperature` | boolean | true         | `false` \| `true`            | Show low temperature |
+| `showTemperature`    | boolean | false        | `false` \| `true`            | Show temperature     |
+| `showLowTemperature` | boolean | false        | `false` \| `true`            | Show low temperature |
 
 ## Example
 
@@ -106,7 +106,8 @@ calendars:
     color: '#1a8fe3'
 weather:
   entity: weather.my_weather_service
-  showLowTemperature: false
+  showTemperature: true
+  showLowTemperature: true
 days: 14
 noCardBackground: true
 eventBackground: rgba(0, 0, 0, .75)

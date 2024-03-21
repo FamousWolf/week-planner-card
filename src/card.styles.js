@@ -1,6 +1,11 @@
 import { css } from 'lit';
 
 export default css`
+    ha-card {
+        --weather-icon-size: 30px;
+        --weather-temperature-separator: ' / ';
+    }
+    
     ha-card.nobackground {
         border: none !important;
         background-color: transparent !important;
@@ -47,7 +52,8 @@ export default css`
     }
 
     div.container div.day div.weather div.icon img {
-        max-height: 30px;
+        max-width: var(--weather-icon-size);
+        max-height: var(--weather-icon-size);
     }
 
     div.container div.day div.weather div.temperature {
@@ -57,7 +63,7 @@ export default css`
     }
     
     div.container div.day div.weather div.temperature:has(span.high) span.low:before {
-        content: ' / ';
+        content: var(--weather-temperature-separator);
     }
 
     div.container div.day div.events {

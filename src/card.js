@@ -156,8 +156,8 @@ export class WeekPlannerCard extends LitElement {
         let configuration = {
             entity: null,
             showCondition: true,
-            showTemperature: true,
-            showLowTemperature: true
+            showTemperature: false,
+            showLowTemperature: false
         };
         if (typeof weatherConfiguration === 'string') {
             configuration.entity = weatherConfiguration;
