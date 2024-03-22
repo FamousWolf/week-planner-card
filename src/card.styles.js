@@ -2,6 +2,15 @@ import { css } from 'lit';
 
 export default css`
     ha-card {
+        --days-spacing: 15px;
+        --day-date-number-font-size: 3.5em;
+        --day-date-number-line-height: 1.2em;
+        --day-date-text-font-size: 1.25em;
+        --events-margin-top: 10px;
+        --event-spacing: 5px;
+        --event-padding: 10px;
+        --event-border-width: 5px;
+        --event-border-radius: 5px;
         --weather-icon-size: 30px;
         --weather-temperature-separator: ' / ';
     }
@@ -11,83 +20,83 @@ export default css`
         background-color: transparent !important;
     }
 
-    div.container {
+    .container {
         container-name: weekplanner;
         container-type: inline-size;
         display: flex;
         flex-wrap: wrap;
-        gap: 15px;
+        gap: var(--days-spacing);
     }
 
-    div.container div.day {
+    .container .day {
         position: relative;
-        width: calc(100% / 7 - 15px);
-        margin: 0 0 20px 0;
+        width: calc((100% - 6 * var(--days-spacing)) / 7);
+        margin: 0 0 var(--days-spacing) 0;
     }
 
-    div.container div.day div.date {
+    .container .day .date {
         position: relative;
         z-index: 2;
     }
     
-    div.container div.day div.date span.number {
-        font-size: 350%;
-        line-height: 1.2em;
+    .container .day .date .number {
+        font-size: var(--day-date-number-font-size);
+        line-height: var(--day-date-number-line-height);
     }
 
-    div.container div.day div.date span.text {
-        font-size: 125%;
+    .container .day .date .text {
+        font-size: var(--day-date-text-font-size);
     }
 
-    div.container div.day div.weather {
+    .container .day .weather {
         position: absolute;
         top: 0;
         right: 0;
         z-index: 1;
     }
     
-    div.container div.day div.weather div.icon {
+    .container .day .weather .icon {
         display: inline-block;
         vertical-align: middle;
     }
 
-    div.container div.day div.weather div.icon img {
+    .container .day .weather .icon img {
         max-width: var(--weather-icon-size);
         max-height: var(--weather-icon-size);
     }
 
-    div.container div.day div.weather div.temperature {
+    .container .day .weather div.temperature {
         display: inline-block;
         margin: 0 5px 0 0;
         vertical-align: middle;
     }
     
-    div.container div.day div.weather div.temperature:has(span.high) span.low:before {
+    .container .day .weather .temperature:has(.high) .low:before {
         content: var(--weather-temperature-separator);
     }
 
-    div.container div.day div.events {
-        margin-top: 10px;
+    .container .day .events {
+        margin-top: var(--events-margin-top);
     }
     
-    div.container div.day div.events div.none,
-    div.container div.day div.events div.event {
-        margin: 0 0 5px 0;
-        padding: 10px;
+    .container .day .events .none,
+    .container .day .events .event {
+        margin-bottom: var(--event-spacing);
+        padding: var(--event-padding);
         background-color: var(--event-background-color);
-        border-radius: 0 5px 5px 0;
+        border-radius: 0 var(--event-border-radius) var(--event-border-radius) 0;
     }
 
-    div.container div.day div.events div.none {
-        border-radius: 5px;
+    .container .day .events .none {
+        border-radius: var(--event-border-radius);
     }
 
-    div.container div.day div.events div.event {
-        border-left: 5px solid var(--border-color, var(--divider-color, #ffffff));
+    .container .day .events .event {
+        border-left: var(--event-border-width) solid var(--border-color, var(--divider-color, #ffffff));
         cursor: pointer;
     }
 
-    div.container div.day div.events div.event div.time {
+    .container .day .events .event .time {
         color: var(--secondary-text-color, #aaaaaa);
         margin: 0 0 3px 0;
     }
@@ -112,25 +121,25 @@ export default css`
         animation: loader 1.2s linear infinite;
     }
 
-    ha-dialog div.calendar,
-    ha-dialog div.datetime,
-    ha-dialog div.location {
+    ha-dialog .calendar,
+    ha-dialog .datetime,
+    ha-dialog .location {
         display: flex;
         align-items: center;
         margin-bottom: 8px;
     }
 
-    ha-dialog div.calendar ha-icon,
-    ha-dialog div.datetime ha-icon,
-    ha-dialog div.location ha-icon {
+    ha-dialog .calendar ha-icon,
+    ha-dialog .datetime ha-icon,
+    ha-dialog .location ha-icon {
         margin-right: 8px;
     }
 
-    ha-dialog div.location div.info a {
+    ha-dialog .location .info a {
         color: var(--primary-text-color);
     }
 
-    ha-dialog div.description {
+    ha-dialog .description {
         border-top: 1px solid var(--primary-text-color);
         margin-top: 16px;
         padding-top: 16px;
@@ -146,19 +155,19 @@ export default css`
     }
     
     @container weekplanner (width <= 1280px) {
-        div.container div.day {
-            width: calc(100% / 5 - 15px);
+        .container .day {
+            width: calc((100% - 4 * var(--days-spacing)) / 5);
         }
     }
 
     @container weekplanner (width <= 1024px) {
-        div.container div.day {
-            width: calc(100% / 3 - 15px);
+        .container .day {
+            width: calc((100% - 2 * var(--days-spacing)) / 3);
         }
     }
 
     @container weekplanner (width <= 640px) {
-        div.container div.day {
+        .container .day {
             width: 100%;
         }
     }
