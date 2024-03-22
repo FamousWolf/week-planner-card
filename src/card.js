@@ -1,5 +1,6 @@
 import { html, LitElement } from 'lit';
-import moment from 'moment';
+import { unsafeHTML } from 'lit-html/directives/unsafe-html.js'
+import moment from 'moment/min/moment-with-locales';
 import styles from './card.styles';
 import clear_night from 'data-url:./icons/clear_night.png';
 import cloudy from 'data-url:./icons/cloudy.png';
@@ -62,6 +63,9 @@ export class WeekPlannerCard extends LitElement {
     _eventBackground;
     _language;
     _weather;
+    _dateFormat;
+    _timeFormat;
+    _locationLink;
 
     /**
      * Get properties
@@ -73,7 +77,8 @@ export class WeekPlannerCard extends LitElement {
             _days: { type: Array },
             _config: { type: Object },
             _isLoading: { type: Boolean },
-            _error: { type: String }
+            _error: { type: String },
+            _currentEventDetails: { type: Object }
         }
     }
 
@@ -95,6 +100,12 @@ export class WeekPlannerCard extends LitElement {
         this._updateInterval = config.updateInterval ?? 60;
         this._noCardBackground = config.noCardBackground ?? false;
         this._eventBackground = config.eventBackground ?? 'var(--card-background-color, inherit)';
+        this._dateFormat = config.dateFormat ?? 'dddd DD MMMM YYYY';
+        this._timeFormat = config.timeFormat ?? 'HH:mm';
+        this._locationLink = config.locationLink ?? 'https://www.google.com/maps/search/?api=1&query=';
+        if (config.locale) {
+            moment.locale(config.locale);
+        }
         this._language = Object.assign(
             {},
             {
@@ -102,46 +113,16 @@ export class WeekPlannerCard extends LitElement {
                 noEvents: 'No events',
                 today: 'Today',
                 tomorrow: 'Tomorrow',
-                sunday: 'Sunday',
-                monday: 'Monday',
-                tuesday: 'Tuesday',
-                wednesday: 'Wednesday',
-                thursday: 'Thursday',
-                friday: 'Friday',
-                saturday: 'Saturday'
+                sunday: moment().day(0).format('dddd'),
+                monday: moment().day(1).format('dddd'),
+                tuesday: moment().day(2).format('dddd'),
+                wednesday: moment().day(3).format('dddd'),
+                thursday: moment().day(4).format('dddd'),
+                friday: moment().day(5).format('dddd'),
+                saturday: moment().day(6).format('dddd')
             },
             config.texts ?? {}
         );
-    }
-
-    /**
-     * Render
-     *
-     * @return {Object}
-     */
-    render() {
-        if (!this._initialized) {
-            this._initialized = true;
-            this._waitForHassAndConfig();
-        }
-
-        return html`
-            <ha-card class="${this._noCardBackground ? 'nobackground' : ''}" style="--event-background-color: ${this._eventBackground}">
-                <div class="card-content">
-                    ${this._error ?
-                        html`<ha-alert alert-type="error">${this._error}</ha-alert>` :
-                        ''
-                    }
-                    <div class="container">
-                        ${this._renderDays()}
-                    </div>
-                    ${this._isLoading ?
-                        html`<div class="loader"></div>` :
-                        ''
-                    }
-                </div>
-            </ha-card>
-        `;
     }
 
     _getWeatherConfig(weatherConfiguration) {
@@ -166,6 +147,37 @@ export class WeekPlannerCard extends LitElement {
         }
 
         return configuration;
+    }
+
+    /**
+     * Render
+     *
+     * @return {Object}
+     */
+    render() {
+        if (!this._initialized) {
+            this._initialized = true;
+            this._waitForHassAndConfig();
+        }
+
+        return html`
+            <ha-card class="${this._noCardBackground ? 'nobackground' : ''}" style="--event-background-color: ${this._eventBackground}">
+                <div class="card-content">
+                    ${this._error ?
+                        html`<ha-alert alert-type="error">${this._error}</ha-alert>` :
+                        ''
+                    }
+                    <div class="container">
+                        ${this._renderDays()}
+                    </div>
+                    ${this._renderEventDetailsDialog()}
+                    ${this._isLoading ?
+                        html`<div class="loader"></div>` :
+                        ''
+                    }
+                </div>
+            </ha-card>
+        `;
     }
 
     _renderDays() {
@@ -225,13 +237,13 @@ export class WeekPlannerCard extends LitElement {
                                 html`
                                     ${day.events.map((event) => {
                                         return html`
-                                            <div class="event" style="--border-color: ${event.color}">
+                                            <div class="event" style="--border-color: ${event.color}" @click="${() => { this._handleEventClick(event) }}">
                                                 <div class="time">
                                                     ${event.fullDay ?
                                                         html`${this._language.fullDay}` :
-                                                        html `
-                                                            ${event.start.format('HH:mm')}
-                                                            ${event.end ? ' - ' + event.end.format('HH:mm') : ''}
+                                                        html`
+                                                            ${event.start.format(this._timeFormat)}
+                                                            ${event.end ? ' - ' + event.end.format(this._timeFormat) : ''}
                                                         `
                                                     }
                                                 </div>
@@ -247,6 +259,96 @@ export class WeekPlannerCard extends LitElement {
                     </div>
                 `
             })}
+        `;
+    }
+
+    _renderEventDetailsDialog() {
+        if (!this._currentEventDetails) {
+            return html``;
+        }
+
+        return html`
+            <ha-dialog
+                open
+                @closed="${this._closeDialog}"
+                .heading="${this._renderEventDetailsDialogHeading()}"
+            >
+                <div class="content">
+                    <div class="calendar">
+                        <ha-icon icon="mdi:calendar-account"></ha-icon>
+                        <div class="info">
+                            ${this.hass.formatEntityAttributeValue(this.hass.states[this._currentEventDetails.calendar], 'friendly_name')}
+                        </div>
+                    </div>
+                    <div class="datetime">
+                        <ha-icon icon="mdi:calendar-clock"></ha-icon>
+                        <div class="info">
+                            ${this._renderEventDetailsDate()}
+                        </div>
+                    </div>
+                    ${this._currentEventDetails.location ?
+                        html`
+                            <div class="location">
+                                <ha-icon icon="mdi:map-marker"></ha-icon>
+                                <div class="info">
+                                    <a href="${this._locationLink}${encodeURI(this._currentEventDetails.location)}" target="_blank">${this._currentEventDetails.location}</a>
+                                </div>
+                            </div>
+                        ` :
+                        ''
+                    }
+                    ${this._currentEventDetails.description ?
+                        html`
+                            <div class="description">
+                                ${unsafeHTML(this._currentEventDetails.description)}
+                            </div>
+                        ` :
+                        ''
+                    }
+                </div>
+            </ha-dialog>
+        `;
+    }
+
+    _renderEventDetailsDialogHeading() {
+        return html`
+            <div class="header_title">
+                <span>${this._currentEventDetails.summary}</span>
+                <ha-icon-button
+                    .label="${this.hass?.localize('ui.dialogs.generic.close') ?? 'Close'}"
+                    dialogAction="close"
+                    class="header_button"
+                ><ha-icon icon="mdi:close"></ha-icon></ha-icon-button>
+            </div>
+        `;
+    }
+
+    _renderEventDetailsDate() {
+        const start = this._currentEventDetails.originalStart;
+        const end = this._currentEventDetails.originalEnd ?? null;
+
+        if (end === null) {
+            return html`
+                ${start.format(this._dateFormat + ' ' + this._timeFormat)}
+            `;
+        } else if (this._isFullDay(start, end, true)) {
+            if (Math.abs(moment.duration(start.diff(end)).asHours()) <= 24) {
+                return html`
+                    ${start.format(this._dateFormat)}
+                `;
+            } else {
+                return html`
+                    ${start.format(this._dateFormat)} - ${end.format(this._dateFormat)}
+                `;
+            }
+        } else if (this._isSameDay(start, end)) {
+            return html`
+                ${start.format(this._dateFormat + ' ' + this._timeFormat) + ' - ' + end.format(this._timeFormat)}
+            `;
+        }
+
+        return html`
+            ${start.format(this._dateFormat + ' ' + this._timeFormat)} - ${end.format(this._dateFormat + ' ' + this._timeFormat)}
         `;
     }
 
@@ -335,10 +437,15 @@ export class WeekPlannerCard extends LitElement {
 
         this._events[dateKey].push({
             summary: event.summary ?? null,
+            description: event.description ?? null,
+            location: event.location ?? null,
             start: startDate,
+            originalStart: this._convertApiDate(event.start),
             end: endDate,
+            originalEnd: this._convertApiDate(event.end),
             fullDay: fullDay,
-            color: calendar.color ?? 'inherit'
+            color: calendar.color ?? 'inherit',
+            calendar: calendar.entity
         });
     }
 
@@ -415,6 +522,14 @@ export class WeekPlannerCard extends LitElement {
             return weekDays[weekDay];
         }
     }
+    
+    _handleEventClick(event) {
+        this._currentEventDetails = event;
+    }
+
+    _closeDialog() {
+        this._currentEventDetails = null;
+    }
 
     _convertApiDate(apiDate) {
         let date = null;
@@ -430,7 +545,7 @@ export class WeekPlannerCard extends LitElement {
         return date;
     }
 
-    _isFullDay(startDate, endDate) {
+    _isFullDay(startDate, endDate, multiDay) {
         if (
             startDate === null
             || endDate === null
@@ -444,7 +559,7 @@ export class WeekPlannerCard extends LitElement {
             return false;
         }
 
-        return startDate.diff(endDate, 'days', true) === -1;
+        return multiDay || Math.abs(startDate.diff(endDate, 'days', true)) === 1;
     }
 
     _isSameDay(date1, date2) {
