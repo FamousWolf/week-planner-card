@@ -508,7 +508,18 @@ export class WeekPlannerCard extends LitElement {
         } else if (this._isSameDay(date, tomorrow)) {
             return this._language.tomorrow;
         } else {
-            return date.format('dddd');
+            const weekDays = [
+                this._language.sunday,
+                this._language.monday,
+                this._language.tuesday,
+                this._language.wednesday,
+                this._language.thursday,
+                this._language.friday,
+                this._language.saturday,
+                this._language.sunday,
+            ];
+            const weekDay = date.day();
+            return weekDays[weekDay];
         }
     }
     
