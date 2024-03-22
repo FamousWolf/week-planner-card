@@ -52,16 +52,20 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 
 ### Main Options
 
-| Name               | Type        | Default                                 | Supported options           | Description                                    |
-|--------------------|-------------|-----------------------------------------|-----------------------------|------------------------------------------------|
-| `type`             | string      | **Required**                            | `custom:week-planner-card`  | Type of the card                               |
-| `days`             | number      | 7                                       | Any positive integer number | The number of days to show                     |
-| `noCardBackground` | boolean     | false                                   | `false` \| `true`           | Do not show default card background and border |
-| `eventBackground`  | string      | `var(--card-background-color, inherit)` | Any CSS color               | Background color of the events                 |
-| `updateInterval`   | number      | 60                                      | Any positive integer number | Seconds between checks for new events          |
-| `calendars`        | object list | **Required**                            | See [Calendars](#calendars) | Calendars shown in this card                   |
-| `texts`            | object list | {}                                      | See [Texts](#texts)         | Texts used in the card                         |
-| `weather`          | object      | optional                                | See [Weather](#weather)     | Configuration for optional weather forecast    |
+| Name               | Type        | Default                                            | Supported options                                                      | Description                                    |
+|--------------------|-------------|----------------------------------------------------|------------------------------------------------------------------------|------------------------------------------------|
+| `type`             | string      | **Required**                                       | `custom:week-planner-card`                                             | Type of the card                               |
+| `days`             | number      | 7                                                  | Any positive integer number                                            | The number of days to show                     |
+| `noCardBackground` | boolean     | false                                              | `false` \| `true`                                                      | Do not show default card background and border |
+| `eventBackground`  | string      | `var(--card-background-color, inherit)`            | Any CSS color                                                          | Background color of the events                 |
+| `updateInterval`   | number      | 60                                                 | Any positive integer number                                            | Seconds between checks for new events          |
+| `calendars`        | object list | **Required**                                       | See [Calendars](#calendars)                                            | Calendars shown in this card                   |
+| `texts`            | object list | {}                                                 | See [Texts](#texts)                                                    | Texts used in the card                         |
+| `weather`          | object      | optional                                           | See [Weather](#weather)                                                | Configuration for optional weather forecast    |
+| `dateFormat`       | string      | `dddd DD MMMM YYYY`                                | See [Moment.js format](https://momentjs.com/docs/#/displaying/format/) | Format of the date in event details            |
+| `timeFormat`       | string      | `HH:mm`                                            | See [Moment.js format](https://momentjs.com/docs/#/displaying/format/) | Format of the time                             |
+| `locale`           | string      | `en`                                               | Any locale string supported by Moment.js                               | Locale used for day and month texts            |
+| `locationLink`     | string      | `https://www.google.com/maps/search/?api=1&query=` | Any URL                                                                | Link used for event location                   |
 
 ### Calendars
 
@@ -72,19 +76,19 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 
 ### Texts
 
-| Name        | Type   | Default      | Supported options | Description                                         |
-|-------------|--------|--------------|-------------------|-----------------------------------------------------|
-| `fullDay`   | string | `Entire day` | Any text          | Text shown for full day events instead of time      |
-| `noEvents`  | string | `No events`  | Any text          | Text shown when there are no events for a day       |
-| `today`     | string | `Today`      | Any text          | Text shown for the today instead of the week day    |
-| `tomorrow`  | string | `Tomorrow`   | Any text          | Text shown for the tomorrow instead of the week day |
-| `sunday`    | string | `Sunday`     | Any text          | Text shown for Sundays                              |
-| `monday`    | string | `Monday`     | Any text          | Text shown for Mondays                              |
-| `tuesday`   | string | `Tuesday`    | Any text          | Text shown for Tuesdays                             |
-| `wednesday` | string | `Wednesday`  | Any text          | Text shown for Wednesdays                           |
-| `thursday`  | string | `Thursday`   | Any text          | Text shown for Thursdays                            |
-| `friday`    | string | `Friday`     | Any text          | Text shown for Fridays                              |
-| `saturday`  | string | `Saturday`   | Any text          | Text shown for Saturdays                            |
+| Name        | Type   | Default                           | Supported options | Description                                         |
+|-------------|--------|-----------------------------------|-------------------|-----------------------------------------------------|
+| `fullDay`   | string | `Entire day`                      | Any text          | Text shown for full day events instead of time      |
+| `noEvents`  | string | `No events`                       | Any text          | Text shown when there are no events for a day       |
+| `today`     | string | `Today`                           | Any text          | Text shown for the today instead of the week day    |
+| `tomorrow`  | string | `Tomorrow`                        | Any text          | Text shown for the tomorrow instead of the week day |
+| `sunday`    | string | Name of Sunday based on locale    | Any text          | Text used to override Sundays                       |
+| `monday`    | string | Name of Monday based on locale    | Any text          | Text used to override Mondays                       |
+| `tuesday`   | string | Name of Tuesday based on locale   | Any text          | Text used to override Tuesdays                      |
+| `wednesday` | string | Name of Wednesday based on locale | Any text          | Text used to override Wednesdays                    |
+| `thursday`  | string | Name of Thursday based on locale  | Any text          | Text used to override Thursdays                     |
+| `friday`    | string | Name of Friday based on locale    | Any text          | Text used to override Fridays                       |
+| `saturday`  | string | Name of Saturday based on locale  | Any text          | Text used to override Saturdays                     |
 
 ### Weather
 

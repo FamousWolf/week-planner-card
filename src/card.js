@@ -103,19 +103,26 @@ export class WeekPlannerCard extends LitElement {
         this._dateFormat = config.dateFormat ?? 'dddd DD MMMM YYYY';
         this._timeFormat = config.timeFormat ?? 'HH:mm';
         this._locationLink = config.locationLink ?? 'https://www.google.com/maps/search/?api=1&query=';
+        if (config.locale) {
+            moment.locale(config.locale);
+        }
         this._language = Object.assign(
             {},
             {
                 fullDay: 'Entire day',
                 noEvents: 'No events',
                 today: 'Today',
-                tomorrow: 'Tomorrow'
+                tomorrow: 'Tomorrow',
+                sunday: moment().day(0).format('dddd'),
+                monday: moment().day(1).format('dddd'),
+                tuesday: moment().day(2).format('dddd'),
+                wednesday: moment().day(3).format('dddd'),
+                thursday: moment().day(4).format('dddd'),
+                friday: moment().day(5).format('dddd'),
+                saturday: moment().day(6).format('dddd')
             },
             config.texts ?? {}
         );
-        if (config.locale) {
-            moment.locale(config.locale);
-        }
     }
 
     _getWeatherConfig(weatherConfiguration) {
@@ -501,7 +508,18 @@ export class WeekPlannerCard extends LitElement {
         } else if (this._isSameDay(date, tomorrow)) {
             return this._language.tomorrow;
         } else {
-            return date.format('dddd');
+            const weekDays = [
+                this._language.sunday,
+                this._language.monday,
+                this._language.tuesday,
+                this._language.wednesday,
+                this._language.thursday,
+                this._language.friday,
+                this._language.saturday,
+                this._language.sunday,
+            ];
+            const weekDay = date.day();
+            return weekDays[weekDay];
         }
     }
     
