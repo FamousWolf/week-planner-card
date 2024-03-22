@@ -20,7 +20,7 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
   - [Calendars](#calendars)
   - [Texts](#texts)
   - [Weather](#weather)
-- [Example](#example)
+- [Examples](#examples)
 
 ## Installation
 
@@ -52,20 +52,20 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 
 ### Main Options
 
-| Name               | Type        | Default                                            | Supported options                                                                                  | Description                                    |
-|--------------------|-------------|----------------------------------------------------|----------------------------------------------------------------------------------------------------|------------------------------------------------|
-| `type`             | string      | **Required**                                       | `custom:week-planner-card`                                                                         | Type of the card                               |
-| `days`             | number      | 7                                                  | Any positive integer number                                                                        | The number of days to show                     |
-| `noCardBackground` | boolean     | false                                              | `false` \| `true`                                                                                  | Do not show default card background and border |
-| `eventBackground`  | string      | `var(--card-background-color, inherit)`            | Any CSS color                                                                                      | Background color of the events                 |
-| `updateInterval`   | number      | 60                                                 | Any positive integer number                                                                        | Seconds between checks for new events          |
-| `calendars`        | object list | **Required**                                       | See [Calendars](#calendars)                                                                        | Calendars shown in this card                   |
-| `texts`            | object list | {}                                                 | See [Texts](#texts)                                                                                | Texts used in the card                         |
-| `weather`          | object      | optional                                           | See [Weather](#weather)                                                                            | Configuration for optional weather forecast    |
-| `dateFormat`       | string      | `cccc d LLLL yyyy`                                 | See [Luxon format](https://github.com/moment/luxon/blob/master/docs/formatting.md#table-of-tokens) | Format of the date in event details            |
-| `timeFormat`       | string      | `HH:mm`                                            | See [Luxon format](https://github.com/moment/luxon/blob/master/docs/formatting.md#table-of-tokens) | Format of the time                             |
-| `locale`           | string      | `en`                                               | Any locale string supported by Luxon                                                               | Locale used for day and month texts            |
-| `locationLink`     | string      | `https://www.google.com/maps/search/?api=1&query=` | Any URL                                                                                            | Link used for event location                   |
+| Name               | Type        | Default                                            | Supported options                                               | Description                                    |
+|--------------------|-------------|----------------------------------------------------|-----------------------------------------------------------------|------------------------------------------------|
+| `type`             | string      | **Required**                                       | `custom:week-planner-card`                                      | Type of the card                               |
+| `days`             | number      | 7                                                  | Any positive integer number                                     | The number of days to show                     |
+| `noCardBackground` | boolean     | false                                              | `false` \| `true`                                               | Do not show default card background and border |
+| `eventBackground`  | string      | `var(--card-background-color, inherit)`            | Any CSS color                                                   | Background color of the events                 |
+| `updateInterval`   | number      | 60                                                 | Any positive integer number                                     | Seconds between checks for new events          |
+| `calendars`        | object list | **Required**                                       | See [Calendars](#calendars)                                     | Calendars shown in this card                   |
+| `texts`            | object list | {}                                                 | See [Texts](#texts)                                             | Texts used in the card                         |
+| `weather`          | object      | optional                                           | See [Weather](#weather)                                         | Configuration for optional weather forecast    |
+| `dateFormat`       | string      | `cccc d LLLL yyyy`                                 | See [Luxon format](https://moment.github.io/luxon/#/formatting) | Format of the date in event details            |
+| `timeFormat`       | string      | `HH:mm`                                            | See [Luxon format](https://moment.github.io/luxon/#/formatting) | Format of the time                             |
+| `locale`           | string      | `en`                                               | Any locale string supported by Luxon                            | Locale used for day and month texts            |
+| `locationLink`     | string      | `https://www.google.com/maps/search/?api=1&query=` | Any URL                                                         | Link used for event location                   |
 
 ### Calendars
 
@@ -99,7 +99,17 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 | `showTemperature`    | boolean | false        | `false` \| `true`            | Show temperature     |
 | `showLowTemperature` | boolean | false        | `false` \| `true`            | Show low temperature |
 
-## Example
+## Examples
+
+### Minimal
+
+```yaml
+type: custom:week-planner-card
+calendars:
+  - entity: calendar.my_calendar_1
+```
+
+### Extended
 
 ```yaml
 type: custom:week-planner-card
@@ -115,16 +125,11 @@ weather:
 days: 14
 noCardBackground: true
 eventBackground: rgba(0, 0, 0, .75)
+locationLink: https://www.openstreetmap.org/search?query=
+locale: nl
 texts:
   noEvents: Geen activiteiten
   fullDay: Hele dag
   today: Vandaag
-  sunday: Zondag
-  monday: Maandag
-  tuesday: Dinsdag
-  wednesday: Woensdag
-  thursday: Donderdag
-  friday: Vrijdag
-  saturday: Zaterdag
   tomorrow: Morgen
 ```
