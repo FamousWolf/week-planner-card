@@ -18,6 +18,7 @@ export default css`
     ha-card.nobackground {
         border: none !important;
         background-color: transparent !important;
+        box-shadow: none !important;
     }
 
     .container {
