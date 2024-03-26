@@ -354,7 +354,7 @@ export class WeekPlannerCard extends LitElement {
         `;
     }
 
-    _getWeatherIcon(weatherState, dayNumber) {
+    _getWeatherIcon(weatherState) {
         const condition = weatherState?.condition;
         if (!condition) {
             return null;
@@ -465,11 +465,20 @@ export class WeekPlannerCard extends LitElement {
         let days = [];
 
         const weatherState = this._weather ? this.hass.states[this._weather.entity] : null;
+        let weatherForecast = {};
+        weatherState?.attributes?.forecast?.forEach((forecast) => {
+            const dateKey = DateTime.fromISO(forecast.datetime).toISODate();
+            weatherForecast[dateKey] = {
+                icon: this._getWeatherIcon(forecast),
+                condition: this.hass.formatEntityState(weatherState, forecast.condition),
+                temperature: this.hass.formatEntityAttributeValue(weatherState, 'temperature', forecast.temperature),
+                templow: this.hass.formatEntityAttributeValue(weatherState, 'templow', forecast.templow)
+            };
+        });
 
         let startDate = DateTime.now().startOf('day');
         let endDate = DateTime.now().startOf('day').plus({ days: this._numberOfDays });
 
-        let dayNumber = 0;
         while (startDate < endDate) {
             let events = [];
 
@@ -483,15 +492,9 @@ export class WeekPlannerCard extends LitElement {
             days.push({
                 date: startDate,
                 events: events,
-                weather: weatherState?.attributes?.forecast[dayNumber] ? {
-                    icon: this._getWeatherIcon(weatherState.attributes.forecast[dayNumber], dayNumber),
-                    condition: this.hass.formatEntityState(weatherState, weatherState.attributes.forecast[dayNumber].condition),
-                    temperature: this.hass.formatEntityAttributeValue(weatherState, 'temperature', weatherState.attributes.forecast[dayNumber].temperature),
-                    templow: this.hass.formatEntityAttributeValue(weatherState, 'templow', weatherState.attributes.forecast[dayNumber].templow)
-                } : null,
+                weather: weatherForecast[dateKey] ?? null,
             });
             startDate = startDate.plus({ days: 1 });
-            dayNumber++;
         }
 
         const jsonDays = JSON.stringify(days)
