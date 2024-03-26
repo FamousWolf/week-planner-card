@@ -61,6 +61,7 @@ export class WeekPlannerCard extends LitElement {
     _updateInterval;
     _noCardBackground;
     _eventBackground;
+    _compact;
     _language;
     _weather;
     _dateFormat;
@@ -100,6 +101,7 @@ export class WeekPlannerCard extends LitElement {
         this._updateInterval = config.updateInterval ?? 60;
         this._noCardBackground = config.noCardBackground ?? false;
         this._eventBackground = config.eventBackground ?? 'var(--card-background-color, inherit)';
+        this._compact = config.compact ?? false;
         this._dateFormat = config.dateFormat ?? 'cccc d LLLL yyyy';
         this._timeFormat = config.timeFormat ?? 'HH:mm';
         this._locationLink = config.locationLink ?? 'https://www.google.com/maps/search/?api=1&query=';
@@ -160,8 +162,16 @@ export class WeekPlannerCard extends LitElement {
             this._waitForHassAndConfig();
         }
 
+        let cardClasses = [];
+        if (this._noCardBackground) {
+            cardClasses.push('nobackground');
+        }
+        if (this._compact) {
+            cardClasses.push('compact');
+        }
+
         return html`
-            <ha-card class="${this._noCardBackground ? 'nobackground' : ''}" style="--event-background-color: ${this._eventBackground}">
+            <ha-card class="${cardClasses.join(' ')}" style="--event-background-color: ${this._eventBackground}">
                 <div class="card-content">
                     ${this._error ?
                         html`<ha-alert alert-type="error">${this._error}</ha-alert>` :

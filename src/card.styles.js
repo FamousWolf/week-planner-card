@@ -11,6 +11,8 @@ export default css`
         --event-padding: 10px;
         --event-border-width: 5px;
         --event-border-radius: 5px;
+        --event-font-size: 1em;
+        --event-line-height: 1.2em;
         --weather-icon-size: 30px;
         --weather-temperature-separator: ' / ';
     }
@@ -18,6 +20,19 @@ export default css`
     ha-card.nobackground {
         border: none !important;
         background-color: transparent !important;
+    }
+    
+    ha-card.compact {
+        --days-spacing: 5px;
+        --day-date-number-font-size: 1.5em;
+        --day-date-text-font-size: 1em;
+        --events-margin-top: 5px;
+        --event-spacing: 2px;
+        --event-padding: 2px 5px;
+        --event-border-width: 2px;
+        --event-font-size: .9em;
+        --event-line-height: 1.1em;
+        --weather-icon-size: 20px;
     }
 
     .container {
@@ -85,6 +100,8 @@ export default css`
         padding: var(--event-padding);
         background-color: var(--event-background-color);
         border-radius: 0 var(--event-border-radius) var(--event-border-radius) 0;
+        font-size: var(--event-font-size);
+        line-height: var(--event-line-height);
     }
 
     .container .day .events .none {
@@ -158,17 +175,29 @@ export default css`
         .container .day {
             width: calc((100% - 4 * var(--days-spacing)) / 5);
         }
+    
+        ha-card.compact .container .day {
+            width: calc((100% - 6 * var(--days-spacing)) / 7);
+        }
     }
 
     @container weekplanner (width <= 1024px) {
         .container .day {
             width: calc((100% - 2 * var(--days-spacing)) / 3);
         }
+
+        ha-card.compact .container .day {
+            width: calc((100% - 3 * var(--days-spacing)) / 4);
+        }
     }
 
     @container weekplanner (width <= 640px) {
         .container .day {
             width: 100%;
+        }
+    
+        ha-card.compact .container .day {
+            width: calc((100% - var(--days-spacing)) / 2);
         }
     }
 `;
