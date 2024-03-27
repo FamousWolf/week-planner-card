@@ -67,6 +67,7 @@ export class WeekPlannerCard extends LitElement {
     _timeFormat;
     _locationLink;
     _startDate;
+    _hideWeekend;
 
     /**
      * Get properties
@@ -98,6 +99,7 @@ export class WeekPlannerCard extends LitElement {
         this._calendars = config.calendars;
         this._weather = this._getWeatherConfig(config.weather);
         this._numberOfDays = config.days ?? 7;
+        this._hideWeekend = config.hideWeekend ?? false;
         this._startDate = this._getStartDate(config.startingDay ?? 'today');
         this._updateInterval = config.updateInterval ?? 60;
         this._noCardBackground = config.noCardBackground ?? false;
@@ -435,6 +437,10 @@ export class WeekPlannerCard extends LitElement {
     }
 
     _addEvent(event, startDate, endDate, fullDay, calendar) {
+        if (this._hideWeekend && startDate.weekday >= 6) {
+            return;
+        }
+
         const dateKey = startDate.toISODate();
         if (!this._events.hasOwnProperty(dateKey)) {
             this._events[dateKey] = [];
@@ -483,20 +489,23 @@ export class WeekPlannerCard extends LitElement {
         let endDate = this._startDate.plus({ days: this._numberOfDays });
 
         while (startDate < endDate) {
-            let events = [];
+            if (!this._hideWeekend || startDate.weekday < 6) {
+                let events = [];
 
-            const dateKey = startDate.toISODate();
-            if (this._events.hasOwnProperty(dateKey)) {
-                events = this._events[dateKey].sort((event1, event2) => {
-                    return event1.start > event2.start ? 1 : (event1.start < event2.start) ? -1 : 0;
+                const dateKey = startDate.toISODate();
+                if (this._events.hasOwnProperty(dateKey)) {
+                    events = this._events[dateKey].sort((event1, event2) => {
+                        return event1.start > event2.start ? 1 : (event1.start < event2.start) ? -1 : 0;
+                    });
+                }
+
+                days.push({
+                    date: startDate,
+                    events: events,
+                    weather: weatherForecast[dateKey] ?? null,
                 });
             }
 
-            days.push({
-                date: startDate,
-                events: events,
-                weather: weatherForecast[dateKey] ?? null,
-            });
             startDate = startDate.plus({ days: 1 });
         }
 
@@ -572,6 +581,10 @@ export class WeekPlannerCard extends LitElement {
             case 'saturday':
                 startDate = this._getWeekDayDate(startDate, 6);
                 break;
+        }
+
+        if (this._hideWeekend && startDate.weekday >= 6) {
+            startDate = this._getStartDate('monday');
         }
 
         return startDate.startOf('day');
