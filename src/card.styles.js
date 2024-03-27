@@ -15,13 +15,14 @@ export default css`
         --event-line-height: 1.2em;
         --weather-icon-size: 30px;
         --weather-temperature-separator: ' / ';
+        --weather-temperature-font-size: 1em;
     }
-    
+
     ha-card.nobackground {
         border: none !important;
         background-color: transparent !important;
     }
-    
+
     ha-card.compact {
         --days-spacing: 5px;
         --day-date-number-font-size: 1.5em;
@@ -33,6 +34,7 @@ export default css`
         --event-font-size: .9em;
         --event-line-height: 1.1em;
         --weather-icon-size: 20px;
+        --weather-temperature-font-size: 0.8em;
     }
 
     .container {
@@ -53,7 +55,7 @@ export default css`
         position: relative;
         z-index: 2;
     }
-    
+
     .container .day .date .number {
         font-size: var(--day-date-number-font-size);
         line-height: var(--day-date-number-line-height);
@@ -68,8 +70,9 @@ export default css`
         top: 0;
         right: 0;
         z-index: 1;
+        font-size: var(--weather-temperature-font-size);
     }
-    
+
     .container .day .weather .icon {
         display: inline-block;
         vertical-align: middle;
@@ -85,7 +88,7 @@ export default css`
         margin: 0 5px 0 0;
         vertical-align: middle;
     }
-    
+
     .container .day .weather .temperature:has(.high) .low:before {
         content: var(--weather-temperature-separator);
     }
@@ -93,7 +96,7 @@ export default css`
     .container .day .events {
         margin-top: var(--events-margin-top);
     }
-    
+
     .container .day .events .none,
     .container .day .events .event {
         margin-bottom: var(--event-spacing);
@@ -125,7 +128,7 @@ export default css`
         width: 40px;
         height: 40px;
     }
-    
+
     .loader:after {
         content: " ";
         display: block;
@@ -170,12 +173,12 @@ export default css`
             transform: rotate(360deg);
         }
     }
-    
+
     @container weekplanner (width <= 1280px) {
         .container .day {
             width: calc((100% - 4 * var(--days-spacing)) / 5);
         }
-    
+
         ha-card.compact .container .day {
             width: calc((100% - 6 * var(--days-spacing)) / 7);
         }
@@ -195,7 +198,7 @@ export default css`
         .container .day {
             width: 100%;
         }
-    
+
         ha-card.compact .container .day {
             width: calc((100% - var(--days-spacing)) / 2);
         }
