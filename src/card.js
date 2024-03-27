@@ -66,6 +66,7 @@ export class WeekPlannerCard extends LitElement {
     _dateFormat;
     _timeFormat;
     _locationLink;
+    _startDate;
 
     /**
      * Get properties
@@ -97,6 +98,7 @@ export class WeekPlannerCard extends LitElement {
         this._calendars = config.calendars;
         this._weather = this._getWeatherConfig(config.weather);
         this._numberOfDays = config.days ?? 7;
+        this._startDate = this._getStartDate(config.startingDay ?? 'today');
         this._updateInterval = config.updateInterval ?? 60;
         this._noCardBackground = config.noCardBackground ?? false;
         this._eventBackground = config.eventBackground ?? 'var(--card-background-color, inherit)';
@@ -113,6 +115,7 @@ export class WeekPlannerCard extends LitElement {
                 noEvents: 'No events',
                 today: 'Today',
                 tomorrow: 'Tomorrow',
+                yesterday: 'Yesterday',
                 sunday: LuxonInfo.weekdays('long')[6],
                 monday: LuxonInfo.weekdays('long')[0],
                 tuesday: LuxonInfo.weekdays('long')[1],
@@ -385,8 +388,8 @@ export class WeekPlannerCard extends LitElement {
         this._error = '';
         this._events = {};
 
-        let startDate = DateTime.now().startOf('day');
-        let endDate = DateTime.now().startOf('day').plus({ days: this._numberOfDays });
+        let startDate = this._startDate;
+        let endDate = this._startDate.plus({ days: this._numberOfDays });
 
         this._calendars.forEach(calendar => {
             this._loading++;
@@ -476,8 +479,8 @@ export class WeekPlannerCard extends LitElement {
             };
         });
 
-        let startDate = DateTime.now().startOf('day');
-        let endDate = DateTime.now().startOf('day').plus({ days: this._numberOfDays });
+        let startDate = this._startDate;
+        let endDate = this._startDate.plus({ days: this._numberOfDays });
 
         while (startDate < endDate) {
             let events = [];
@@ -506,11 +509,14 @@ export class WeekPlannerCard extends LitElement {
 
     _getWeekDayText(date) {
         const today = DateTime.now().startOf('day');
-        const tomorrow = DateTime.now().startOf('day').plus({ days: 1 });
-        if (this._isSameDay(date, today)) {
+        const tomorrow = today.plus({ days: 1 });
+        const yesterday = today.minus({ days: 1 });
+        if (this._language.today && this._isSameDay(date, today)) {
             return this._language.today;
-        } else if (this._isSameDay(date, tomorrow)) {
+        } else if (this._language.tomorrow && this._isSameDay(date, tomorrow)) {
             return this._language.tomorrow;
+        } else if (this._language.yesterday && this._isSameDay(date, yesterday)) {
+            return this._language.yesterday;
         } else {
             const weekDays = [
                 this._language.sunday,
@@ -533,6 +539,54 @@ export class WeekPlannerCard extends LitElement {
 
     _closeDialog() {
         this._currentEventDetails = null;
+    }
+
+    _getStartDate(startingDay) {
+        let startDate = DateTime.now();
+
+        switch (startingDay) {
+            case 'yesterday':
+                startDate = startDate.minus({ days: 1 })
+                break;
+            case 'tomorrow':
+                startDate = startDate.plus({ days: 1 })
+                break;
+            case 'sunday':
+                startDate = this._getWeekDayDate(startDate, 7);
+                break;
+            case 'monday':
+                startDate = this._getWeekDayDate(startDate, 1);
+                break;
+            case 'tuesday':
+                startDate = this._getWeekDayDate(startDate, 2);
+                break;
+            case 'wednesday':
+                startDate = this._getWeekDayDate(startDate, 3);
+                break;
+            case 'thursday':
+                startDate = this._getWeekDayDate(startDate, 4);
+                break;
+            case 'friday':
+                startDate = this._getWeekDayDate(startDate, 5);
+                break;
+            case 'saturday':
+                startDate = this._getWeekDayDate(startDate, 6);
+                break;
+        }
+
+        return startDate.startOf('day');
+    }
+
+    _getWeekDayDate(currentDate, weekday) {
+        const currentWeekDay = currentDate.weekday;
+        if (currentWeekDay > weekday) {
+            return currentDate.minus({ days: currentWeekDay - weekday })
+        }
+        if (currentWeekDay < weekday) {
+            return currentDate.minus({ days: 7 - weekday + currentWeekDay })
+        }
+
+        return currentDate;
     }
 
     _convertApiDate(apiDate) {

@@ -52,20 +52,21 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 
 ### Main Options
 
-| Name               | Type        | Default                                            | Supported options                                               | Description                                    |
-|--------------------|-------------|----------------------------------------------------|-----------------------------------------------------------------|------------------------------------------------|
-| `type`             | string      | **Required**                                       | `custom:week-planner-card`                                      | Type of the card                               |
-| `days`             | number      | 7                                                  | Any positive integer number                                     | The number of days to show                     |
-| `noCardBackground` | boolean     | false                                              | `false` \| `true`                                               | Do not show default card background and border |
-| `eventBackground`  | string      | `var(--card-background-color, inherit)`            | Any CSS color                                                   | Background color of the events                 |
-| `updateInterval`   | number      | 60                                                 | Any positive integer number                                     | Seconds between checks for new events          |
-| `calendars`        | object list | **Required**                                       | See [Calendars](#calendars)                                     | Calendars shown in this card                   |
-| `texts`            | object list | {}                                                 | See [Texts](#texts)                                             | Texts used in the card                         |
-| `weather`          | object      | optional                                           | See [Weather](#weather)                                         | Configuration for optional weather forecast    |
-| `dateFormat`       | string      | `cccc d LLLL yyyy`                                 | See [Luxon format](https://moment.github.io/luxon/#/formatting) | Format of the date in event details            |
-| `timeFormat`       | string      | `HH:mm`                                            | See [Luxon format](https://moment.github.io/luxon/#/formatting) | Format of the time                             |
-| `locale`           | string      | `en`                                               | Any locale string supported by Luxon                            | Locale used for day and month texts            |
-| `locationLink`     | string      | `https://www.google.com/maps/search/?api=1&query=` | Any URL                                                         | Link used for event location                   |
+| Name               | Type        | Default                                            | Supported options                                                                                                                | Description                                    |
+|--------------------|-------------|----------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------|
+| `type`             | string      | **Required**                                       | `custom:week-planner-card`                                                                                                       | Type of the card                               |
+| `days`             | number      | 7                                                  | Any positive integer number                                                                                                      | The number of days to show                     |
+| `startingDay`      | string      | `today`                                            | `today` \| `tomorrow` \| `yesterday` \| `sunday` \| `monday` \| `tuesday` \| `wednesday` \| `thursday` \| `friday` \| `saturday` | Day to start with                              |
+| `noCardBackground` | boolean     | false                                              | `false` \| `true`                                                                                                                | Do not show default card background and border |
+| `eventBackground`  | string      | `var(--card-background-color, inherit)`            | Any CSS color                                                                                                                    | Background color of the events                 |
+| `updateInterval`   | number      | 60                                                 | Any positive integer number                                                                                                      | Seconds between checks for new events          |
+| `calendars`        | object list | **Required**                                       | See [Calendars](#calendars)                                                                                                      | Calendars shown in this card                   |
+| `texts`            | object list | {}                                                 | See [Texts](#texts)                                                                                                              | Texts used in the card                         |
+| `weather`          | object      | optional                                           | See [Weather](#weather)                                                                                                          | Configuration for optional weather forecast    |
+| `dateFormat`       | string      | `cccc d LLLL yyyy`                                 | See [Luxon format](https://moment.github.io/luxon/#/formatting)                                                                  | Format of the date in event details            |
+| `timeFormat`       | string      | `HH:mm`                                            | See [Luxon format](https://moment.github.io/luxon/#/formatting)                                                                  | Format of the time                             |
+| `locale`           | string      | `en`                                               | Any locale string supported by Luxon                                                                                             | Locale used for day and month texts            |
+| `locationLink`     | string      | `https://www.google.com/maps/search/?api=1&query=` | Any URL                                                                                                                          | Link used for event location                   |
 
 ### Calendars
 
@@ -76,19 +77,20 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 
 ### Texts
 
-| Name        | Type   | Default                           | Supported options | Description                                         |
-|-------------|--------|-----------------------------------|-------------------|-----------------------------------------------------|
-| `fullDay`   | string | `Entire day`                      | Any text          | Text shown for full day events instead of time      |
-| `noEvents`  | string | `No events`                       | Any text          | Text shown when there are no events for a day       |
-| `today`     | string | `Today`                           | Any text          | Text shown for the today instead of the week day    |
-| `tomorrow`  | string | `Tomorrow`                        | Any text          | Text shown for the tomorrow instead of the week day |
-| `sunday`    | string | Name of Sunday based on locale    | Any text          | Text used to override Sundays                       |
-| `monday`    | string | Name of Monday based on locale    | Any text          | Text used to override Mondays                       |
-| `tuesday`   | string | Name of Tuesday based on locale   | Any text          | Text used to override Tuesdays                      |
-| `wednesday` | string | Name of Wednesday based on locale | Any text          | Text used to override Wednesdays                    |
-| `thursday`  | string | Name of Thursday based on locale  | Any text          | Text used to override Thursdays                     |
-| `friday`    | string | Name of Friday based on locale    | Any text          | Text used to override Fridays                       |
-| `saturday`  | string | Name of Saturday based on locale  | Any text          | Text used to override Saturdays                     |
+| Name        | Type   | Default                           | Supported options | Description                                                                     |
+|-------------|--------|-----------------------------------|-------------------|---------------------------------------------------------------------------------|
+| `fullDay`   | string | `Entire day`                      | Any text          | Text shown for full day events instead of time                                  |
+| `noEvents`  | string | `No events`                       | Any text          | Text shown when there are no events for a day                                   |
+| `today`     | string | `Today`                           | Any text          | Text shown for today instead of the week day. Set to empty to show week day     |
+| `tomorrow`  | string | `Tomorrow`                        | Any text          | Text shown for tomorrow instead of the week day. Set to empty to show week day  |
+| `yesterday` | string | `Yesterday`                       | Any text          | Text shown for yesterday instead of the week day. Set to empty to show week day |
+| `sunday`    | string | Name of Sunday based on locale    | Any text          | Text used to override Sundays                                                   |
+| `monday`    | string | Name of Monday based on locale    | Any text          | Text used to override Mondays                                                   |
+| `tuesday`   | string | Name of Tuesday based on locale   | Any text          | Text used to override Tuesdays                                                  |
+| `wednesday` | string | Name of Wednesday based on locale | Any text          | Text used to override Wednesdays                                                |
+| `thursday`  | string | Name of Thursday based on locale  | Any text          | Text used to override Thursdays                                                 |
+| `friday`    | string | Name of Friday based on locale    | Any text          | Text used to override Fridays                                                   |
+| `saturday`  | string | Name of Saturday based on locale  | Any text          | Text used to override Saturdays                                                 |
 
 ### Weather
 
@@ -132,4 +134,20 @@ texts:
   fullDay: Hele dag
   today: Vandaag
   tomorrow: Morgen
+```
+
+### Starting on Sunday
+
+```yaml
+type: custom:week-planner-card
+calendars:
+  - entity: calendar.my_calendar_1
+    color: '#e6c229'
+  - entity: calendar.my_calendar_2
+    color: '#1a8fe3'
+startingDay: sunday
+texts:
+  today: ''
+  tomorrow: ''
+  yesterday: ''
 ```
