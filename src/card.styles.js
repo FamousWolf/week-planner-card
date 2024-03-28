@@ -11,14 +11,31 @@ export default css`
         --event-padding: 10px;
         --event-border-width: 5px;
         --event-border-radius: 5px;
+        --event-font-size: 1em;
+        --event-line-height: 1.2em;
         --weather-icon-size: 30px;
         --weather-temperature-separator: ' / ';
+        --weather-temperature-font-size: 1em;
     }
-    
+
     ha-card.nobackground {
         border: none !important;
         background-color: transparent !important;
         box-shadow: none !important;
+    }
+
+    ha-card.compact {
+        --days-spacing: 5px;
+        --day-date-number-font-size: 1.5em;
+        --day-date-text-font-size: 1em;
+        --events-margin-top: 5px;
+        --event-spacing: 2px;
+        --event-padding: 2px 5px;
+        --event-border-width: 2px;
+        --event-font-size: .9em;
+        --event-line-height: 1.1em;
+        --weather-icon-size: 20px;
+        --weather-temperature-font-size: 0.8em;
     }
 
     .container {
@@ -39,7 +56,7 @@ export default css`
         position: relative;
         z-index: 2;
     }
-    
+
     .container .day .date .number {
         font-size: var(--day-date-number-font-size);
         line-height: var(--day-date-number-line-height);
@@ -54,8 +71,9 @@ export default css`
         top: 0;
         right: 0;
         z-index: 1;
+        font-size: var(--weather-temperature-font-size);
     }
-    
+
     .container .day .weather .icon {
         display: inline-block;
         vertical-align: middle;
@@ -71,7 +89,7 @@ export default css`
         margin: 0 5px 0 0;
         vertical-align: middle;
     }
-    
+
     .container .day .weather .temperature:has(.high) .low:before {
         content: var(--weather-temperature-separator);
     }
@@ -79,13 +97,15 @@ export default css`
     .container .day .events {
         margin-top: var(--events-margin-top);
     }
-    
+
     .container .day .events .none,
     .container .day .events .event {
         margin-bottom: var(--event-spacing);
         padding: var(--event-padding);
         background-color: var(--event-background-color);
         border-radius: 0 var(--event-border-radius) var(--event-border-radius) 0;
+        font-size: var(--event-font-size);
+        line-height: var(--event-line-height);
     }
 
     .container .day .events .none {
@@ -109,7 +129,7 @@ export default css`
         width: 40px;
         height: 40px;
     }
-    
+
     .loader:after {
         content: " ";
         display: block;
@@ -154,10 +174,14 @@ export default css`
             transform: rotate(360deg);
         }
     }
-    
+
     @container weekplanner (width <= 1280px) {
         .container .day {
             width: calc((100% - 4 * var(--days-spacing)) / 5);
+        }
+
+        ha-card.compact .container .day {
+            width: calc((100% - 6 * var(--days-spacing)) / 7);
         }
     }
 
@@ -165,11 +189,19 @@ export default css`
         .container .day {
             width: calc((100% - 2 * var(--days-spacing)) / 3);
         }
+
+        ha-card.compact .container .day {
+            width: calc((100% - 3 * var(--days-spacing)) / 4);
+        }
     }
 
     @container weekplanner (width <= 640px) {
         .container .day {
             width: 100%;
+        }
+
+        ha-card.compact .container .day {
+            width: calc((100% - var(--days-spacing)) / 2);
         }
     }
 `;
