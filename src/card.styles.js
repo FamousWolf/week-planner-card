@@ -56,6 +56,7 @@ export default css`
     .container .day .date {
         position: relative;
         z-index: 2;
+        cursor: pointer;
     }
 
     .container .day .date .number {
