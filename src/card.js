@@ -69,6 +69,7 @@ export class WeekPlannerCard extends LitElement {
     _locationLink;
     _startDate;
     _hideWeekend;
+    _weatherForecast = null;
 
     /**
      * Get properties
@@ -390,6 +391,18 @@ export class WeekPlannerCard extends LitElement {
         this._updateEvents();
     }
 
+    _subscribeToWeatherForecast() {
+        this._loading++;
+        this.hass.connection.subscribeMessage((event) => {
+            this._weatherForecast = event.forecast ?? [];
+            this._loading--;
+        }, {
+            type: 'weather/subscribe_forecast',
+            forecast_type: 'daily',
+            entity_id: this._weather.entity
+        });
+    }
+
     _updateEvents() {
         if (this._loading > 0) {
             return;
@@ -402,6 +415,10 @@ export class WeekPlannerCard extends LitElement {
 
         let startDate = this._startDate;
         let endDate = this._startDate.plus({ days: this._numberOfDays });
+
+        if (this._weatherForecast === null) {
+            this._subscribeToWeatherForecast();
+        }
 
         this._calendars.forEach(calendar => {
             this._loading++;
@@ -485,7 +502,7 @@ export class WeekPlannerCard extends LitElement {
 
         const weatherState = this._weather ? this.hass.states[this._weather.entity] : null;
         let weatherForecast = {};
-        weatherState?.attributes?.forecast?.forEach((forecast) => {
+        this._weatherForecast?.forEach((forecast) => {
             const dateKey = DateTime.fromISO(forecast.datetime).toISODate();
             weatherForecast[dateKey] = {
                 icon: this._getWeatherIcon(forecast),
