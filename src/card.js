@@ -61,6 +61,7 @@ export class WeekPlannerCard extends LitElement {
     _updateInterval;
     _noCardBackground;
     _eventBackground;
+    _displayRelativeDate;
     _compact;
     _language;
     _weather;
@@ -106,6 +107,7 @@ export class WeekPlannerCard extends LitElement {
         this._updateInterval = config.updateInterval ?? 60;
         this._noCardBackground = config.noCardBackground ?? false;
         this._eventBackground = config.eventBackground ?? 'var(--card-background-color, inherit)';
+        this._displayRelativeDate = config.displayRelativeDate ?? true;
         this._compact = config.compact ?? false;
         this._dateFormat = config.dateFormat ?? 'cccc d LLLL yyyy';
         this._timeFormat = config.timeFormat ?? 'HH:mm';
@@ -547,11 +549,14 @@ export class WeekPlannerCard extends LitElement {
         const today = DateTime.now().startOf('day');
         const tomorrow = today.plus({ days: 1 });
         const yesterday = today.minus({ days: 1 });
-        if (this._language.today && this._isSameDay(date, today)) {
+        if (this._language.today && this._isSameDay(date, today) &&
+        this._displayRelativeDate) {
             return this._language.today;
-        } else if (this._language.tomorrow && this._isSameDay(date, tomorrow)) {
+        } else if (this._language.tomorrow && this._isSameDay(date, tomorrow) &&
+        this._displayRelativeDate) {
             return this._language.tomorrow;
-        } else if (this._language.yesterday && this._isSameDay(date, yesterday)) {
+        } else if (this._language.yesterday && this._isSameDay(date, yesterday) &&
+        this._displayRelativeDate) {
             return this._language.yesterday;
         } else {
             const weekDays = [
