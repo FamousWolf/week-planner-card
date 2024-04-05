@@ -68,7 +68,8 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 | `dateFormat`       | string      | `cccc d LLLL yyyy`                                 | See [Luxon format](https://moment.github.io/luxon/#/formatting)                                                                  | Format of the date in event details                          |
 | `timeFormat`       | string      | `HH:mm`                                            | See [Luxon format](https://moment.github.io/luxon/#/formatting)                                                                  | Format of the time                                           |
 | `locale`           | string      | `en`                                               | Any locale string supported by Luxon                                                                                             | Locale used for day and month texts                          |
-| `locationLink`     | string      | `https://www.google.com/maps/search/?api=1&query=` | Any URL                                                                                                                          | Link used for event location                                 |
+| `locationLink`     | string      | `https://www.google.com/maps/search/?api=1&query=` | Any URL                                                                                                                          | Link used for event location in the detail popup             |
+| `showLocation`     | boolean     | false                                              | `false` \| `true`                                                                                                                | Show event location in overview                              |
 
 ### Calendars
 
