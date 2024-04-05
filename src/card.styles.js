@@ -13,6 +13,7 @@ export default css`
         --event-border-radius: 5px;
         --event-font-size: 1em;
         --event-line-height: 1.2em;
+        --event-icon-size: 18px;
         --weather-icon-size: 30px;
         --weather-temperature-separator: ' / ';
         --weather-temperature-font-size: 1em;
@@ -120,6 +121,11 @@ export default css`
     .container .day .events .event .time {
         color: var(--secondary-text-color, #aaaaaa);
         margin: 0 0 3px 0;
+    }
+
+    .container .day .events .event .location {
+        margin: 3px 0 0 0;
+        --mdc-icon-size: var(--event-icon-size);
     }
 
     .loader {

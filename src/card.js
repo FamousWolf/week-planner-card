@@ -70,6 +70,7 @@ export class WeekPlannerCard extends LitElement {
     _startDate;
     _hideWeekend;
     _weatherForecast = null;
+    _showLocation = null;
 
     /**
      * Get properties
@@ -110,6 +111,7 @@ export class WeekPlannerCard extends LitElement {
         this._dateFormat = config.dateFormat ?? 'cccc d LLLL yyyy';
         this._timeFormat = config.timeFormat ?? 'HH:mm';
         this._locationLink = config.locationLink ?? 'https://www.google.com/maps/search/?api=1&query=';
+        this._showLocation = config.showLocation ?? false;
         if (config.locale) {
             LuxonSettings.defaultLocale = config.locale;
         }
@@ -266,6 +268,15 @@ export class WeekPlannerCard extends LitElement {
                                                 <div class="title">
                                                     ${event.summary}
                                                 </div>
+                                                ${this._showLocation && event.location ?
+                                                    html`
+                                                        <div class="location">
+                                                            <ha-icon icon="mdi:map-marker"></ha-icon>
+                                                            ${event.location}
+                                                        </div>
+                                                    ` :
+                                                    ''
+                                                }
                                             </div>
                                         `
                                     })}
