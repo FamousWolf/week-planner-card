@@ -212,16 +212,16 @@ export class WeekPlannerCard extends LitElement {
                         ${day.weather ?
                             html`
                                 <div class="weather">
-                                    ${this._weather.showTemperature || this._weather.showLowTemperature ?
+                                    ${this._weather?.showTemperature || this._weather?.showLowTemperature ?
                                         html`
                                             <div class="temperature">
-                                                ${this._weather.showTemperature ?
+                                                ${this._weather?.showTemperature ?
                                                     html`
                                                         <span class="high">${day.weather.temperature}</span>
                                                     ` :
                                                     ''
                                                 }
-                                                ${this._weather.showLowTemperature ?
+                                                ${this._weather?.showLowTemperature ?
                                                     html`
                                                             <span class="low">${day.weather.templow}</span>
                                                     ` :
@@ -231,7 +231,7 @@ export class WeekPlannerCard extends LitElement {
                                         ` :
                                         ''
                                     }
-                                    ${this._weather.showCondition ?
+                                    ${this._weather?.showCondition ?
                                         html`
                                             <div class="icon">
                                                 <img src="${day.weather.icon}" alt="${day.weather.condition}">
@@ -416,7 +416,7 @@ export class WeekPlannerCard extends LitElement {
         let startDate = this._startDate;
         let endDate = this._startDate.plus({ days: this._numberOfDays });
 
-        if (this._weatherForecast === null) {
+        if (this._weather && this._weatherForecast === null) {
             this._subscribeToWeatherForecast();
         }
 
