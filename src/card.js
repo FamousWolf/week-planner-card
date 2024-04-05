@@ -214,14 +214,14 @@ export class WeekPlannerCard extends LitElement {
                 }
                 
                 return html`
-                    <div class="day" >
-                        <div class="date" @click=${{handleEvent: () => this._fire_event('hass-more-info', this._weather.entity)}}>
+                    <div class="day">
+                        <div class="date">
                             <span class="number">${day.date.day}</span>
                             <span class="text">${this._getWeekDayText(day.date)}</span>
                         </div>
                         ${day.weather ?
                             html`
-                                <div class="weather">
+                                <div class="weather" @click="${this._handleWeatherClick}">
                                     ${this._weather?.showTemperature || this._weather?.showLowTemperature ?
                                         html`
                                             <div class="temperature">
@@ -601,6 +601,21 @@ export class WeekPlannerCard extends LitElement {
         this._currentEventDetails = null;
     }
 
+    _handleWeatherClick(e) {
+        const event = new Event(
+            'hass-more-info', {
+                bubbles: true,
+                composed: true,
+            }
+        );
+        event.detail = {
+            entityId: this._weather.entity
+        }
+        this.dispatchEvent(event);
+
+        e.stopImmediatePropagation();
+    }
+
     _getStartDate(startingDay) {
         let startDate = DateTime.now();
 
@@ -711,25 +726,5 @@ export class WeekPlannerCard extends LitElement {
     _isYesterday(date) {
         const yesterday = DateTime.now().startOf('day').minus({ days: 1 });
         return this._isSameDay(date, yesterday);
-    }
-
-    // To fire an event on demand use this
-    // eventTYpe
-    // - hass-more-info
-    // - url
-    // For more, see https://github.com/custom-cards/custom-card-helpers/blob/master/src/handle-click.ts
-    _fire_event(eventType, eventDetail)
-    {
-        console.log(`_fire_event: ${eventType} ${eventDetail}`)
-        switch (eventType) {
-            case 'hass-more-info':
-                const event = new Event(eventType, { bubbles: true, composed: true });
-                event.detail = { entityId: eventDetail };
-                this.dispatchEvent(event);
-                break;
-            case 'url':
-                window.open(eventDetail);
-                break;
-        }
     }
 }
