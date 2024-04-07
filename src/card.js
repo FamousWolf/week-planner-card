@@ -70,7 +70,8 @@ export class WeekPlannerCard extends LitElement {
     _startDate;
     _hideWeekend;
     _weatherForecast = null;
-    _showLocation = null;
+    _showLocation;
+    _hidePastEvents;
 
     /**
      * Get properties
@@ -112,6 +113,7 @@ export class WeekPlannerCard extends LitElement {
         this._timeFormat = config.timeFormat ?? 'HH:mm';
         this._locationLink = config.locationLink ?? 'https://www.google.com/maps/search/?api=1&query=';
         this._showLocation = config.showLocation ?? false;
+        this._hidePastEvents = config.hidePastEvents ?? false;
         if (config.locale) {
             LuxonSettings.defaultLocale = config.locale;
         }
@@ -430,6 +432,7 @@ export class WeekPlannerCard extends LitElement {
 
         let startDate = this._startDate;
         let endDate = this._startDate.plus({ days: this._numberOfDays });
+        let now = DateTime.now();
 
         if (this._weather && this._weatherForecast === null) {
             this._subscribeToWeatherForecast();
@@ -444,6 +447,9 @@ export class WeekPlannerCard extends LitElement {
                 response.forEach(event => {
                     let startDate = this._convertApiDate(event.start);
                     let endDate = this._convertApiDate(event.end);
+                    if (this._hidePastEvents && endDate < now) {
+                        return;
+                    }
                     let fullDay = this._isFullDay(startDate, endDate);
 
                     if (!fullDay && !this._isSameDay(startDate, endDate)) {
