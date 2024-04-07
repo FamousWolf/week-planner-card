@@ -404,9 +404,13 @@ export class WeekPlannerCard extends LitElement {
 
     _subscribeToWeatherForecast() {
         this._loading++;
+        let loadingWeather = true;
         this.hass.connection.subscribeMessage((event) => {
             this._weatherForecast = event.forecast ?? [];
-            this._loading--;
+            if (loadingWeather) {
+                this._loading--;
+                loadingWeather = false;
+            }
         }, {
             type: 'weather/subscribe_forecast',
             forecast_type: 'daily',
