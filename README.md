@@ -70,6 +70,7 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 | `locale`           | string      | `en`                                               | Any locale string supported by Luxon                                                                                             | Locale used for day and month texts                          |
 | `locationLink`     | string      | `https://www.google.com/maps/search/?api=1&query=` | Any URL                                                                                                                          | Link used for event location in the detail popup             |
 | `showLocation`     | boolean     | false                                              | `false` \| `true`                                                                                                                | Show event location in overview                              |
+| `hidePastEvents`   | boolean     | false                                              | `false` \| `true`                                                                                                                | Do not show past events                                      |
 
 ### Calendars
 
