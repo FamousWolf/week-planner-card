@@ -72,6 +72,7 @@ export class WeekPlannerCard extends LitElement {
     _weatherForecast = null;
     _showLocation;
     _hidePastEvents;
+    _hideDaysWithoutEvents;
 
     /**
      * Get properties
@@ -114,6 +115,7 @@ export class WeekPlannerCard extends LitElement {
         this._locationLink = config.locationLink ?? 'https://www.google.com/maps/search/?api=1&query=';
         this._showLocation = config.showLocation ?? false;
         this._hidePastEvents = config.hidePastEvents ?? false;
+        this._hideDaysWithoutEvents = config.hideDaysWithoutEvents ?? false;
         if (config.locale) {
             LuxonSettings.defaultLocale = config.locale;
         }
@@ -207,6 +209,10 @@ export class WeekPlannerCard extends LitElement {
 
         return html`
             ${this._days.map((day) => {
+                if (this._hideDaysWithoutEvents && day.events.length === 0 && !this._isToday(day.date)) {
+                    return html``;
+                }
+                
                 return html`
                     <div class="day">
                         <div class="date">
@@ -565,14 +571,11 @@ export class WeekPlannerCard extends LitElement {
     }
 
     _getWeekDayText(date) {
-        const today = DateTime.now().startOf('day');
-        const tomorrow = today.plus({ days: 1 });
-        const yesterday = today.minus({ days: 1 });
-        if (this._language.today && this._isSameDay(date, today)) {
+        if (this._language.today && this._isToday(date)) {
             return this._language.today;
-        } else if (this._language.tomorrow && this._isSameDay(date, tomorrow)) {
+        } else if (this._language.tomorrow && this._isTomorrow(date)) {
             return this._language.tomorrow;
-        } else if (this._language.yesterday && this._isSameDay(date, yesterday)) {
+        } else if (this._language.yesterday && this._isYesterday(date)) {
             return this._language.yesterday;
         } else {
             const weekDays = [
@@ -589,7 +592,7 @@ export class WeekPlannerCard extends LitElement {
             return weekDays[weekDay];
         }
     }
-    
+
     _handleEventClick(event) {
         this._currentEventDetails = event;
     }
@@ -693,5 +696,20 @@ export class WeekPlannerCard extends LitElement {
         return date1.day === date2.day
             && date1.month === date2.month
             && date1.year === date2.year
+    }
+
+    _isToday(date) {
+        const today = DateTime.now().startOf('day');
+        return this._isSameDay(date, today);
+    }
+
+    _isTomorrow(date) {
+        const tomorrow = DateTime.now().startOf('day').plus({ days: 1 });
+        return this._isSameDay(date, tomorrow);
+    }
+
+    _isYesterday(date) {
+        const yesterday = DateTime.now().startOf('day').minus({ days: 1 });
+        return this._isSameDay(date, yesterday);
     }
 }
