@@ -55,7 +55,7 @@ export default css`
 
     .container .day .date {
         position: relative;
-        z-index: 2;
+        z-index: 1;
     }
 
     .container .day .date .number {
@@ -71,8 +71,9 @@ export default css`
         position: absolute;
         top: 0;
         right: 0;
-        z-index: 1;
+        z-index: 2;
         font-size: var(--weather-temperature-font-size);
+        cursor: pointer;
     }
 
     .container .day .weather .icon {

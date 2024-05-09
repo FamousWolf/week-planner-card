@@ -221,7 +221,7 @@ export class WeekPlannerCard extends LitElement {
                         </div>
                         ${day.weather ?
                             html`
-                                <div class="weather">
+                                <div class="weather" @click="${this._handleWeatherClick}">
                                     ${this._weather?.showTemperature || this._weather?.showLowTemperature ?
                                         html`
                                             <div class="temperature">
@@ -599,6 +599,21 @@ export class WeekPlannerCard extends LitElement {
 
     _closeDialog() {
         this._currentEventDetails = null;
+    }
+
+    _handleWeatherClick(e) {
+        const event = new Event(
+            'hass-more-info', {
+                bubbles: true,
+                composed: true,
+            }
+        );
+        event.detail = {
+            entityId: this._weather.entity
+        }
+        this.dispatchEvent(event);
+
+        e.stopImmediatePropagation();
     }
 
     _getStartDate(startingDay) {
