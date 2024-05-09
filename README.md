@@ -52,59 +52,59 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 
 ### Main Options
 
-| Name                    | Type        | Default                                            | Supported options                                                                                                                | Description                                                  |
-|-------------------------|-------------|----------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------|
-| `type`                  | string      | **Required**                                       | `custom:week-planner-card`                                                                                                       | Type of the card                                             |
-| `days`                  | number      | 7                                                  | Any positive integer number                                                                                                      | The number of days to show                                   |
-| `startingDay`           | string      | `today`                                            | `today` \| `tomorrow` \| `yesterday` \| `sunday` \| `monday` \| `tuesday` \| `wednesday` \| `thursday` \| `friday` \| `saturday` | Day to start with                                            |
-| `hideWeekend`           | boolean     | false                                              | `false` \| `true`                                                                                                                | Do not show Saturday and Sunday                              |
-| `noCardBackground`      | boolean     | false                                              | `false` \| `true`                                                                                                                | Do not show default card background and border               |
-| `eventBackground`       | string      | `var(--card-background-color, inherit)`            | Any CSS color                                                                                                                    | Background color of the events                               |
-| `compact`               | boolean     | false                                              | `false` \| `true`                                                                                                                | Use compact mode, decreasing several spacings and font sizes |
-| `updateInterval`        | number      | 60                                                 | Any positive integer number                                                                                                      | Seconds between checks for new events                        |
-| `calendars`             | object list | **Required**                                       | See [Calendars](#calendars)                                                                                                      | Calendars shown in this card                                 |
-| `texts`                 | object list | {}                                                 | See [Texts](#texts)                                                                                                              | Texts used in the card                                       |
-| `weather`               | object      | optional                                           | See [Weather](#weather)                                                                                                          | Configuration for optional weather forecast                  |
-| `dateFormat`            | string      | `cccc d LLLL yyyy`                                 | See [Luxon format](https://moment.github.io/luxon/#/formatting)                                                                  | Format of the date in event details                          |
-| `timeFormat`            | string      | `HH:mm`                                            | See [Luxon format](https://moment.github.io/luxon/#/formatting)                                                                  | Format of the time                                           |
-| `locale`                | string      | `en`                                               | Any locale string supported by Luxon                                                                                             | Locale used for day and month texts                          |
-| `locationLink`          | string      | `https://www.google.com/maps/search/?api=1&query=` | Any URL                                                                                                                          | Link used for event location in the detail popup             |
-| `showLocation`          | boolean     | false                                              | `false` \| `true`                                                                                                                | Show event location in overview                              |
-| `hidePastEvents`        | boolean     | false                                              | `false` \| `true`                                                                                                                | Do not show past events                                      |
-| `hideDaysWithoutEvents` | boolean     | false                                              | `false` \| `true`                                                                                                                | Do not show days without events, except for today            |
+| Name                    | Type        | Default                                            | Supported options                                                                                                                | Description                                                  | Version |
+|-------------------------|-------------|----------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------|---------|
+| `type`                  | string      | **Required**                                       | `custom:week-planner-card`                                                                                                       | Type of the card                                             | 1.0.0   |
+| `days`                  | number      | 7                                                  | Any positive integer number                                                                                                      | The number of days to show                                   | 1.0.0   |
+| `startingDay`           | string      | `today`                                            | `today` \| `tomorrow` \| `yesterday` \| `sunday` \| `monday` \| `tuesday` \| `wednesday` \| `thursday` \| `friday` \| `saturday` | Day to start with                                            | 1.2.0   |
+| `hideWeekend`           | boolean     | false                                              | `false` \| `true`                                                                                                                | Do not show Saturday and Sunday                              | 1.2.0   |
+| `noCardBackground`      | boolean     | false                                              | `false` \| `true`                                                                                                                | Do not show default card background and border               | 1.0.0   |
+| `eventBackground`       | string      | `var(--card-background-color, inherit)`            | Any CSS color                                                                                                                    | Background color of the events                               | 1.0.0   |
+| `compact`               | boolean     | false                                              | `false` \| `true`                                                                                                                | Use compact mode, decreasing several spacings and font sizes | 1.2.0   |
+| `updateInterval`        | number      | 60                                                 | Any positive integer number                                                                                                      | Seconds between checks for new events                        | 1.0.0   |
+| `calendars`             | object list | **Required**                                       | See [Calendars](#calendars)                                                                                                      | Calendars shown in this card                                 | 1.0.0   |
+| `texts`                 | object list | {}                                                 | See [Texts](#texts)                                                                                                              | Texts used in the card                                       | 1.0.0   |
+| `weather`               | object      | optional                                           | See [Weather](#weather)                                                                                                          | Configuration for optional weather forecast                  | 1.1.0   |
+| `dateFormat`            | string      | `cccc d LLLL yyyy`                                 | See [Luxon format](https://moment.github.io/luxon/#/formatting)                                                                  | Format of the date in event details                          | 1.0.0   |
+| `timeFormat`            | string      | `HH:mm`                                            | See [Luxon format](https://moment.github.io/luxon/#/formatting)                                                                  | Format of the time                                           | 1.0.0   |
+| `locale`                | string      | `en`                                               | Any locale string supported by Luxon                                                                                             | Locale used for day and month texts                          | 1.1.0   |
+| `locationLink`          | string      | `https://www.google.com/maps/search/?api=1&query=` | Any URL                                                                                                                          | Link used for event location in the detail popup             | 1.1.0   |
+| `showLocation`          | boolean     | false                                              | `false` \| `true`                                                                                                                | Show event location in overview                              | 1.3.0   |
+| `hidePastEvents`        | boolean     | false                                              | `false` \| `true`                                                                                                                | Do not show past events                                      | 1.3.0   |
+| `hideDaysWithoutEvents` | boolean     | false                                              | `false` \| `true`                                                                                                                | Do not show days without events, except for today            | 1.4.0   |
 
 ### Calendars
 
-| Name           | Type        | Default      | Supported options                   | Description                                          |
-|----------------|-------------|--------------|-------------------------------------|------------------------------------------------------|
-| `entity`       | string      | **Required** | `calendar.my_calendar`              | Entity ID                                            |
-| `color`        | string      | optional     | Any CSS color                       | Color used for events from the calendar              |
+| Name           | Type        | Default      | Supported options                   | Description                                          | Version |
+|----------------|-------------|--------------|-------------------------------------|------------------------------------------------------|---------|
+| `entity`       | string      | **Required** | `calendar.my_calendar`              | Entity ID                                            | 1.0.0   |
+| `color`        | string      | optional     | Any CSS color                       | Color used for events from the calendar              | 1.0.0   |
 
 ### Texts
 
-| Name        | Type   | Default                           | Supported options | Description                                                                     |
-|-------------|--------|-----------------------------------|-------------------|---------------------------------------------------------------------------------|
-| `fullDay`   | string | `Entire day`                      | Any text          | Text shown for full day events instead of time                                  |
-| `noEvents`  | string | `No events`                       | Any text          | Text shown when there are no events for a day                                   |
-| `today`     | string | `Today`                           | Any text          | Text shown for today instead of the week day. Set to empty to show week day     |
-| `tomorrow`  | string | `Tomorrow`                        | Any text          | Text shown for tomorrow instead of the week day. Set to empty to show week day  |
-| `yesterday` | string | `Yesterday`                       | Any text          | Text shown for yesterday instead of the week day. Set to empty to show week day |
-| `sunday`    | string | Name of Sunday based on locale    | Any text          | Text used to override Sundays                                                   |
-| `monday`    | string | Name of Monday based on locale    | Any text          | Text used to override Mondays                                                   |
-| `tuesday`   | string | Name of Tuesday based on locale   | Any text          | Text used to override Tuesdays                                                  |
-| `wednesday` | string | Name of Wednesday based on locale | Any text          | Text used to override Wednesdays                                                |
-| `thursday`  | string | Name of Thursday based on locale  | Any text          | Text used to override Thursdays                                                 |
-| `friday`    | string | Name of Friday based on locale    | Any text          | Text used to override Fridays                                                   |
-| `saturday`  | string | Name of Saturday based on locale  | Any text          | Text used to override Saturdays                                                 |
+| Name        | Type   | Default                           | Supported options | Description                                                                     | Version |
+|-------------|--------|-----------------------------------|-------------------|---------------------------------------------------------------------------------|---------|
+| `fullDay`   | string | `Entire day`                      | Any text          | Text shown for full day events instead of time                                  | 1.0.0   |
+| `noEvents`  | string | `No events`                       | Any text          | Text shown when there are no events for a day                                   | 1.0.0   |
+| `today`     | string | `Today`                           | Any text          | Text shown for today instead of the week day. Set to empty to show week day     | 1.0.0   |
+| `tomorrow`  | string | `Tomorrow`                        | Any text          | Text shown for tomorrow instead of the week day. Set to empty to show week day  | 1.0.0   |
+| `yesterday` | string | `Yesterday`                       | Any text          | Text shown for yesterday instead of the week day. Set to empty to show week day | 1.2.0   |
+| `sunday`    | string | Name of Sunday based on locale    | Any text          | Text used to override Sundays                                                   | 1.1.0   |
+| `monday`    | string | Name of Monday based on locale    | Any text          | Text used to override Mondays                                                   | 1.1.0   |
+| `tuesday`   | string | Name of Tuesday based on locale   | Any text          | Text used to override Tuesdays                                                  | 1.1.0   |
+| `wednesday` | string | Name of Wednesday based on locale | Any text          | Text used to override Wednesdays                                                | 1.1.0   |
+| `thursday`  | string | Name of Thursday based on locale  | Any text          | Text used to override Thursdays                                                 | 1.1.0   |
+| `friday`    | string | Name of Friday based on locale    | Any text          | Text used to override Fridays                                                   | 1.1.0   |
+| `saturday`  | string | Name of Saturday based on locale  | Any text          | Text used to override Saturdays                                                 | 1.1.0   |
 
 ### Weather
 
-| Name                 | Type    | Default      | Supported options            | Description          |
-|----------------------|---------|--------------|------------------------------|----------------------|
-| `entity`             | string  | **Required** | `weather.my_weather_service` | Entity ID            |
-| `showCondition`      | boolean | true         | `false` \| `true`            | Show condition icon  |
-| `showTemperature`    | boolean | false        | `false` \| `true`            | Show temperature     |
-| `showLowTemperature` | boolean | false        | `false` \| `true`            | Show low temperature |
+| Name                 | Type    | Default      | Supported options            | Description          | Version |
+|----------------------|---------|--------------|------------------------------|----------------------|---------|
+| `entity`             | string  | **Required** | `weather.my_weather_service` | Entity ID            | 1.1.0   |
+| `showCondition`      | boolean | true         | `false` \| `true`            | Show condition icon  | 1.1.0   |
+| `showTemperature`    | boolean | false        | `false` \| `true`            | Show temperature     | 1.1.0   |
+| `showLowTemperature` | boolean | false        | `false` \| `true`            | Show low temperature | 1.1.0   |
 
 ## Examples
 
