@@ -20,6 +20,7 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
   - [Calendars](#calendars)
   - [Texts](#texts)
   - [Weather](#weather)
+- [Custom styling using cardmod](#custom-styling-using-cardmod)
 - [Examples](#examples)
 
 ## Installation
@@ -106,6 +107,29 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 | `showTemperature`    | boolean | false        | `false` \| `true`            | Show temperature     | 1.1.0   |
 | `showLowTemperature` | boolean | false        | `false` \| `true`            | Show low temperature | 1.1.0   |
 
+## Custom styling using cardmod
+
+Like with most cards, you can add custom styling to this card using [card_mod](https://github.com/thomasloven/lovelace-card-mod). To make it easier to add custom styles to days and/or events, there are several classes that days and events can have.
+
+### Day classes
+
+| Class       | Description       | Version |
+|-------------|-------------------|---------|
+| `today`     | The current day   | 1.5.0   |
+| `tomorrow`  | The next day      | 1.5.0   |
+| `yesterday` | The previous day  | 1.5.0   |
+| `future`    | Day in the future | 1.5.0   |
+| `past`      | Day in the past   | 1.5.0   |
+
+### Event classes
+
+| Class     | Description              | Version |
+|-----------|--------------------------|---------|
+| `fullday` | Event lasts the full day | 1.5.0   |
+| `ongoing` | Currently ongoing        | 1.5.0   |
+| `future`  | Event in the future      | 1.5.0   |
+| `past`    | Event in the past        | 1.5.0   |
+
 ## Examples
 
 ### Minimal
@@ -155,4 +179,20 @@ texts:
   today: ''
   tomorrow: ''
   yesterday: ''
+```
+
+### Past events transparent with card_mod
+
+```yaml
+type: custom:week-planner-card
+calendars:
+  - entity: calendar.my_calendar_1
+    color: '#e6c229'
+  - entity: calendar.my_calendar_2
+    color: '#1a8fe3'
+card_mod:
+  style: |
+    .event.past {
+      opacity: .3;
+    }
 ```

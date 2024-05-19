@@ -214,7 +214,7 @@ export class WeekPlannerCard extends LitElement {
                 }
                 
                 return html`
-                    <div class="day">
+                    <div class="day ${day.class}">
                         <div class="date">
                             <span class="number">${day.date.day}</span>
                             <span class="text">${this._getWeekDayText(day.date)}</span>
@@ -263,7 +263,7 @@ export class WeekPlannerCard extends LitElement {
                                 html`
                                     ${day.events.map((event) => {
                                         return html`
-                                            <div class="event" style="--border-color: ${event.color}" @click="${() => { this._handleEventClick(event) }}">
+                                            <div class="event ${event.class}" style="--border-color: ${event.color}" @click="${() => { this._handleEventClick(event) }}">
                                                 <div class="time">
                                                     ${event.fullDay ?
                                                         html`${this._language.fullDay}` :
@@ -510,8 +510,46 @@ export class WeekPlannerCard extends LitElement {
             originalEnd: this._convertApiDate(event.end),
             fullDay: fullDay,
             color: calendar.color ?? 'inherit',
-            calendar: calendar.entity
+            calendar: calendar.entity,
+            class: this._getEventClass(startDate, endDate, fullDay)
         });
+    }
+
+    _getEventClass(startDate, endDate, fullDay) {
+        let classes = [];
+        let now = DateTime.now();
+        if (fullDay) {
+            classes.push('fullday');
+        }
+        if (endDate < now) {
+            classes.push('past');
+        } else if (startDate <= now && endDate > now) {
+            classes.push('ongoing');
+        } else {
+            classes.push('future');
+        }
+        return classes.join(' ');
+    }
+
+    _getDayClass(startDate) {
+        let classes = [];
+        if (this._isToday(startDate)) {
+            classes.push('today');
+        } else if (this._isTomorrow(startDate)) {
+            classes.push('tomorrow');
+            classes.push('future');
+        } else if (this._isYesterday(startDate)) {
+            classes.push('yesterday');
+            classes.push('past');
+        } else {
+            let now = DateTime.now();
+            if (startDate > now) {
+                classes.push('future');
+            } else {
+                classes.push('past');
+            }
+        }
+        return classes.join(' ');
     }
 
     _handleMultiDayEvent(event, startDate, endDate, calendar) {
@@ -557,6 +595,7 @@ export class WeekPlannerCard extends LitElement {
                     date: startDate,
                     events: events,
                     weather: weatherForecast[dateKey] ?? null,
+                    class: this._getDayClass(startDate)
                 });
             }
 
