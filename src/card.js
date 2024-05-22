@@ -103,7 +103,7 @@ export class WeekPlannerCard extends LitElement {
 
         this._calendars = config.calendars;
         this._weather = this._getWeatherConfig(config.weather);
-        this._numberOfDays = config.days ?? 7;
+        this._numberOfDays = this._getNumberOfDays(config.days ?? 7);
         this._hideWeekend = config.hideWeekend ?? false;
         this._startDate = this._getStartDate(config.startingDay ?? 'today');
         this._updateInterval = config.updateInterval ?? 60;
@@ -655,6 +655,14 @@ export class WeekPlannerCard extends LitElement {
         e.stopImmediatePropagation();
     }
 
+    _getNumberOfDays(numberOfDays) {
+        if (numberOfDays === 'month') {
+            numberOfDays = DateTime.now().daysInMonth;
+        }
+
+        return numberOfDays;
+    }
+
     _getStartDate(startingDay) {
         let startDate = DateTime.now();
 
@@ -685,6 +693,9 @@ export class WeekPlannerCard extends LitElement {
                 break;
             case 'saturday':
                 startDate = this._getWeekDayDate(startDate, 6);
+                break;
+            case 'month':
+                startDate = startDate.startOf('month');
                 break;
         }
 
