@@ -16,7 +16,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/FamousWolf/week-planner-card.git"
+    "url": "git+https://github.com/Smeltvig/week-planner-card.git"
   },
   "keywords": [
     "lovelace"
@@ -24,9 +24,9 @@
   "author": "Rudy Gnodde",
   "licence": "MIT",
   "bugs": {
-    "url": "https://github.com/FamousWolf/week-planner-card/issues"
+    "url": "https://github.com/Smeltvig/week-planner-card/issues"
   },
-  "homepage": "https://github.com/FamousWolf/week-planner-card",
+  "homepage": "https://github.com/Smeltvig/week-planner-card",
   "devDependencies": {
     "@parcel/optimizer-data-url": "^2.12.0",
     "@parcel/transformer-inline-string": "^2.11.0",
