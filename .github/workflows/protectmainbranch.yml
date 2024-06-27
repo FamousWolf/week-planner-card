@@ -1,0 +1,16 @@
+name: 'Protect main branch'
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  check_origin_branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check origin branch
+        if: github.base_ref == 'main' && github.head_ref != 'dev'
+        run: |
+          echo "ERROR: You can only merge to main from dev."
+          exit 1
