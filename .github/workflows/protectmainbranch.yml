@@ -2,8 +2,6 @@ name: 'Protect main branch'
 
 on:
   pull_request:
-    branches:
-      - main
 
 jobs:
   check_origin_branch:
