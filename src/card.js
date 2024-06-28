@@ -263,7 +263,7 @@ export class WeekPlannerCard extends LitElement {
                                 html`
                                     ${day.events.map((event) => {
                                         return html`
-                                            <div class="event ${event.class}" style="--border-color: ${event.color}" @click="${() => { this._handleEventClick(event) }}">
+                                            <div class="event ${event.class}" data-entity="${event.calendar}" style="--border-color: ${event.color}" @click="${() => { this._handleEventClick(event) }}">
                                                 <div class="time">
                                                     ${event.fullDay ?
                                                         html`${this._language.fullDay}` :
