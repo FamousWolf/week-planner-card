@@ -105,7 +105,8 @@ export class WeekPlannerCard extends LitElement {
         this._weather = this._getWeatherConfig(config.weather);
         this._numberOfDays = this._getNumberOfDays(config.days ?? 7);
         this._hideWeekend = config.hideWeekend ?? false;
-        this._startDate = this._getStartDate(config.startingDay ?? 'today');
+        this._startingDay = config.startingDay ?? 'today';
+        this._startDate = this._getStartDate();
         this._updateInterval = config.updateInterval ?? 60;
         this._noCardBackground = config.noCardBackground ?? false;
         this._eventBackground = config.eventBackground ?? 'var(--card-background-color, inherit)';
@@ -436,6 +437,7 @@ export class WeekPlannerCard extends LitElement {
         this._error = '';
         this._events = {};
 
+        this._startDate = this._getStartDate();
         let startDate = this._startDate;
         let endDate = this._startDate.plus({ days: this._numberOfDays });
         let now = DateTime.now();
@@ -663,10 +665,10 @@ export class WeekPlannerCard extends LitElement {
         return numberOfDays;
     }
 
-    _getStartDate(startingDay) {
+    _getStartDate(alternativeStartingDay) {
         let startDate = DateTime.now();
 
-        switch (startingDay) {
+        switch (alternativeStartingDay ?? this._startingDay) {
             case 'yesterday':
                 startDate = startDate.minus({ days: 1 })
                 break;
