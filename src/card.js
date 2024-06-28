@@ -448,7 +448,7 @@ export class WeekPlannerCard extends LitElement {
             this._loading++;
             this.hass.callApi(
                 'get',
-                'calendars/' + calendar.entity + '?start=' + startDate.toFormat('yyyy-LL-dd\'T\'HH:mm:ss\'Z\'') + '&end=' + endDate.toFormat('yyyy-LL-dd\'T\'HH:mm:ss\'Z\'')
+                'calendars/' + calendar.entity + '?start=' + encodeURIComponent(startDate.toISO()) + '&end=' + encodeURIComponent(endDate.toISO())
             ).then(response => {
                 response.forEach(event => {
                     let startDate = this._convertApiDate(event.start);
