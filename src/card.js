@@ -112,6 +112,7 @@ export class WeekPlannerCard extends LitElement {
         this._noCardBackground = config.noCardBackground ?? false;
         this._eventBackground = config.eventBackground ?? 'var(--card-background-color, inherit)';
         this._compact = config.compact ?? false;
+        this._dayFormat = config.dayFormat ?? null;
         this._dateFormat = config.dateFormat ?? 'cccc d LLLL yyyy';
         this._timeFormat = config.timeFormat ?? 'HH:mm';
         this._locationLink = config.locationLink ?? 'https://www.google.com/maps/search/?api=1&query=';
@@ -222,8 +223,13 @@ export class WeekPlannerCard extends LitElement {
                 return html`
                     <div class="day ${day.class}">
                         <div class="date">
-                            <span class="number">${day.date.day}</span>
-                            <span class="text">${this._getWeekDayText(day.date)}</span>
+                            ${this._dayFormat ?
+                                    unsafeHTML(day.date.toFormat(this._dayFormat)) :
+                                    html`
+                                        <span class="number">${day.date.day}</span>
+                                    <span class="text">${this._getWeekDayText(day.date)}</span>
+                                `
+                            }
                         </div>
                         ${day.weather ?
                             html`
