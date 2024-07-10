@@ -114,13 +114,20 @@ Like with most cards, you can add custom styling to this card using [card_mod](h
 
 ### Day classes
 
-| Class       | Description       | Version |
-|-------------|-------------------|---------|
-| `today`     | The current day   | 1.5.0   |
-| `tomorrow`  | The next day      | 1.5.0   |
-| `yesterday` | The previous day  | 1.5.0   |
-| `future`    | Day in the future | 1.5.0   |
-| `past`      | Day in the past   | 1.5.0   |
+| Class       | Description        | Version |
+|-------------|--------------------|---------|
+| `today`     | The current day    | 1.5.0   |
+| `tomorrow`  | The next day       | 1.5.0   |
+| `yesterday` | The previous day   | 1.5.0   |
+| `future`    | Day in the future  | 1.5.0   |
+| `past`      | Day in the past    | 1.5.0   |
+| `sunday`    | Day is a sunday    | 1.6.0   |
+| `monday`    | Day is a monday    | 1.6.0   |
+| `tuesday`   | Day is a tuesday   | 1.6.0   |
+| `wednesday` | Day is a wednesday | 1.6.0   |
+| `thursday`  | Day is a thursday  | 1.6.0   |
+| `friday`    | Day is a friday    | 1.6.0   |
+| `saturday`  | Day is a saturday  | 1.6.0   |
 
 ### Event classes
 
