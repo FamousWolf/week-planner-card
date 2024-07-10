@@ -101,15 +101,18 @@ export class WeekPlannerCard extends LitElement {
             throw new Error('No calendars are configured');
         }
 
+        this._title = config.title ?? null;
         this._calendars = config.calendars;
         this._weather = this._getWeatherConfig(config.weather);
         this._numberOfDays = this._getNumberOfDays(config.days ?? 7);
         this._hideWeekend = config.hideWeekend ?? false;
-        this._startDate = this._getStartDate(config.startingDay ?? 'today');
+        this._startingDay = config.startingDay ?? 'today';
+        this._startDate = this._getStartDate();
         this._updateInterval = config.updateInterval ?? 60;
         this._noCardBackground = config.noCardBackground ?? false;
         this._eventBackground = config.eventBackground ?? 'var(--card-background-color, inherit)';
         this._compact = config.compact ?? false;
+        this._dayFormat = config.dayFormat ?? null;
         this._dateFormat = config.dateFormat ?? 'cccc d LLLL yyyy';
         this._timeFormat = config.timeFormat ?? 'HH:mm';
         this._locationLink = config.locationLink ?? 'https://www.google.com/maps/search/?api=1&query=';
@@ -189,6 +192,10 @@ export class WeekPlannerCard extends LitElement {
                         html`<ha-alert alert-type="error">${this._error}</ha-alert>` :
                         ''
                     }
+                    ${this._title ?
+                        html`<h1 class="card-title">${this._title}</h1>` :
+                        ''
+                    }
                     <div class="container">
                         ${this._renderDays()}
                     </div>
@@ -216,8 +223,13 @@ export class WeekPlannerCard extends LitElement {
                 return html`
                     <div class="day ${day.class}">
                         <div class="date">
-                            <span class="number">${day.date.day}</span>
-                            <span class="text">${this._getWeekDayText(day.date)}</span>
+                            ${this._dayFormat ?
+                                    unsafeHTML(day.date.toFormat(this._dayFormat)) :
+                                    html`
+                                        <span class="number">${day.date.day}</span>
+                                    <span class="text">${this._getWeekDayText(day.date)}</span>
+                                `
+                            }
                         </div>
                         ${day.weather ?
                             html`
@@ -263,7 +275,7 @@ export class WeekPlannerCard extends LitElement {
                                 html`
                                     ${day.events.map((event) => {
                                         return html`
-                                            <div class="event ${event.class}" style="--border-color: ${event.color}" @click="${() => { this._handleEventClick(event) }}">
+                                            <div class="event ${event.class}" data-entity="${event.calendar}" style="--border-color: ${event.color}" @click="${() => { this._handleEventClick(event) }}">
                                                 <div class="time">
                                                     ${event.fullDay ?
                                                         html`${this._language.fullDay}` :
@@ -436,6 +448,7 @@ export class WeekPlannerCard extends LitElement {
         this._error = '';
         this._events = {};
 
+        this._startDate = this._getStartDate();
         let startDate = this._startDate;
         let endDate = this._startDate.plus({ days: this._numberOfDays });
         let now = DateTime.now();
@@ -549,6 +562,16 @@ export class WeekPlannerCard extends LitElement {
                 classes.push('past');
             }
         }
+        classes.push([
+            'sunday',
+            'monday',
+            'tuesday',
+            'wednesday',
+            'thursday',
+            'friday',
+            'saturday',
+            'sunday'
+        ][startDate.weekday]);
         return classes.join(' ');
     }
 
@@ -663,10 +686,10 @@ export class WeekPlannerCard extends LitElement {
         return numberOfDays;
     }
 
-    _getStartDate(startingDay) {
+    _getStartDate(alternativeStartingDay) {
         let startDate = DateTime.now();
 
-        switch (startingDay) {
+        switch (alternativeStartingDay ?? this._startingDay) {
             case 'yesterday':
                 startDate = startDate.minus({ days: 1 })
                 break;

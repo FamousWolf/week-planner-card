@@ -39,7 +39,7 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
     Add:
     ```yaml
     resources:
-      - url: /local/week-planner-card.js?version=1.5.1
+      - url: /local/week-planner-card.js?version=1.6.0
     type: module
     ```
   - **Using the graphical editor**
@@ -53,26 +53,28 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 
 ### Main Options
 
-| Name                    | Type             | Default                                            | Supported options                                                                                                                           | Description                                                  | Version |
-|-------------------------|------------------|----------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------|---------|
-| `type`                  | string           | **Required**                                       | `custom:week-planner-card`                                                                                                                  | Type of the card                                             | 1.0.0   |
-| `days`                  | number \| string | 7                                                  | Any positive integer number \| `month`                                                                                                      | The number of days to show                                   | 1.0.0   |
-| `startingDay`           | string           | `today`                                            | `today` \| `tomorrow` \| `yesterday` \| `sunday` \| `monday` \| `tuesday` \| `wednesday` \| `thursday` \| `friday` \| `saturday` \| `month` | Day to start with                                            | 1.2.0   |
-| `hideWeekend`           | boolean          | false                                              | `false` \| `true`                                                                                                                           | Do not show Saturday and Sunday                              | 1.2.0   |
-| `noCardBackground`      | boolean          | false                                              | `false` \| `true`                                                                                                                           | Do not show default card background and border               | 1.0.0   |
-| `eventBackground`       | string           | `var(--card-background-color, inherit)`            | Any CSS color                                                                                                                               | Background color of the events                               | 1.0.0   |
-| `compact`               | boolean          | false                                              | `false` \| `true`                                                                                                                           | Use compact mode, decreasing several spacings and font sizes | 1.2.0   |
-| `updateInterval`        | number           | 60                                                 | Any positive integer number                                                                                                                 | Seconds between checks for new events                        | 1.0.0   |
-| `calendars`             | object list      | **Required**                                       | See [Calendars](#calendars)                                                                                                                 | Calendars shown in this card                                 | 1.0.0   |
-| `texts`                 | object list      | {}                                                 | See [Texts](#texts)                                                                                                                         | Texts used in the card                                       | 1.0.0   |
-| `weather`               | object           | optional                                           | See [Weather](#weather)                                                                                                                     | Configuration for optional weather forecast                  | 1.1.0   |
-| `dateFormat`            | string           | `cccc d LLLL yyyy`                                 | See [Luxon format](https://moment.github.io/luxon/#/formatting?id=table-of-tokens)                                                          | Format of the date in event details                          | 1.0.0   |
-| `timeFormat`            | string           | `HH:mm`                                            | See [Luxon format](https://moment.github.io/luxon/#/formatting?id=table-of-tokens)                                                          | Format of the time                                           | 1.0.0   |
-| `locale`                | string           | `en`                                               | Any locale string supported by Luxon                                                                                                        | Locale used for day and month texts                          | 1.1.0   |
-| `locationLink`          | string           | `https://www.google.com/maps/search/?api=1&query=` | Any URL                                                                                                                                     | Link used for event location in the detail popup             | 1.1.0   |
-| `showLocation`          | boolean          | false                                              | `false` \| `true`                                                                                                                           | Show event location in overview                              | 1.3.0   |
-| `hidePastEvents`        | boolean          | false                                              | `false` \| `true`                                                                                                                           | Do not show past events                                      | 1.3.0   |
-| `hideDaysWithoutEvents` | boolean          | false                                              | `false` \| `true`                                                                                                                           | Do not show days without events, except for today            | 1.4.0   |
+| Name                    | Type             | Default                                            | Supported options                                                                                                                           | Description                                                                            | Version |
+|-------------------------|------------------|----------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------|---------|
+| `type`                  | string           | **Required**                                       | `custom:week-planner-card`                                                                                                                  | Type of the card                                                                       | 1.0.0   |
+| `title`                 | string           | optional                                           | Any string                                                                                                                                  | Card title                                                                             | 1.6.0   |
+| `days`                  | number \| string | 7                                                  | Any positive integer number \| `month`                                                                                                      | The number of days to show                                                             | 1.0.0   |
+| `startingDay`           | string           | `today`                                            | `today` \| `tomorrow` \| `yesterday` \| `sunday` \| `monday` \| `tuesday` \| `wednesday` \| `thursday` \| `friday` \| `saturday` \| `month` | Day to start with                                                                      | 1.2.0   |
+| `hideWeekend`           | boolean          | false                                              | `false` \| `true`                                                                                                                           | Do not show Saturday and Sunday                                                        | 1.2.0   |
+| `noCardBackground`      | boolean          | false                                              | `false` \| `true`                                                                                                                           | Do not show default card background and border                                         | 1.0.0   |
+| `eventBackground`       | string           | `var(--card-background-color, inherit)`            | Any CSS color                                                                                                                               | Background color of the events                                                         | 1.0.0   |
+| `compact`               | boolean          | false                                              | `false` \| `true`                                                                                                                           | Use compact mode, decreasing several spacings and font sizes                           | 1.2.0   |
+| `updateInterval`        | number           | 60                                                 | Any positive integer number                                                                                                                 | Seconds between checks for new events                                                  | 1.0.0   |
+| `calendars`             | object list      | **Required**                                       | See [Calendars](#calendars)                                                                                                                 | Calendars shown in this card                                                           | 1.0.0   |
+| `texts`                 | object list      | {}                                                 | See [Texts](#texts)                                                                                                                         | Texts used in the card                                                                 | 1.0.0   |
+| `weather`               | object           | optional                                           | See [Weather](#weather)                                                                                                                     | Configuration for optional weather forecast                                            | 1.1.0   |
+| `dayFormat`             | string           | optional                                           | See [Luxon format](https://moment.github.io/luxon/#/formatting?id=table-of-tokens)                                                          | Format of the date at the top of the day. This is not escaped, so HTML is allowed here | 1.6.0   |
+| `dateFormat`            | string           | `cccc d LLLL yyyy`                                 | See [Luxon format](https://moment.github.io/luxon/#/formatting?id=table-of-tokens)                                                          | Format of the date in event details                                                    | 1.0.0   |
+| `timeFormat`            | string           | `HH:mm`                                            | See [Luxon format](https://moment.github.io/luxon/#/formatting?id=table-of-tokens)                                                          | Format of the time                                                                     | 1.0.0   |
+| `locale`                | string           | `en`                                               | Any locale string supported by Luxon                                                                                                        | Locale used for day and month texts                                                    | 1.1.0   |
+| `locationLink`          | string           | `https://www.google.com/maps/search/?api=1&query=` | Any URL                                                                                                                                     | Link used for event location in the detail popup                                       | 1.1.0   |
+| `showLocation`          | boolean          | false                                              | `false` \| `true`                                                                                                                           | Show event location in overview                                                        | 1.3.0   |
+| `hidePastEvents`        | boolean          | false                                              | `false` \| `true`                                                                                                                           | Do not show past events                                                                | 1.3.0   |
+| `hideDaysWithoutEvents` | boolean          | false                                              | `false` \| `true`                                                                                                                           | Do not show days without events, except for today                                      | 1.4.0   |
 
 ### Calendars
 
@@ -113,13 +115,20 @@ Like with most cards, you can add custom styling to this card using [card_mod](h
 
 ### Day classes
 
-| Class       | Description       | Version |
-|-------------|-------------------|---------|
-| `today`     | The current day   | 1.5.0   |
-| `tomorrow`  | The next day      | 1.5.0   |
-| `yesterday` | The previous day  | 1.5.0   |
-| `future`    | Day in the future | 1.5.0   |
-| `past`      | Day in the past   | 1.5.0   |
+| Class       | Description        | Version |
+|-------------|--------------------|---------|
+| `today`     | The current day    | 1.5.0   |
+| `tomorrow`  | The next day       | 1.5.0   |
+| `yesterday` | The previous day   | 1.5.0   |
+| `future`    | Day in the future  | 1.5.0   |
+| `past`      | Day in the past    | 1.5.0   |
+| `sunday`    | Day is a sunday    | 1.6.0   |
+| `monday`    | Day is a monday    | 1.6.0   |
+| `tuesday`   | Day is a tuesday   | 1.6.0   |
+| `wednesday` | Day is a wednesday | 1.6.0   |
+| `thursday`  | Day is a thursday  | 1.6.0   |
+| `friday`    | Day is a friday    | 1.6.0   |
+| `saturday`  | Day is a saturday  | 1.6.0   |
 
 ### Event classes
 
@@ -205,4 +214,13 @@ calendars:
   - entity: calendar.my_calendar_1
 days: month
 startingDay: month
+```
+
+### Show month with each day
+
+```yaml
+type: custom:week-planner-card
+calendars:
+  - calendar.my_calendar_1
+dayFormat: '''<span class="number">''d''</span> <span class="month">''MMMM''</span>'''
 ```
