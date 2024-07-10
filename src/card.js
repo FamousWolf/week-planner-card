@@ -101,6 +101,7 @@ export class WeekPlannerCard extends LitElement {
             throw new Error('No calendars are configured');
         }
 
+        this._title = config.title ?? null;
         this._calendars = config.calendars;
         this._weather = this._getWeatherConfig(config.weather);
         this._numberOfDays = this._getNumberOfDays(config.days ?? 7);
@@ -188,6 +189,10 @@ export class WeekPlannerCard extends LitElement {
                 <div class="card-content">
                     ${this._error ?
                         html`<ha-alert alert-type="error">${this._error}</ha-alert>` :
+                        ''
+                    }
+                    ${this._title ?
+                        html`<h1 class="card-title">${this._title}</h1>` :
                         ''
                     }
                     <div class="container">
