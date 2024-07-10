@@ -556,7 +556,15 @@ export class WeekPlannerCard extends LitElement {
                 classes.push('past');
             }
         }
-        classes.push(["sunday","monday","tuesday","wednesday","thursday","friday","saturday"][startDate.getDay()])
+        classes.push([
+            'sunday',
+            'monday',
+            'tuesday',
+            'wednesday',
+            'thursday',
+            'friday',
+            'saturday'
+        ][startDate.getDay()]);
         return classes.join(' ');
     }
 
