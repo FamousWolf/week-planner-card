@@ -563,8 +563,9 @@ export class WeekPlannerCard extends LitElement {
             'wednesday',
             'thursday',
             'friday',
-            'saturday'
-        ][startDate.getDay()]);
+            'saturday',
+            'sunday'
+        ][startDate.weekday]);
         return classes.join(' ');
     }
 
