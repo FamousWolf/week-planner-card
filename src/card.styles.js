@@ -38,15 +38,49 @@ export default css`
         --weather-icon-size: 20px;
         --weather-temperature-font-size: 0.8em;
     }
+    .calendar_default_cell_inner {
+        position: absolute;
+        inset: 0px;
+        border-right: 1px solid rgb(221, 221, 221);
+        border-bottom: 1px solid rgb(221, 221, 221);
+    }
 
     .container {
         container-name: weekplanner;
         container-type: inline-size;
+        padding-top: 3em;
         display: flex;
         flex-wrap: wrap;
         gap: var(--days-spacing);
     }
-
+    .container .button_calendar_view {
+        height: 2.5em; 
+        width: 2.5em; 
+        position: fixed; 
+        left: 1em; 
+        top: 1em;
+    }
+    .container #button_calendar_add {
+        position: fixed; 
+        top: 1em; 
+        right: 1em; 
+        display: flex; 
+        flex-direction: column; 
+        align-items: center; 
+        z-index: 1024; 
+        height: 3.5em; 
+        display: block; 
+        width: 3.5em; 
+        border-radius: 50%; 
+        background-color: #3498db; 
+        box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26); 
+        color: white !important; 
+        text-align: center; 
+        line-height: 2.6; 
+        border-color: transparent; 
+        cursor: pointer; 
+        outline: 0;
+    }
     .container .day {
         position: relative;
         width: calc((100% - 6 * var(--days-spacing)) / 7);

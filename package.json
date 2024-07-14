@@ -11,29 +11,33 @@
     }
   },
   "scripts": {
+    "start": "node src/index.js",
     "watch": "parcel watch",
+    "build2": "parcel build --public-url /Volumes/config/www/community/week-planner-card/",
     "build": "parcel build"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/FamousWolf/week-planner-card.git"
+    "url": "git+https://github.com/Smeltvig/week-planner-card.git"
   },
   "keywords": [
     "lovelace"
   ],
-  "author": "Rudy Gnodde",
+  "author": "Thomas",
   "licence": "MIT",
   "bugs": {
-    "url": "https://github.com/FamousWolf/week-planner-card/issues"
+    "url": "https://github.com/Smeltvig/week-planner-card/issues"
   },
-  "homepage": "https://github.com/FamousWolf/week-planner-card",
+  "homepage": "https://github.com/Smeltvig/week-planner-card",
   "devDependencies": {
     "@parcel/optimizer-data-url": "^2.12.0",
     "@parcel/transformer-inline-string": "^2.11.0",
-    "parcel": "^2.11.0"
+    "click-and-hold": "^2.0.0",
+    "parcel": "^2.12.0"
   },
   "dependencies": {
     "lit": "^3.1.2",
-    "luxon": "^3.4.4"
+    "luxon": "^3.4.4",
+    "uuid": "^10.0.0"
   }
 }

@@ -16,6 +16,8 @@ import snowy from 'data-url:./icons/snowy.png';
 import mixed_rain from 'data-url:./icons/mixed_rain.png';
 import sunny from 'data-url:./icons/sunny.png';
 import windy from 'data-url:./icons/windy.svg';
+import { v4 as uuidv4 } from 'uuid';
+
 
 const ICONS = {
   'clear-day': sunny,
@@ -49,8 +51,20 @@ const ICONS_NIGHT = {
   'lightning-rainy': storm_night
 };
 
+const VIEW_TYPE = {
+    Day: 'day',
+    Days: 'days',
+    Week: 'week',
+    WorkWeek: 'workweek',
+    Resources: 'resources'
+};
+
 export class WeekPlannerCard extends LitElement {
+
     static styles = styles;
+
+
+    
 
     _initialized = false;
     _loading = 0;
@@ -59,6 +73,7 @@ export class WeekPlannerCard extends LitElement {
     _calendars;
     _numberOfDays;
     _updateInterval;
+    _viewType;
     _noCardBackground;
     _eventBackground;
     _compact;
@@ -74,6 +89,7 @@ export class WeekPlannerCard extends LitElement {
     _hidePastEvents;
     _hideDaysWithoutEvents;
 
+    
     /**
      * Get properties
      *
@@ -82,10 +98,12 @@ export class WeekPlannerCard extends LitElement {
     static get properties() {
         return {
             _days: { type: Array },
+            _hours: { type: Array },
             _config: { type: Object },
             _isLoading: { type: Boolean },
             _error: { type: String },
-            _currentEventDetails: { type: Object }
+            _currentEventDetails: { type: Object },
+            _viewType: { type: VIEW_TYPE }
         }
     }
 
@@ -100,7 +118,9 @@ export class WeekPlannerCard extends LitElement {
         if (!config.calendars) {
             throw new Error('No calendars are configured');
         }
-
+        //this._calendars = Cell Duration
+        //this._calendars = Cell Height
+        this._hours = Array.from({length: 24}, (_, index) => index + 1);
         this._calendars = config.calendars;
         this._weather = this._getWeatherConfig(config.weather);
         this._numberOfDays = this._getNumberOfDays(config.days ?? 7);
@@ -108,6 +128,10 @@ export class WeekPlannerCard extends LitElement {
         this._startDate = this._getStartDate(config.startingDay ?? 'today');
         this._updateInterval = config.updateInterval ?? 60;
         this._noCardBackground = config.noCardBackground ?? false;
+        this._viewType = config.viewType ?? VIEW_TYPE.Days;
+
+
+        
         this._eventBackground = config.eventBackground ?? 'var(--card-background-color, inherit)';
         this._compact = config.compact ?? false;
         this._dateFormat = config.dateFormat ?? 'cccc d LLLL yyyy';
@@ -181,7 +205,7 @@ export class WeekPlannerCard extends LitElement {
         if (this._compact) {
             cardClasses.push('compact');
         }
-
+        
         return html`
             <ha-card class="${cardClasses.join(' ')}" style="--event-background-color: ${this._eventBackground}">
                 <div class="card-content">
@@ -190,113 +214,268 @@ export class WeekPlannerCard extends LitElement {
                         ''
                     }
                     <div class="container">
+                        <button class="button_calendar_view" style="left: 2em;" @click="${() => {this._setViewType(VIEW_TYPE.Day) }}">${this._getViewTypeIcon(VIEW_TYPE.Day)}</button>
+                        <button class="button_calendar_view" style="left: 4em;" @click="${() => {this._setViewType(VIEW_TYPE.Days) }}">${this._getViewTypeIcon(VIEW_TYPE.Days)}</button>
+                        <button id="button_calendar_add" style=" " @click="${() => { this._createEvent("test 2", "2024-07-08 10:00:00","2024-07-08 14:00:00", false ,(this._calendars[0])) }}">Add</button>
+                        ${this._renderCalendars()}
                         ${this._renderDays()}
+
                     </div>
                     ${this._renderEventDetailsDialog()}
                     ${this._isLoading ?
                         html`<div class="loader"></div>` :
                         ''
-                    }
+                    } 
                 </div>
             </ha-card>
         `;
     }
+    _getViewTypeIcon(view) {
 
-    _renderDays() {
+        switch (view.toLowerCase()) {
+            case VIEW_TYPE.Day:
+                return html`<svg preserveAspectRatio="xMidYMid meet" focusable="false" role="img" aria-hidden="true" viewBox="0 0 24 24" style=""> <g><path class="primary-path" d="M14,14H7V16H14M19,19H5V8H19M19,3H18V1H16V3H8V1H6V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M17,10H7V12H17V10Z"></path></g> </svg>`;
+                break;
+            case VIEW_TYPE.Days:
+                return html`
+                    <svg preserveAspectRatio="xMidYMid meet" focusable="false" role="img" aria-hidden="true" viewBox="0 0 24 24"> <g> <path class="primary-path" d="M9,10V12H7V10H9M13,10V12H11V10H13M17,10V12H15V10H17M19,3A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5A2,2 0 0,1 5,3H6V1H8V3H16V1H18V3H19M19,19V8H5V19H19M9,14V16H7V14H9M13,14V16H11V14H13M17,14V16H15V14H17Z"></path> </g> </svg>
+                `;
+                break;
+            default:
+                return html`
+                    <svg preserveAspectRatio="xMidYMid meet" focusable="false" role="img" aria-hidden="true" viewBox="0 0 24 24"> <g> <path class="primary-path" d="M9,10V12H7V10H9M13,10V12H11V10H13M17,10V12H15V10H17M19,3A2,2 0 0,1 21,5V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5A2,2 0 0,1 5,3H6V1H8V3H16V1H18V3H19M19,19V8H5V19H19M9,14V16H7V14H9M13,14V16H11V14H13M17,14V16H15V14H17Z"></path> </g> </svg>
+                `;
+                
+        }
+        
+        
+    }
+    _setViewType(view) {
+        //viewType?: "Day" | "Days" | "Week" | "WorkWeek" | "Resources";
+        //mdi:calendar-text -- Day
+        //mdi:calendar-month -- Days
+        //mdi:calendar-multiselect -- WorkWeek
+        //mdi:calendar-range -- Week
+        switch (view.toLowerCase()) {
+            case VIEW_TYPE.Day:
+                this._viewType = VIEW_TYPE.Day;
+                this._loading = 0;
+                this._updateEvents();
+                break;
+            case VIEW_TYPE.Days:
+                this._viewType = VIEW_TYPE.Days;
+                this._loading = 0;
+                this._updateEvents();
+                break;
+            default:
+                this._viewType = VIEW_TYPE.Days;
+                this._loading = 0;
+                this._updateEvents();
+        }
+    }
+    _renderCalendars() {
+
         if (!this._days) {
             return html``;
         }
 
-        return html`
-            ${this._days.map((day) => {
-                if (this._hideDaysWithoutEvents && day.events.length === 0 && !this._isToday(day.date)) {
-                    return html``;
-                }
-                
-                return html`
-                    <div class="day ${day.class}">
-                        <div class="date">
-                            <span class="number">${day.date.day}</span>
-                            <span class="text">${this._getWeekDayText(day.date)}</span>
-                        </div>
-                        ${day.weather ?
-                            html`
-                                <div class="weather" @click="${this._handleWeatherClick}">
-                                    ${this._weather?.showTemperature || this._weather?.showLowTemperature ?
-                                        html`
-                                            <div class="temperature">
-                                                ${this._weather?.showTemperature ?
-                                                    html`
-                                                        <span class="high">${day.weather.temperature}</span>
-                                                    ` :
-                                                    ''
-                                                }
-                                                ${this._weather?.showLowTemperature ?
-                                                    html`
-                                                            <span class="low">${day.weather.templow}</span>
-                                                    ` :
-                                                    ''
-                                                }
+        if (this._viewType == VIEW_TYPE.Day) {
+            return html`
+
+
+            <table cellspacing="0" cellpadding="0" border="0" style="border: 0px none;width: 100%;position: unset;">
+                <tbody>
+                    <tr>
+                        <td style="padding: 0px; border: 0px none;">
+                            <table cellspacing="0" cellpadding="0" border="0" style="border: 0px none; width: 60px;">
+                                <tbody>
+                                ${this._hours.map((hour) => {
+                                    return html`
+                                    <tr style="height: 80px;">
+                                        <td style="cursor: default; padding: 0px; border: 0px none;">
+                                            <div class="calendar_default_rowheader" style="position: relative; width: 60px; height: 80px; overflow: hidden;">
+                                                <div class="calendar_default_rowheader_inner">
+                                                    <div>${hour-1}<span class="calendar_default_rowheader_minutes">00</span></div>
+                                                </div>
                                             </div>
-                                        ` :
-                                        ''
-                                    }
-                                    ${this._weather?.showCondition ?
-                                        html`
-                                            <div class="icon">
-                                                <img src="${day.weather.icon}" alt="${day.weather.condition}">
-                                            </div>
-                                        ` :
-                                        ''
-                                    }
-                                </div>
-                            ` :
-                            ''
-                        }
-                        <div class="events">
-                            ${day.events.length === 0 ?
-                                html`
-                                    <div class="none">
-                                        ${this._language.noEvents}
-                                    </div>
-                                ` :
-                                html`
-                                    ${day.events.map((event) => {
+                                        </td>
+                                    </tr>
+                                    `;
+                                })}
+                                </tbody>
+                            </table>
+                        </td>
+
+                    ${this._calendars.map((calendar) => {
+                        return html`
+
+                        <!-- calendars length : ${(this._calendars.length)} -->
+                        <td width="${((1/this._calendars.length)*100)}%" style="padding: 0px; border: 0px none;">
+                            <div style="position: relative;">
+
+                         
+                                <table cellpadding="0" cellspacing="0" border="0" style="width: 100%; border: 0px none; table-layout: fixed;">
+                                    <tbody>
+
+                                    ${this._hours.map((hour) => {
                                         return html`
-                                            <div class="event ${event.class}" style="--border-color: ${event.color}" @click="${() => { this._handleEventClick(event) }}">
-                                                <div class="time">
-                                                    ${event.fullDay ?
-                                                        html`${this._language.fullDay}` :
+                                        <tr>
+                                            <td style="padding: 0px; border: 0px none; vertical-align: top; height: 20px; overflow: hidden;">
+                                                <div class="calendar_default_cell" style="height: 20px; position: relative;">
+                                                    <div unselectable="on" class="calendar_default_cell_inner"></div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 0px; border: 0px none; vertical-align: top; height: 20px; overflow: hidden;">
+                                                <div class="calendar_default_cell" style="height: 20px; position: relative;">
+                                                    <div unselectable="on" class="calendar_default_cell_inner"></div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 0px; border: 0px none; vertical-align: top; height: 20px; overflow: hidden;">
+                                                <div class="calendar_default_cell" style="height: 20px; position: relative;">
+                                                    <div unselectable="on" class="calendar_default_cell_inner"></div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 0px; border: 0px none; vertical-align: top; height: 20px; overflow: hidden;">
+                                                <div class="calendar_default_cell" style="height: 20px; position: relative;">
+                                                    <div unselectable="on" class="calendar_default_cell_inner"></div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        `;
+                                    })}
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </td>
+                        `;
+                    })}
+                    </tr>
+                </tbody>
+            </table>
+            `;
+        }
+
+    }
+    _renderDays() {
+        if (!this._days) {
+            return html``;
+        }
+        if (this._viewType == VIEW_TYPE.Days) {
+        
+            return html`
+                ${this._days.map((day) => {
+                    if (this._hideDaysWithoutEvents && day.events.length === 0 && !this._isToday(day.date)) {
+                        return html``;
+                    }
+                    
+                    return html`
+                        <div class="day ${day.class}">
+                            <div class="date">
+                                <span class="number">${day.date.day}</span>
+                                <span class="text">${this._getWeekDayText(day.date)}</span>
+                            </div>
+                            ${day.weather ?
+                                html`
+                                    <div class="weather" @click="${this._handleWeatherClick}">
+                                        ${this._weather?.showTemperature || this._weather?.showLowTemperature ?
+                                            html`
+                                                <div class="temperature">
+                                                    ${this._weather?.showTemperature ?
                                                         html`
-                                                            ${event.start.toFormat(this._timeFormat)}
-                                                            ${event.end ? ' - ' + event.end.toFormat(this._timeFormat) : ''}
-                                                        `
+                                                            <span class="high">${day.weather.temperature}</span>
+                                                        ` :
+                                                        ''
+                                                    }
+                                                    ${this._weather?.showLowTemperature ?
+                                                        html`
+                                                                <span class="low">${day.weather.templow}</span>
+                                                        ` :
+                                                        ''
                                                     }
                                                 </div>
-                                                <div class="title">
-                                                    ${event.summary}
+                                            ` :
+                                            ''
+                                        }
+                                        ${this._weather?.showCondition ?
+                                            html`
+                                                <div class="icon">
+                                                    <img src="${day.weather.icon}" alt="${day.weather.condition}">
                                                 </div>
-                                                ${this._showLocation && event.location ?
-                                                    html`
-                                                        <div class="location">
-                                                            <ha-icon icon="mdi:map-marker"></ha-icon>
-                                                            ${event.location}
-                                                        </div>
-                                                    ` :
-                                                    ''
-                                                }
-                                            </div>
-                                        `
-                                    })}
-                                `
+                                            ` :
+                                            ''
+                                        }
+                                    </div>
+                                ` :
+                                ''
                             }
+                            <div class="events">
+                                ${day.events.length === 0 ?
+                                    html`
+                                        <div class="none">
+                                            ${this._language.noEvents}
+                                        </div>
+                                    ` :
+                                    html`
+                                        ${day.events.map((event) => {
+                                            return html`
+                                                <div id="${event.id}" class="event ${event.class}" style="--border-color: ${event.color}" @click="${() => { this._handleEventClick(event) }}">
+                                                    <div class="time">
+                                                        ${event.fullDay ?
+                                                            html`${this._language.fullDay}` :
+                                                            html`
+                                                                ${event.start.toFormat(this._timeFormat)}
+                                                                ${event.end ? ' - ' + event.end.toFormat(this._timeFormat) : ''}
+                                                            `
+                                                        }
+                                                    </div>
+                                                    <div class="title">
+                                                        ${event.summary}
+                                                    </div>
+                                                    ${this._showLocation && event.location ?
+                                                        html`
+                                                            <div class="location">
+                                                                <ha-icon icon="mdi:map-marker"></ha-icon>
+                                                                ${event.location}
+                                                            </div>
+                                                        ` :
+                                                        ''
+                                                    }
+                                                </div>
+                                            `
+                                        })}
+                                    `
+                                }
+                            </div>
                         </div>
-                    </div>
-                `
-            })}
-        `;
+                    `
+                })}
+            `;
+        }
     }
 
+    valueChanged(ev) {
+        //const newValue = ev.currentTarget.value;
+
+        //const attributeName = ev.currentTarget.getAttribute("data-attributeName");
+        //const ff = this._currentEventDetails[attributeName] = newValue;
+
+        //const sdf = ff;
+        //const entity = ev.currentTarget.getAttribute("data-entity");
+        //const newValue_summary = this.shadowRoot.querySelector("#textinput_summary").value;
+        //const newValue = this.shadowRoot.querySelector("#textinput_summary").value;
+        //const param = {
+        //  entity_id: entity,
+        //  value: newValue,
+        //};
+        //this._hass.callService('input_text', 'set_value', param);
+      }
     _renderEventDetailsDialog() {
         if (!this._currentEventDetails) {
             return html``;
@@ -312,7 +491,14 @@ export class WeekPlannerCard extends LitElement {
                     <div class="calendar">
                         <ha-icon icon="mdi:calendar-account"></ha-icon>
                         <div class="info">
-                            ${this.hass.formatEntityAttributeValue(this.hass.states[this._currentEventDetails.calendar], 'friendly_name')}
+
+                        <button
+                        class="footer_button"
+                        @click="${() => { this._deleteEvent(this._currentEventDetails)}}"
+                    ><ha-icon icon="mdi:close"></ha-icon></button>
+
+
+                        ${this._currentEventDetails.calendar ? html`${this.hass.formatEntityAttributeValue(this.hass.states[this._currentEventDetails.calendar], 'friendly_name')}` :''}
                         </div>
                     </div>
                     <div class="datetime">
@@ -340,15 +526,38 @@ export class WeekPlannerCard extends LitElement {
                         ` :
                         ''
                     }
+                    ${this._renderEventDetailsDialogFooter()}
                 </div>
             </ha-dialog>
         `;
     }
 
+    _renderEventDetailsDialogFooter() {
+        return html`
+            <div class="footer">
+                <button
+                    class="footer_button"
+                    @click="${() => { this._deleteEvent()}}"
+                ><ha-icon icon="mdi:close"></ha-icon></button>
+            </div>
+        `;
+    }
     _renderEventDetailsDialogHeading() {
         return html`
             <div class="header_title">
-                <span>${this._currentEventDetails.summary}</span>
+
+
+            <ha-textfield
+            label="dddddd"
+            style="width: 100%"
+            value="${this._currentEventDetails.summary}"
+            @change="${this.valueChanged}"
+            id="textinput_summary"
+            placeholder=""
+            ></ha-textfield>
+
+                <!-- <span>${this._currentEventDetails.summary}</span> -->
+                
                 <ha-icon-button
                     .label="${this.hass?.localize('ui.dialogs.generic.close') ?? 'Close'}"
                     dialogAction="close"
@@ -426,6 +635,114 @@ export class WeekPlannerCard extends LitElement {
         });
     }
 
+
+    _deleteEvent(){
+
+        if (!this._currentEventDetails) {
+            return html``;
+        }
+        const uid = this._currentEventDetails.id;
+        const entity_id = this._currentEventDetails.calendar;
+        //this.hass.callWS({
+        //    type: "calendar/event/delete",
+        //    entity_id: entity_id,
+        //    uid: uid
+        //})
+        //.then(response =>
+        //    console.log("ssss", response))
+        //.catch(error =>
+        //    console.log("aaaa", error));
+
+
+
+            
+        this.hass.callService('calendar', 'delete_event', {
+            "entity_id": entity_id,
+            "uid": uid
+        }).then(response => {
+            console.log(response)
+        }).catch(error => {
+            console.log(error)
+        });
+
+
+    }
+    _createEvent(summary, startDate,endDate,fullDay, calendar) {
+
+     
+        
+
+        let currentTime = new Date("2024-07-08T10:00:00.000+02:00");
+        
+        let updatedTIme = new Date("2024-07-08T15:00:00.000+02:00");
+        //const event = new Date(startDate);
+        calendar = {
+            "entity": this._calendars[0].entity,
+            "color": this._calendars[0].color
+        }
+        let ff = {
+            summary: summary,
+            description:  null,
+            location: null,
+            start: currentTime,
+            originalStart: this._convertApiDate({dateTime:currentTime}),
+            end: updatedTIme,
+            originalEnd: this._convertApiDate({dateTime:updatedTIme}),
+            fullDay: fullDay ?? false,
+            color: calendar.color ?? 'inherit',
+            calendar: calendar.entity,
+            class: this._getEventClass(currentTime, updatedTIme, fullDay)
+        };
+
+        this._currentEventDetails = ff;
+        this._renderEventDetailsDialog()
+
+        
+        //this.hass.callService('calendar', 'create_event', {
+        //        "entity_id": calendar,
+        //        "summary": summary,
+        //        "start_date_time": start_date_time,
+        //        "end_date_time": end_date_time
+        //    }).then(response => {
+        //        console.log(response)
+        //        this._updateEvents()
+        //  }).catch(error => {
+        //    console.log(error)
+        //  });
+    }
+    _createEvent22(summary, start_date_time,end_date_time, calendar) {
+
+        let ff = {
+            summary: event.summary ?? null,
+            description: event.description ?? null,
+            location: event.location ?? null,
+            start: startDate,
+            originalStart: this._convertApiDate(event.start),
+            end: endDate,
+            originalEnd: this._convertApiDate(event.end),
+            fullDay: fullDay,
+            color: calendar.color ?? 'inherit',
+            calendar: calendar.entity,
+            class: this._getEventClass(startDate, endDate, fullDay)
+        };
+
+        this._renderEventDetailsDialog()
+
+        
+        this.hass.callService('calendar', 'create_event', {
+                "entity_id": calendar,
+                "summary": summary,
+                "start_date_time": start_date_time,
+                "end_date_time": end_date_time
+            }).then(response => {
+                console.log(response)
+                this._updateEvents()
+          }).catch(error => {
+            console.log(error)
+          });
+    }
+
+    
     _updateEvents() {
         if (this._loading > 0) {
             return;
@@ -501,6 +818,7 @@ export class WeekPlannerCard extends LitElement {
         }
 
         this._events[dateKey].push({
+            id: event.uid ?? uuidv4(),
             summary: event.summary ?? null,
             description: event.description ?? null,
             location: event.location ?? null,
@@ -632,6 +950,8 @@ export class WeekPlannerCard extends LitElement {
         }
     }
 
+   
+   
     _handleEventClick(event) {
         this._currentEventDetails = event;
     }

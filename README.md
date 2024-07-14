@@ -1,3 +1,12 @@
+```
+rm -r node_modules && rm -r .parcel-cache && rm -r dist && rm package-lock.json && npm install && npm run build && cp -R ./dist/ /Volumes/config/www/community/week-planner-card
+```
+
+
+```
+folders=(".parcel-cache" "node_modules" "dist") && files=("/Volumes/config/www/community/week-planner-card/week-planner-card.js.map" "/Volumes/config/www/community/week-planner-card/week-planner-card.js" "package-lock.json") && for x in $files; do; if test -e $x; then rm $x; fi; done && for x in $folders; do; if test -e $x; then rm -r $x; fi; done && npm install && npm run build && cp -R ./dist/ /Volumes/config/www/community/week-planner-card
+```
+
 # Week Planner Card
 
 ![GitHub Release](https://img.shields.io/github/v/release/FamousWolf/week-planner-card)
