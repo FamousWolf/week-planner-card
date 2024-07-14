@@ -9,11 +9,10 @@ folders=(".parcel-cache" "node_modules" "dist") && files=("/Volumes/config/www/c
 
 # Week Planner Card
 
-![GitHub Release](https://img.shields.io/github/v/release/FamousWolf/week-planner-card)
-![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/FamousWolf/week-planner-card/total)
-![GitHub commit activity](https://img.shields.io/github/commit-activity/y/FamousWolf/week-planner-card)
-![GitHub License](https://img.shields.io/github/license/FamousWolf/week-planner-card)
-[![Static Badge](https://img.shields.io/badge/-buy_me_a_tea-gray?logo=buy-me-a-coffee)](https://www.buymeacoffee.com/rudygnodde)
+![GitHub Release](https://img.shields.io/github/v/release/Smeltvig/week-planner-card)
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/Smeltvig/week-planner-card/total)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/y/Smeltvig/week-planner-card)
+![GitHub License](https://img.shields.io/github/license/Smeltvig/week-planner-card)
 
 Custom Home Assistant card displaying a responsive overview of multiple days with events from one or multiple calendars
 
@@ -37,12 +36,12 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 ### HACS (Recommended)
 
 1. Make sure [HACS](https://hacs.xyz) is installed and working.
-2. Add this repository (https://github.com/FamousWolf/week-planner-card) via [HACS Custom repositories](https://hacs.xyz/docs/faq/custom_repositories)
+2. Add this repository (https://github.com/Smeltvig/week-planner-card) via [HACS Custom repositories](https://hacs.xyz/docs/faq/custom_repositories)
 3. Download and install using HACS
 
 ### Manual
 
-1. Download and copy `eweek-planner-card.js` from the [latest release](https://github.com/FamousWolf/week-planner-card/releases/latest) into your `config/www` directory.
+1. Download and copy `eweek-planner-card.js` from the [latest release](https://github.com/Smeltvig/week-planner-card/releases/latest) into your `config/www` directory.
 2. Add the resource reference to Home Assistant configuration using one of these methods:
   - **Edit your configuration.yaml**
     Add:
