@@ -6,6 +6,8 @@ customElements.define(
     WeekPlannerCard
 );
 
+
+
 window.customCards = window.customCards || [];
 window.customCards.push({
     type: 'week-planner-card',

@@ -1,6 +1,13 @@
 import { css } from 'lit';
 
 export default css`
+    .gui-editor .calendar-settings {
+        background-color: blue !important;
+    }
+    #wallpanel-screensaver-image-one-container,
+    #wallpanel-screensaver-image-two-container {
+        height: unset;
+    }
     ha-card {
         --days-spacing: 15px;
         --day-date-number-font-size: 3.5em;
@@ -17,6 +24,8 @@ export default css`
         --weather-icon-size: 30px;
         --weather-temperature-separator: ' / ';
         --weather-temperature-font-size: 1em;
+        --secondary-text-color: var(--primary-text-color, inherit);
+        --event-background-color: var(--border-color);
     }
 
     ha-card.nobackground {
@@ -59,6 +68,29 @@ export default css`
         position: fixed; 
         left: 1em; 
         top: 1em;
+    }
+    .container .clickable {
+        cursor: pointer;
+    }
+    .container .calendar-profil-cell .label  {
+        margin-top: -1em;
+    }
+    .container .calendar-profil-cell .label span {
+        background: transparent;
+        border-radius: 1em;
+        padding: .2em 1em .2em 1em;
+    }
+    .container .calendar-profil-cell {
+        padding: 0px; 
+        border: 0px none;
+        text-align: center;
+    }
+    .container .calendar-profil-picture {
+        border-radius: 50%;
+        height: 12em;
+        border-width: thick;
+        border-style: solid;
+        border-color: transparent;
     }
     .container #button_calendar_add {
         position: fixed; 
@@ -139,7 +171,7 @@ export default css`
         margin-bottom: var(--event-spacing);
         padding: var(--event-padding);
         background-color: var(--event-background-color);
-        border-radius: 0 var(--event-border-radius) var(--event-border-radius) 0;
+        border-radius: var(--event-border-radius);
         font-size: var(--event-font-size);
         line-height: var(--event-line-height);
     }

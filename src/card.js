@@ -17,7 +17,8 @@ import mixed_rain from 'data-url:./icons/mixed_rain.png';
 import sunny from 'data-url:./icons/sunny.png';
 import windy from 'data-url:./icons/windy.svg';
 import { v4 as uuidv4 } from 'uuid';
-
+import { MyCustomCardEditor } from './card-editor.js';
+import { Helper} from './helpers/helper.js';
 
 const ICONS = {
   'clear-day': sunny,
@@ -58,8 +59,42 @@ const VIEW_TYPE = {
     WorkWeek: 'workweek',
     Resources: 'resources'
 };
+const CALENDAR_COLOR = {
+    blue: 'blue',
+    red: 'red',
+    orange: 'orange',
+    green: 'green'
+};
+const CALENDAR_EDITOR = {
+    entity: '',
+    color: CALENDAR_COLOR.blue,
+    name: '',
+    image: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEBLAEsAAD/4QBWRXhpZgAATU0AKgAAAAgABAEaAAUAAAABAAAAPgEbAAUAAAABAAAARgEoAAMAAAABAAIAAAITAAMAAAABAAEAAAAAAAAAAAEsAAAAAQAAASwAAAAB/+0ALFBob3Rvc2hvcCAzLjAAOEJJTQQEAAAAAAAPHAFaAAMbJUccAQAAAgAEAP/hDW5odHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvADw/eHBhY2tldCBiZWdpbj0n77u/JyBpZD0nVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkJz8+Cjx4OnhtcG1ldGEgeG1sbnM6eD0nYWRvYmU6bnM6bWV0YS8nIHg6eG1wdGs9J0ltYWdlOjpFeGlmVG9vbCAxMS44OCc+CjxyZGY6UkRGIHhtbG5zOnJkZj0naHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyc+CgogPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9JycKICB4bWxuczp0aWZmPSdodHRwOi8vbnMuYWRvYmUuY29tL3RpZmYvMS4wLyc+CiAgPHRpZmY6UmVzb2x1dGlvblVuaXQ+MjwvdGlmZjpSZXNvbHV0aW9uVW5pdD4KICA8dGlmZjpYUmVzb2x1dGlvbj4zMDAvMTwvdGlmZjpYUmVzb2x1dGlvbj4KICA8dGlmZjpZUmVzb2x1dGlvbj4zMDAvMTwvdGlmZjpZUmVzb2x1dGlvbj4KIDwvcmRmOkRlc2NyaXB0aW9uPgoKIDxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PScnCiAgeG1sbnM6eG1wPSdodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvJz4KICA8eG1wOkNyZWF0b3JUb29sPkFkb2JlIFN0b2NrIFBsYXRmb3JtPC94bXA6Q3JlYXRvclRvb2w+CiA8L3JkZjpEZXNjcmlwdGlvbj4KCiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0nJwogIHhtbG5zOnhtcE1NPSdodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vJz4KICA8eG1wTU06RG9jdW1lbnRJRD54bXAuaWlkOjc3MTQ0MzVhLTcyYjYtNGUyYy04YTNhLWY3Nzg1Nzg1NzZjMTwveG1wTU06RG9jdW1lbnRJRD4KICA8eG1wTU06SW5zdGFuY2VJRD5hZG9iZTpkb2NpZDpzdG9jazoyMDg1YzhmYi1iMmE5LTQ1MjUtOWFjNC00ZDQ4N2JjY2VmMWU8L3htcE1NOkluc3RhbmNlSUQ+CiAgPHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD5hZG9iZTpkb2NpZDpzdG9jazo4NTg1MTAyNTY8L3htcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD4KIDwvcmRmOkRlc2NyaXB0aW9uPgo8L3JkZjpSREY+CjwveDp4bXBtZXRhPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAo8P3hwYWNrZXQgZW5kPSd3Jz8+/9sAQwAD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"
+  };
+
 
 export class WeekPlannerCard extends LitElement {
+
+
+
+
+    static getConfigElement() {
+        // Create and return an editor element
+        return document.createElement("my-custom-card-editor");
+    }
+
+    static getStubConfig() {
+        // Return a minimal configuration that will result in a working card configuration
+        //${this._currentEventDetails.calendar ? html`${this.hass.formatEntityAttributeValue(this.hass.states[this._currentEventDetails.calendar], 'friendly_name')}` :''}
+        //const calendarEntities = [];
+
+     
+        return {
+            type: 'custom:week-planner-card',
+            calendars: [],
+        };
+        //return { calendars: { type: Object }};
+    }
 
     static styles = styles;
 
@@ -86,8 +121,11 @@ export class WeekPlannerCard extends LitElement {
     _hideWeekend;
     _weatherForecast = null;
     _showLocation;
+    _showCalendarProfil = true;
     _hidePastEvents;
     _hideDaysWithoutEvents;
+    _hideNoEvent;
+    _isThemesInDarkMode;
 
     
     /**
@@ -98,6 +136,7 @@ export class WeekPlannerCard extends LitElement {
     static get properties() {
         return {
             _days: { type: Array },
+            _calendars: { type: Array },
             _hours: { type: Array },
             _config: { type: Object },
             _isLoading: { type: Boolean },
@@ -114,24 +153,26 @@ export class WeekPlannerCard extends LitElement {
      */
     setConfig(config) {
         this._config = config;
-
         if (!config.calendars) {
             throw new Error('No calendars are configured');
         }
-        //this._calendars = Cell Duration
-        //this._calendars = Cell Height
-        this._hours = Array.from({length: 24}, (_, index) => index + 1);
+
         this._calendars = config.calendars;
+      
+        
+        this._hours = Array.from({length: 24}, (_, index) => index + 1);
+        
         this._weather = this._getWeatherConfig(config.weather);
         this._numberOfDays = this._getNumberOfDays(config.days ?? 7);
         this._hideWeekend = config.hideWeekend ?? false;
         this._startDate = this._getStartDate(config.startingDay ?? 'today');
         this._updateInterval = config.updateInterval ?? 60;
         this._noCardBackground = config.noCardBackground ?? false;
+        this._showCalendarProfil = config.showCalendarProfil ?? true;
         this._viewType = config.viewType ?? VIEW_TYPE.Days;
 
 
-        
+        this._showCalendarProfil = config.showCalendarProfil ?? true;
         this._eventBackground = config.eventBackground ?? 'var(--card-background-color, inherit)';
         this._compact = config.compact ?? false;
         this._dateFormat = config.dateFormat ?? 'cccc d LLLL yyyy';
@@ -140,6 +181,8 @@ export class WeekPlannerCard extends LitElement {
         this._showLocation = config.showLocation ?? false;
         this._hidePastEvents = config.hidePastEvents ?? false;
         this._hideDaysWithoutEvents = config.hideDaysWithoutEvents ?? false;
+        this._hideNoEvent = config.hideNoEvent ?? (this._calendars.length == 0);
+
         if (config.locale) {
             LuxonSettings.defaultLocale = config.locale;
         }
@@ -198,6 +241,22 @@ export class WeekPlannerCard extends LitElement {
             this._waitForHassAndConfig();
         }
 
+        Helper.isDarkMode = this.hass?.themes?.darkMode ?? false;
+        if (this._isThemesInDarkMode != Helper.isDarkMode) {
+            const _arr = [];
+            for (let object of this._calendars) {
+                let obj = Helper.fixReadOnlyOnObject(object,'color', object.color ?? '')
+                const key = obj.color.replace("#", '');
+                const arr = [Helper.darkModeCalendarColors[key], Helper.lightModeCalendarColors[key]];
+                const text = arr.find(x=>x!==undefined);
+                let _calendarColors = (this.hass?.themes?.darkMode ?? false) ? Helper.darkModeCalendarColors:Helper.lightModeCalendarColors;
+                obj['color'] = '#'+Object.keys(_calendarColors).find(key => _calendarColors[key] === text);
+                _arr.push(obj);
+            }
+            this._calendars = _arr;
+            this._config = Helper.fixReadOnlyOnObject(this._config, 'calendars', this._calendars);
+            this._isThemesInDarkMode = Helper.isDarkMode;
+        }
         let cardClasses = [];
         if (this._noCardBackground) {
             cardClasses.push('nobackground');
@@ -214,9 +273,14 @@ export class WeekPlannerCard extends LitElement {
                         ''
                     }
                     <div class="container">
-                        <button class="button_calendar_view" style="left: 2em;" @click="${() => {this._setViewType(VIEW_TYPE.Day) }}">${this._getViewTypeIcon(VIEW_TYPE.Day)}</button>
-                        <button class="button_calendar_view" style="left: 4em;" @click="${() => {this._setViewType(VIEW_TYPE.Days) }}">${this._getViewTypeIcon(VIEW_TYPE.Days)}</button>
-                        <button id="button_calendar_add" style=" " @click="${() => { this._createEvent("test 2", "2024-07-08 10:00:00","2024-07-08 14:00:00", false ,(this._calendars[0])) }}">Add</button>
+                        <!--
+                        <button class="clickable button_calendar_view" style="left: 2em;" @click="${() => {this._setViewType(VIEW_TYPE.Day) }}">${this._getViewTypeIcon(VIEW_TYPE.Day)}</button>
+                        <button class="clickable button_calendar_view" style="left: 4em;" @click="${() => {this._setViewType(VIEW_TYPE.Days) }}">${this._getViewTypeIcon(VIEW_TYPE.Days)}</button>
+                        -->
+                        ${this._showCalendarProfil ?
+                            html`${this._renderCalendarProfil()}` :
+                            ''
+                        }
                         ${this._renderCalendars()}
                         ${this._renderDays()}
 
@@ -251,11 +315,6 @@ export class WeekPlannerCard extends LitElement {
         
     }
     _setViewType(view) {
-        //viewType?: "Day" | "Days" | "Week" | "WorkWeek" | "Resources";
-        //mdi:calendar-text -- Day
-        //mdi:calendar-month -- Days
-        //mdi:calendar-multiselect -- WorkWeek
-        //mdi:calendar-range -- Week
         switch (view.toLowerCase()) {
             case VIEW_TYPE.Day:
                 this._viewType = VIEW_TYPE.Day;
@@ -273,12 +332,50 @@ export class WeekPlannerCard extends LitElement {
                 this._updateEvents();
         }
     }
-    _renderCalendars() {
 
-        if (!this._days) {
+    _renderCalendarProfil() {
+        if (!this._calendars) {
+            return html``;
+        }
+        return html`
+
+        <table cellspacing="0" cellpadding="0" border="0" style="border: 0px none;width: 100%;position: unset;">
+            <tbody>
+                <tr>
+            ${this._calendars.map((calendar) => {
+                
+                const img = calendar.image ?? "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEBLAEsAAD/4QBWRXhpZgAATU0AKgAAAAgABAEaAAUAAAABAAAAPgEbAAUAAAABAAAARgEoAAMAAAABAAIAAAITAAMAAAABAAEAAAAAAAAAAAEsAAAAAQAAASwAAAAB/+0ALFBob3Rvc2hvcCAzLjAAOEJJTQQEAAAAAAAPHAFaAAMbJUccAQAAAgAEAP/hDW5odHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvADw/eHBhY2tldCBiZWdpbj0n77u/JyBpZD0nVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkJz8+Cjx4OnhtcG1ldGEgeG1sbnM6eD0nYWRvYmU6bnM6bWV0YS8nIHg6eG1wdGs9J0ltYWdlOjpFeGlmVG9vbCAxMS44OCc+CjxyZGY6UkRGIHhtbG5zOnJkZj0naHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyc+CgogPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9JycKICB4bWxuczp0aWZmPSdodHRwOi8vbnMuYWRvYmUuY29tL3RpZmYvMS4wLyc+CiAgPHRpZmY6UmVzb2x1dGlvblVuaXQ+MjwvdGlmZjpSZXNvbHV0aW9uVW5pdD4KICA8dGlmZjpYUmVzb2x1dGlvbj4zMDAvMTwvdGlmZjpYUmVzb2x1dGlvbj4KICA8dGlmZjpZUmVzb2x1dGlvbj4zMDAvMTwvdGlmZjpZUmVzb2x1dGlvbj4KIDwvcmRmOkRlc2NyaXB0aW9uPgoKIDxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PScnCiAgeG1sbnM6eG1wPSdodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvJz4KICA8eG1wOkNyZWF0b3JUb29sPkFkb2JlIFN0b2NrIFBsYXRmb3JtPC94bXA6Q3JlYXRvclRvb2w+CiA8L3JkZjpEZXNjcmlwdGlvbj4KCiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0nJwogIHhtbG5zOnhtcE1NPSdodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vJz4KICA8eG1wTU06RG9jdW1lbnRJRD54bXAuaWlkOjc3MTQ0MzVhLTcyYjYtNGUyYy04YTNhLWY3Nzg1Nzg1NzZjMTwveG1wTU06RG9jdW1lbnRJRD4KICA8eG1wTU06SW5zdGFuY2VJRD5hZG9iZTpkb2NpZDpzdG9jazoyMDg1YzhmYi1iMmE5LTQ1MjUtOWFjNC00ZDQ4N2JjY2VmMWU8L3htcE1NOkluc3RhbmNlSUQ+CiAgPHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD5hZG9iZTpkb2NpZDpzdG9jazo4NTg1MTAyNTY8L3htcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD4KIDwvcmRmOkRlc2NyaXB0aW9uPgo8L3JkZjpSREY+CjwveDp4bXBtZXRhPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAo8P3hwYWNrZXQgZW5kPSd3Jz8+/9sAQwAD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";
+                const background = calendar.name ? calendar.color : 'transparent';
+                
+                return html`  
+                <td class="calendar-profil-cell" width="${((1/this._calendars.length)*100)}%" style="">
+                    <div class="calendar-profil-label-badge"> 
+                        <div class="value"> 
+                            <img class="calendar-profil-picture" style="border-color: ${calendar.color};" src="${img}"/>
+                        </div>
+                        <div class="label"> 
+                            <span style="background: ${background}" >
+                                ${calendar.name}
+                            </span> 
+                        </div>  
+                    </div>
+                </td>
+                    `;
+            })} 
+
+                </tr>
+            </tbody>
+        </table>
+        `;
+    }
+
+    _renderCalendars() {
+        if (!this._calendars) {
             return html``;
         }
 
+
+        
         if (this._viewType == VIEW_TYPE.Day) {
             return html`
 
@@ -305,15 +402,10 @@ export class WeekPlannerCard extends LitElement {
                                 </tbody>
                             </table>
                         </td>
-
                     ${this._calendars.map((calendar) => {
                         return html`
-
-                        <!-- calendars length : ${(this._calendars.length)} -->
                         <td width="${((1/this._calendars.length)*100)}%" style="padding: 0px; border: 0px none;">
                             <div style="position: relative;">
-
-                         
                                 <table cellpadding="0" cellspacing="0" border="0" style="width: 100%; border: 0px none; table-layout: fixed;">
                                     <tbody>
 
@@ -374,7 +466,6 @@ export class WeekPlannerCard extends LitElement {
                     if (this._hideDaysWithoutEvents && day.events.length === 0 && !this._isToday(day.date)) {
                         return html``;
                     }
-                    
                     return html`
                         <div class="day ${day.class}">
                             <div class="date">
@@ -418,14 +509,18 @@ export class WeekPlannerCard extends LitElement {
                             <div class="events">
                                 ${day.events.length === 0 ?
                                     html`
-                                        <div class="none">
-                                            ${this._language.noEvents}
-                                        </div>
+                                        ${this._hideNoEvent ?
+                                            html `` :
+                                            html`
+                                                <div class="none">
+                                                    ${this._language.noEvents}
+                                                </div>
+                                            `}
                                     ` :
                                     html`
                                         ${day.events.map((event) => {
                                             return html`
-                                                <div id="${event.id}" class="event ${event.class}" style="--border-color: ${event.color}" @click="${() => { this._handleEventClick(event) }}">
+                                                <div id="${event.id}" class="event ${event.class}" style="--border-color: ${event.color}; --event-background-color: ${event.color}" @click="${() => { this._handleEventClick(event) }}">
                                                     <div class="time">
                                                         ${event.fullDay ?
                                                             html`${this._language.fullDay}` :
@@ -459,10 +554,15 @@ export class WeekPlannerCard extends LitElement {
             `;
         }
     }
+    _dateRangeChanged(value) {
+        const newValue = value;
 
+        console.log(newValue)
+    }
     valueChanged(ev) {
-        //const newValue = ev.currentTarget.value;
+        const newValue = ev.currentTarget.value;
 
+        console.log(newValue)
         //const attributeName = ev.currentTarget.getAttribute("data-attributeName");
         //const ff = this._currentEventDetails[attributeName] = newValue;
 
@@ -491,13 +591,6 @@ export class WeekPlannerCard extends LitElement {
                     <div class="calendar">
                         <ha-icon icon="mdi:calendar-account"></ha-icon>
                         <div class="info">
-
-                        <button
-                        class="footer_button"
-                        @click="${() => { this._deleteEvent(this._currentEventDetails)}}"
-                    ><ha-icon icon="mdi:close"></ha-icon></button>
-
-
                         ${this._currentEventDetails.calendar ? html`${this.hass.formatEntityAttributeValue(this.hass.states[this._currentEventDetails.calendar], 'friendly_name')}` :''}
                         </div>
                     </div>
@@ -535,10 +628,13 @@ export class WeekPlannerCard extends LitElement {
     _renderEventDetailsDialogFooter() {
         return html`
             <div class="footer">
-                <button
+                
+            <!--
+            <button
                     class="footer_button"
                     @click="${() => { this._deleteEvent()}}"
                 ><ha-icon icon="mdi:close"></ha-icon></button>
+                -->
             </div>
         `;
     }
@@ -546,18 +642,19 @@ export class WeekPlannerCard extends LitElement {
         return html`
             <div class="header_title">
 
-
-            <ha-textfield
-            label="dddddd"
-            style="width: 100%"
-            value="${this._currentEventDetails.summary}"
-            @change="${this.valueChanged}"
-            id="textinput_summary"
-            placeholder=""
-            ></ha-textfield>
-
-                <!-- <span>${this._currentEventDetails.summary}</span> -->
-                
+            ${this._currentEventDetails.summary.length === 0 ?
+                html`
+                    <ha-textfield
+                        label="dddddd"
+                        style="width: 100%"
+                        value="${this._currentEventDetails.summary}"
+                        @change="${this.valueChanged}"
+                        id="textinput_summary"
+                        placeholder=""
+                        ></ha-textfield>
+                ` :
+                html`<span>${this._currentEventDetails.summary}</span>`
+            }
                 <ha-icon-button
                     .label="${this.hass?.localize('ui.dialogs.generic.close') ?? 'Close'}"
                     dialogAction="close"
@@ -566,8 +663,72 @@ export class WeekPlannerCard extends LitElement {
             </div>
         `;
     }
-
     _renderEventDetailsDate() {
+        const start = this._currentEventDetails.originalStart;
+        const end = this._currentEventDetails.originalEnd ?? null;
+
+        
+        const canEdit = this._currentEventDetails.summary.length === 0 ;
+
+        const res = html`<MuiPickersUtilsProvider utils={LuxonUtils}>
+                <DatePicker
+                    className={classes.input}
+                    disableToolbar
+                    variant="inline"
+                    label="Date"
+                    format="${this._dateFormat}"
+                    helperText="DD"
+                    value=${start.toFormat(this._dateFormat)}
+                    margin="normal"
+                    inputVariant="filled"
+                    fullWidth
+                    minDate={new Date()}
+                    />
+            </MuiPickersUtilsProvider>`;
+
+
+
+
+        if (end === null) {
+            return html`${canEdit ? html`${res}`:
+                html`
+                    ${start.toFormat(this._dateFormat + ' ' + this._timeFormat)}
+                `
+            }`;
+        } else if (this._isFullDay(start, end, true)) {
+            if (Math.abs(start.diff(end, 'hours').toObject().hours) <= 24) {
+
+                return html`${canEdit ? html`${res}`:
+                    html`${start.toFormat(this._dateFormat)}`
+                }`;
+            } else {
+                // End is midnight on the next day, so remove 1 second to get the correct end date
+                const endMinusOneSecond = end.minus({ seconds: 1 });
+                return html`${canEdit ? html`${res}`:
+                    html`${start.toFormat(this._dateFormat)} - ${endMinusOneSecond.toFormat(this._dateFormat)}`
+                }`;
+            }
+        } else if (this._isSameDay(start, end)) {
+            return html`${canEdit ? html`${res}`:
+                html`
+                    ${start.toFormat(this._dateFormat + ' ' + this._timeFormat) + ' - ' + end.toFormat(this._timeFormat)}`
+                }`;
+        }
+
+        return html`${canEdit ? html`${res}`:
+            html`
+                ${start.toFormat(this._dateFormat + ' ' + this._timeFormat)} - ${end.toFormat(this._dateFormat + ' ' + this._timeFormat)}`
+        }`;
+
+            //year()
+            //month()
+            //day()
+            //hour()
+            //minute()
+            //second()
+         
+    }
+    _renderEventDetailsDate33() {
         const start = this._currentEventDetails.originalStart;
         const end = this._currentEventDetails.originalEnd ?? null;
 
@@ -619,6 +780,9 @@ export class WeekPlannerCard extends LitElement {
         this._updateEvents();
     }
 
+    
+    
+
     _subscribeToWeatherForecast() {
         this._loading++;
         let loadingWeather = true;
@@ -633,6 +797,8 @@ export class WeekPlannerCard extends LitElement {
             forecast_type: 'daily',
             entity_id: this._weather.entity
         });
+
+       
     }
 
 
@@ -669,19 +835,58 @@ export class WeekPlannerCard extends LitElement {
     }
     _createEvent(summary, startDate,endDate,fullDay, calendar) {
 
-     
+
+        //static local(
+        //    year: number,
+        //    month: number,
+        //    day: number,
+        //    hour: number,
+        //    minute: number,
+        //    second: number,
+        //    millisecond: number,
+    
+        //const currentTime = DateTime.local(2024,7,14,14,20,25);
+        //const updatedTIme = currentTime.startOf('hour').plus({ hours: 3 });
+
+
+
+        const currentTime = DateTime.fromISO("2024-07-08T10:00:00.000+02:00");
+        const updatedTIme = currentTime.startOf('hour').plus({ hours: 3 });
+        const sssw = DateTime.now().toISOTime();
+        console.log(sssw);
+        const sss = DateTime.now().toISODate();
+        console.log(sss);
+        const fff = currentTime.toString();
+        console.log(fff);
         
 
-        let currentTime = new Date("2024-07-08T10:00:00.000+02:00");
+
+        const currentTime3 = DateTime.now();
+        const updatedTIme3 = DateTime.now().startOf('hour').plus({ hours: 3 });
+        const fff3 = currentTime3.toJSDate();
+
+
+        const currentTime2 = DateTime.local();
+        const updatedTIme2 = DateTime.local().startOf('hour').plus({ hours: 3 });
+        const fff2 = currentTime2.toJSDate();
+
+
+        //const updatedTIme = DateTime.local();
+
+        //console.log(dt);
+        //console.log(dt.toJSDate());
         
-        let updatedTIme = new Date("2024-07-08T15:00:00.000+02:00");
+        //let currentTime = new Date("2024-07-08T10:00:00.000+02:00");
+        
+        //let updatedTIme = new Date("2024-07-08T15:00:00.000+02:00");
         //const event = new Date(startDate);
         calendar = {
             "entity": this._calendars[0].entity,
+            "image": this._calendars[0].image,
             "color": this._calendars[0].color
         }
         let ff = {
-            summary: summary,
+            summary: '',
             description:  null,
             location: null,
             start: currentTime,
@@ -748,6 +953,10 @@ export class WeekPlannerCard extends LitElement {
             return;
         }
 
+        Helper.isDarkMode = this?.hass?.themes?.darkMode ?? false;
+
+
+
         this._loading++;
         this._isLoading = true;
         this._error = '';
@@ -757,10 +966,16 @@ export class WeekPlannerCard extends LitElement {
         let endDate = this._startDate.plus({ days: this._numberOfDays });
         let now = DateTime.now();
 
+
         if (this._weather && this._weatherForecast === null) {
             this._subscribeToWeatherForecast();
         }
 
+
+
+
+
+        
         this._calendars.forEach(calendar => {
             this._loading++;
             this.hass.callApi(
@@ -788,7 +1003,12 @@ export class WeekPlannerCard extends LitElement {
                 this._loading = 0;
                 throw new Error(this._error);
             });
+            
+
         });
+        
+
+
 
         let checkLoading = window.setInterval(() => {
             if (this._loading === 0) {
@@ -828,6 +1048,8 @@ export class WeekPlannerCard extends LitElement {
             originalEnd: this._convertApiDate(event.end),
             fullDay: fullDay,
             color: calendar.color ?? 'inherit',
+            image: calendar.image ?? 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEBLAEsAAD/4QBWRXhpZgAATU0AKgAAAAgABAEaAAUAAAABAAAAPgEbAAUAAAABAAAARgEoAAMAAAABAAIAAAITAAMAAAABAAEAAAAAAAAAAAEsAAAAAQAAASwAAAAB/+0ALFBob3Rvc2hvcCAzLjAAOEJJTQQEAAAAAAAPHAFaAAMbJUccAQAAAgAEAP/hDW5odHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvADw/eHBhY2tldCBiZWdpbj0n77u/JyBpZD0nVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkJz8+Cjx4OnhtcG1ldGEgeG1sbnM6eD0nYWRvYmU6bnM6bWV0YS8nIHg6eG1wdGs9J0ltYWdlOjpFeGlmVG9vbCAxMS44OCc+CjxyZGY6UkRGIHhtbG5zOnJkZj0naHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyc+CgogPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9JycKICB4bWxuczp0aWZmPSdodHRwOi8vbnMuYWRvYmUuY29tL3RpZmYvMS4wLyc+CiAgPHRpZmY6UmVzb2x1dGlvblVuaXQ+MjwvdGlmZjpSZXNvbHV0aW9uVW5pdD4KICA8dGlmZjpYUmVzb2x1dGlvbj4zMDAvMTwvdGlmZjpYUmVzb2x1dGlvbj4KICA8dGlmZjpZUmVzb2x1dGlvbj4zMDAvMTwvdGlmZjpZUmVzb2x1dGlvbj4KIDwvcmRmOkRlc2NyaXB0aW9uPgoKIDxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PScnCiAgeG1sbnM6eG1wPSdodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvJz4KICA8eG1wOkNyZWF0b3JUb29sPkFkb2JlIFN0b2NrIFBsYXRmb3JtPC94bXA6Q3JlYXRvclRvb2w+CiA8L3JkZjpEZXNjcmlwdGlvbj4KCiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0nJwogIHhtbG5zOnhtcE1NPSdodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vJz4KICA8eG1wTU06RG9jdW1lbnRJRD54bXAuaWlkOjc3MTQ0MzVhLTcyYjYtNGUyYy04YTNhLWY3Nzg1Nzg1NzZjMTwveG1wTU06RG9jdW1lbnRJRD4KICA8eG1wTU06SW5zdGFuY2VJRD5hZG9iZTpkb2NpZDpzdG9jazoyMDg1YzhmYi1iMmE5LTQ1MjUtOWFjNC00ZDQ4N2JjY2VmMWU8L3htcE1NOkluc3RhbmNlSUQ+CiAgPHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD5hZG9iZTpkb2NpZDpzdG9jazo4NTg1MTAyNTY8L3htcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD4KIDwvcmRmOkRlc2NyaXB0aW9uPgo8L3JkZjpSREY+CjwveDp4bXBtZXRhPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAo8P3hwYWNrZXQgZW5kPSd3Jz8+/9sAQwAD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',
+            name: calendar.name ?? '',
             calendar: calendar.entity,
             class: this._getEventClass(startDate, endDate, fullDay)
         });
@@ -920,9 +1142,12 @@ export class WeekPlannerCard extends LitElement {
             startDate = startDate.plus({ days: 1 });
         }
 
+        //const result = d.filter((value, index) => d.indexOf(value) === index);
+
         const jsonDays = JSON.stringify(days)
         if (jsonDays !== this._jsonDays) {
             this._days = days;
+            
             this._jsonDays = jsonDays;
         }
     }
@@ -1098,3 +1323,5 @@ export class WeekPlannerCard extends LitElement {
         return this._isSameDay(date, yesterday);
     }
 }
+
+
