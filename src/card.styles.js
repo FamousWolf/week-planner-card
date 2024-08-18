@@ -1,9 +1,21 @@
 import { css } from 'lit';
 
-export default css`
-    .gui-editor .calendar-settings {
-        background-color: blue !important;
+export const styles = css`
+    :host ha-dialog { 
+        user-select: text !important;
     }
+    :host ha-form-switch ha-switch{
+        margin: calc((48px - 40px)/ 2) !important;
+        margin: calc((var(--mdc-checkbox-state-layer-size,48px) - var(--mdc-checkbox-state-layer-size,40px))/ 2) !important;
+    }
+    
+    :host ha-expansion-panel .content {
+        padding-bottom: 12px;
+    }
+    :host ha-expansion-panel .info { 
+        padding: 0 12px 12px 12px !important;
+    }
+        
     #wallpanel-screensaver-image-one-container,
     #wallpanel-screensaver-image-two-container {
         height: unset;
@@ -223,11 +235,21 @@ export default css`
         margin-bottom: 8px;
     }
 
+    ha-dialog .calendar,
+    ha-dialog .datetime,
+    ha-dialog .textselect,
+    ha-dialog .description,
+    ha-dialog .location {
+        user-select: text !important;
+    }
+
     ha-dialog .calendar ha-icon,
     ha-dialog .datetime ha-icon,
     ha-dialog .location ha-icon {
         margin-right: 8px;
     }
+
+    
 
     ha-dialog .location .info a {
         color: var(--primary-text-color);

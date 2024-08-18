@@ -1,19 +1,157 @@
 import { DateTime, Settings as LuxonSettings, Info as LuxonInfo } from 'luxon';
 import i18next, { t as translate } from 'i18next';
 import backend from 'i18next-xhr-backend'; 
-import { WeatherConfigObj } from './types.js';
+
+class i18nextHelper{
+    static {
+        
+    }
+    static i18next_options() {
+        const lang = (localStorage.getItem('selectedLanguage') || 'en').replace(/['"]+/g, '').replace('-', '_');
+        const _options = {
+            lng: lang,
+            debug: false,
+            defaultNS: 'app',
+            ns: ['app','config'],
+            fallbackLng: 'en',
+            backend: {
+                loadPath: i18nextHelper.loadPath,
+            }
+        };
+        return _options;
+         
+    }
+    static loadPath(lng, namespace) {
+        let path = `/hacsfiles/week-planner-card/en_app.json`;
+        switch (namespace[0]) {
+            case 'app':
+                path = `/hacsfiles/week-planner-card/${lng[0]}_${namespace[0]}.json`;
+                break;
+            case 'config':
+                path = `/hacsfiles/week-planner-card/custom_${namespace[0]}.json`;
+                break;
+            default:
+                break;
+        }
+        return path;
+    }
+}
+
+
+
+ 
 
 export class Helper{
    
-    static isDarkMode = false;
+    /* static isDarkMode = false;
 
     static {
         this.isDarkMode = this.hass?.themes?.darkMode ?? false;
+    } */
+    static Colors = [
+        "#44739e",
+        "#984ea3",
+        "#ff7f00",
+        "#af8d00",
+        "#7f80cd",
+        "#c42e60",
+        "#a65628",
+        "#f781bf",
+        "#8dd3c7",
+        "#bebada",
+        "#fb8072",
+        "#80b1d3",
+        "#fdb462",
+        "#fccde5",
+        "#bc80bd",
+        "#ffed6f",
+        "#c4eaff",
+        "#cf8c00",
+        "#1b9e77",
+        "#d95f02",
+        "#e7298a",
+        "#e6ab02",
+        "#a6761d",
+        "#0097ff",
+        "#00d067",
+        "#f43600",
+        "#4ba93b",
+        "#5779bb",
+        "#927acc",
+        "#97ee3f",
+        "#bf3947",
+        "#9f5b00",
+        "#f48758",
+        "#8caed6",
+        "#f2b94f",
+        "#eff26e",
+        "#e43872",
+        "#d9b100",
+        "#9d7a00",
+        "#698cff",
+        "#d9d9d9",
+        "#00d27e",
+        "#d06800",
+        "#009f82",
+        "#c49200",
+        "#cbe8ff",
+        "#fecddf",
+        "#c27eb6",
+        "#8cd2ce",
+        "#c4b8d9",
+        "#f883b0",
+        "#a49100",
+        "#f48800",
+        "#27d0df",
+        "#00d2d5",
+        "#a04a9b",
+        "#b3e900"
+      ];
+
+    static getColorByIndex(index) {
+        return Helper.Colors[index % Helper.Colors.length];
+    }
+    static getFreeColorIndex (index,calendars){
+        let color = Helper.getColorByIndex(index);
+        let updatedCalendar = calendars.find(c => (c?.color ?? 'A') == (color ?? 'B') );
+        if ((typeof updatedCalendar !== "undefined") && (typeof updatedCalendar !== "null")) {
+            return Helper.getFreeColorIndex(index+1, calendars);
+        }else{
+            return index;
+        }
+
+    };
+    static isColor(strColor){
+        let s = new Option().style;
+        s.color = strColor;
+        return (s.color == strColor);
+    }
+    static isColorV2(strColor){
+        let s = new Option().style;
+        s.color = strColor;
+        let test1 = (s.color == strColor);
+        let test2 = /^#[0-9A-F]{6}$/i.test(strColor);
+        if(test1 == true || test2 == true){
+          return true;
+        } else{
+          return false;
+        }
     }
 
+    static isNullOrUndefined(value){
+        //return (value === undefined || value == null || value.length <= 0) ? true : false;
+        return !((typeof value !== "undefined") && (typeof value !== "null") || (typeof value == "boolean"));
+    }
+    static isNullOrUndefinedOrEmpty(value){
+        if (Helper.isNullOrUndefined(value)) {
+            return true;
+        }else{
+            return ((value?.length ?? 0) <= 0);
+        }
+    }
     static fixReadOnlyOnObject(object, key, value = null){
         let v = null;
-        if ((typeof value !== "undefined") && (typeof value !== "null")) {
+        if (!Helper.isNullOrUndefinedOrEmpty(value)) {
             v = value;
         }else{
             if (object.hasOwnProperty(key)){
@@ -29,19 +167,104 @@ export class Helper{
         });
 
         Object.assign(obj,  object ?? {});
+        obj[key] = v;
+
         return obj;
     }
 
-    static updateCalendarColor(calendar){
+
+    static findKeyByColor(strColor, objColors){
+        if (!objColors) {
+            return null;
+        }
+        //Helper.customConfig();
+        //Object.keys(objColors)
+        const light = Object.keys(objColors).find(key => objColors[key]?.light === strColor);
+        const dark = Object.keys(objColors).find(key => objColors[key]?.dark === strColor);
+      
+        if ((typeof light !== "undefined") && (typeof light !== "null")) {
+            return light;
+        }
+        else if ((typeof dark !== "undefined") && (typeof dark !== "null")) {
+            return dark;
+        } else{
+            return undefined;
+        }
+        
+    }
+    static getColorConfig(colorConfig, objColors) {
+        if (
+            !colorConfig
+            || typeof colorConfig !== 'string'
+            && typeof colorConfig !== 'object'
+        ) {
+            return null;
+        }
+        
+
+        let configuration = {};
+        //let configuration = {
+        //    light: null,
+        //    dark: null
+        //};
+
+        if (typeof colorConfig === 'string') {
+
+            if (!objColors) {
+                return colorConfig;
+            }
+            else if (Helper.isColor(colorConfig)){
+                let key = Helper.findKeyByColor(colorConfig, objColors);
+                if ((typeof key !== "undefined") && (typeof key !== "null")) {
+                    configuration[key] = objColors[key];
+
+                }else{
+                    configuration['custom'] = {
+                        light: colorConfig,
+                        dark: colorConfig
+                    };
+                }
+            }else{
+                configuration[colorConfig] = objColors[colorConfig];
+            }
+
+           /*  const key = colorConfig;
+            const arr = [this.colorConfig[key]?.light, this.colorConfig[key]?.dark];
+            const text = arr.find(x=>x!==undefined);
+            if ((typeof text !== "undefined") && (typeof text !== "null")) {
+                configuration.light = this._calendarColors[key]?.light;
+                configuration.dark = this._calendarColors[key]?.dark;
+            }else{
+                const light = Object.keys(this._calendarColors).find(key => this._calendarColors[key].light === calendarColor);
+                const dark = Object.keys(this._calendarColors).find(key => this._calendarColors[key].dark === calendarColor);
+                const arr2 = [light, dark];
+                const k = arr2.find(x=>x!==undefined);
+                if ((typeof k !== "undefined") && (typeof k !== "null")) {
+                    configuration.light = this._calendarColors[k]?.light;
+                    configuration.dark = this._calendarColors[k]?.dark;
+                }
+            } */
+
+
+            
+        } else {
+            Object.assign(configuration, colorConfig);
+        }
+
+        return configuration;
+    }
+
+
+    /* static updateCalendarColor(calendar){
         if ((typeof calendar !== "undefined") && (typeof calendar !== "null")) {
             calendar = Helper.fixReadOnlyOnObject(calendar,'color');
             calendar['color'] = Helper.getCalendarColor(calendar['color']);
             
         }
         return calendar;
-    }
+    } */
 
-    static getCalendarColor(color){
+    /* static getCalendarColor(color){
         if ((typeof color !== "undefined") && (typeof color !== "null")) {
             const key = color.replace("#", '');
             const arr = [Helper.darkModeCalendarColors[key], Helper.lightModeCalendarColors[key]];
@@ -51,20 +274,27 @@ export class Helper{
         }else{
             return color;
         }
+    } */
+
+   
+    static customConfig(string) {
+        if (!i18next.isInitialized) {
+            const event_icon_options = i18nextHelper.i18next_options();
+            i18next.use(backend);
+            i18next.init(event_icon_options);
+        }
+        return i18next.getResource(i18nextHelper.i18next_options().lng , 'config', string, i18nextHelper.i18next_options());
     }
-
-    //const CalendarEditorObj = { enabled: false, image: String(), color: String(), entity: null, friendly_name: String(), name: String()};
-
-    //const CalendarObj = {entity: null, image: String(), color: String(), name: String()};
-    
-    //const WeatherConfigObj = {entity: null, showCondition: true, showTemperature: false, showLowTemperature: false};
-    //static CreateObj() {}
-    //static CreateObj = {
-    //    CalendarObj: Object.create({entity: null, image: String(), color: String(), name: String()}),
-    //    CalendarEditorObj: Object.create(Object.assign({},Helper.CreateObj.CalendarObj,{enabled: false,friendly_name: String()})),
-    //};
-
     static localize(string, search = '', replace = '') {
+        if (!i18next.isInitialized) {
+            
+            const localize_options = i18nextHelper.i18next_options();
+            i18next.use(backend);
+            i18next.init(localize_options);
+        }
+        return translate('app:'+string);
+    }
+    static localize_dddfdfdf(string, search = '', replace = '') {
         if (!i18next.isInitialized) {
             const lang = (localStorage.getItem('selectedLanguage') || 'en').replace(/['"]+/g, '').replace('-', '_');
             const localize_options = {
@@ -74,13 +304,12 @@ export class Helper{
                 ns: ['app'],
                 fallbackLng: 'en',
                 backend: {
-                    loadPath: '/hacsfiles/week-planner-card/locales/{{lng}}/{{ns}}.json'
+                    loadPath: '/hacsfiles/week-planner-card/{{lng}}_{{ns}}.json'
                 }
             };
             i18next.use(backend);
             i18next.init(localize_options);
         }
-        
         return translate('app:'+string);
     }
 //    static getDefaultWeatherConfig(weatherConfiguration) {
@@ -227,7 +456,7 @@ export class Helper{
         'F691B2': 'Cherry Blossom',
         'CD74E6': 'Grape',
         'A47AE2': 'Amethyst'
-    };
+    }; 
     static darkModeCalendarColors = {
         '795548': 'Cocoa',
         'E67C73': 'Flamingo',
@@ -253,11 +482,11 @@ export class Helper{
         'D81B60': 'Cherry Blossom',
         '8E24AA': 'Grape',
         '9E69AF': 'Amethyst'
-    };
+    }; 
 
-    static calendarColors = (Helper.isDarkMode ?? false) ? Helper.darkModeCalendarColors : Helper.lightModeCalendarColors;
+    /* static calendarColors = (Helper.isDarkMode ?? false) ? Helper.darkModeCalendarColors : Helper.lightModeCalendarColors;
 
-
+ */
     static StartingDayEnum = {
         today: `${Helper.localize('texts.today')}`,
         tomorrow: `${Helper.localize('texts.tomorrow')}`,
@@ -283,7 +512,7 @@ export class Helper{
 
 
 
-    static getWeekDayDate(currentDate, weekday) {
+   /*  static getWeekDayDate(currentDate, weekday) {
         const currentWeekDay = currentDate.weekday;
         if (currentWeekDay > weekday) {
             return currentDate.minus({ days: currentWeekDay - weekday })
@@ -293,9 +522,9 @@ export class Helper{
         }
 
         return currentDate;
-    }
+    } */
 
-    static getStartDate(startingDay, _hideWeekend = false) {
+    /* static getStartDate(startingDay, _hideWeekend = false) {
         let startDate = DateTime.now();
 
         switch (startingDay) {
@@ -336,7 +565,7 @@ export class Helper{
         }
 
         return startDate.startOf('day');
-    }
+    } */
 }
 
 

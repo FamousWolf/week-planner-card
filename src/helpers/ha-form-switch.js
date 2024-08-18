@@ -1,8 +1,50 @@
 import { html, LitElement } from 'lit';
-import styles from '../card.styles';
+import { styles } from '../card.styles';
+
+
+export class HaFormLabel extends LitElement {
+    static styles = [styles];
+
+    schema = {};
+    data;
+    label;
+    disabled = false;
+    computeLabel;
+    color;
+    /**
+     * Get properties
+     *
+     * @return {Object}
+     */
+    static get properties() {
+        return {
+            data: { type: Object },
+            schema: { type: Object },
+            disabled: { type: Boolean },
+            name: { type: String },
+            label: { type: String }
+        }
+    }
+    render() {
+        if (!this.hass) {
+            return html``;
+        }
+        this.color = this.schema?.color;
+        this.label = this.schema?.label ?? this.data ?? '';
+        //this.label = this.label ?? (this.computeLabel ? this.computeLabel(this.schema,this.data) : this.schema ? this.schema.name : "");
+        return html`
+            <ha-label style=${this.color ? `--color: ${this.color}` : ""}>
+                ${this.schema?.icon
+                ? html`<ha-icon slot="icon" .icon=${this.schema?.icon}></ha-icon>`
+                : ''}
+                ${this.label ?? ''}
+            </ha-label>
+            `;
+    }
+}
 export class HaFormSwitch extends LitElement {
 
-    static styles = styles;
+    static styles = [styles];
 
     schema = {};
     data;

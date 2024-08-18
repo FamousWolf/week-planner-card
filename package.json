@@ -22,8 +22,8 @@
     "watch": "parcel watch",
     "build": "parcel build",
     "build:l": "(npm run clean && sleep 1) && npm install && npm run build && ( sleep 1 && npm run cp:locales && npm run cp:dist)",
-    "cp:locales": "cp -r ./src/locales ./dist",
-    "cp:dist": "cp -r ./dist/ /Volumes/config/www/community/week-planner-card",
+    "cp:locales": "cp -r ./src/locales/ ./dist",
+    "cp:dist": "cp ./dist/* /Volumes/config/www/community/week-planner-card",
     "clean": "npm run clean:dist && npm run clean:node_modules && npm run clean:parcel-cache ",
     "clean:parcel-cache": "find . -name \".parcel-cache\" -type d -prune -exec rm -rf '{}' +",
     "clean:node_modules": "find . -name \"node_modules\" -type d -prune -exec rm -rf '{}' +",
@@ -53,6 +53,7 @@
     "lit": "^3.1.2",
     "lit-element-i18n": "^0.1.1",
     "lit-i18n": "^4.1.0",
+    "load-json-file": "^7.0.1",
     "luxon": "^3.4.4",
     "uuid": "^10.0.0"
   }

@@ -1,7 +1,7 @@
-import { html, LitElement } from 'lit';
+import { html, LitElement, css } from 'lit';
 import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';
 import { DateTime, Settings as LuxonSettings, Info as LuxonInfo } from 'luxon';
-import styles from './card.styles';
+import { styles } from './card.styles';
 import clear_night from 'data-url:./icons/clear_night.png';
 import cloudy from 'data-url:./icons/cloudy.png';
 import fog from 'data-url:./icons/fog.png';
@@ -75,9 +75,8 @@ const CALENDAR_EDITOR = {
 
 export class WeekPlannerCard extends LitElement {
 
-
-
-
+    static styles = [styles];
+    //static styles = [styles, css`:host ha-dialog { user-select: text !important; }`];
     static getConfigElement() {
         // Create and return an editor element
         return document.createElement("my-custom-card-editor");
@@ -96,9 +95,7 @@ export class WeekPlannerCard extends LitElement {
         //return { calendars: { type: Object }};
     }
 
-    static styles = styles;
-
-
+    
     
 
     _initialized = false;
@@ -125,8 +122,6 @@ export class WeekPlannerCard extends LitElement {
     _hidePastEvents;
     _hideDaysWithoutEvents;
     _hideNoEvent;
-    _isThemesInDarkMode;
-
     
     /**
      * Get properties
@@ -139,6 +134,7 @@ export class WeekPlannerCard extends LitElement {
             _calendars: { type: Array },
             _hours: { type: Array },
             _config: { type: Object },
+            _event_icons: { type: Object },
             _isLoading: { type: Boolean },
             _error: { type: String },
             _currentEventDetails: { type: Object },
@@ -146,6 +142,12 @@ export class WeekPlannerCard extends LitElement {
         }
     }
 
+    firstUpdated(){
+ 
+    }
+    _updateCalendarColors(){
+        
+    }
     /**
      * Set configuration
      *
@@ -157,11 +159,44 @@ export class WeekPlannerCard extends LitElement {
             throw new Error('No calendars are configured');
         }
 
-        this._calendars = config.calendars;
-      
         
+
+        this._calendars = [];
+
+        let i = 0;
+        for (let object of this._config.calendars) {
+            if (!object.hasOwnProperty('color') || !((typeof object['color'] !== "undefined") && (typeof object['color'] !== "null"))) {
+                let obj = Helper.fixReadOnlyOnObject(object,'color');
+                obj['color'] = Helper.getColorByIndex(i);
+                this._calendars.push(obj);
+                i = i+1;
+            }else{
+                this._calendars.push(object);
+            }
+        }
+        if(i>0){
+            this._config = Helper.fixReadOnlyOnObject(this._config,'calendars');
+            this._config.calendars = this._calendars;
+            //a = [1, 2, 3]
+            //b = a.map(function (i) { return i + 1 })
+            let d = this._calendars.map((i) => ({entity: i.entity, color: i.color}));
+            localStorage.setItem('calendar_colors',JSON.stringify(d));
+            //const event = new CustomEvent("config-changed", {
+            //    detail: { config: this._config },
+            //    bubbles: true,
+            //    composed: true,
+            //});
+            //this.dispatchEvent(event);
+        }
+       
+
+
+
+        //this._config.calendars = this._calendars;
         this._hours = Array.from({length: 24}, (_, index) => index + 1);
-        
+
+       
+
         this._weather = this._getWeatherConfig(config.weather);
         this._numberOfDays = this._getNumberOfDays(config.days ?? 7);
         this._hideWeekend = config.hideWeekend ?? false;
@@ -205,7 +240,7 @@ export class WeekPlannerCard extends LitElement {
             config.texts ?? {}
         );
     }
-
+    
     _getWeatherConfig(weatherConfiguration) {
         if (
             !weatherConfiguration
@@ -240,23 +275,8 @@ export class WeekPlannerCard extends LitElement {
             this._initialized = true;
             this._waitForHassAndConfig();
         }
-
-        Helper.isDarkMode = this.hass?.themes?.darkMode ?? false;
-        if (this._isThemesInDarkMode != Helper.isDarkMode) {
-            const _arr = [];
-            for (let object of this._calendars) {
-                let obj = Helper.fixReadOnlyOnObject(object,'color', object.color ?? '')
-                const key = obj.color.replace("#", '');
-                const arr = [Helper.darkModeCalendarColors[key], Helper.lightModeCalendarColors[key]];
-                const text = arr.find(x=>x!==undefined);
-                let _calendarColors = (this.hass?.themes?.darkMode ?? false) ? Helper.darkModeCalendarColors:Helper.lightModeCalendarColors;
-                obj['color'] = '#'+Object.keys(_calendarColors).find(key => _calendarColors[key] === text);
-                _arr.push(obj);
-            }
-            this._calendars = _arr;
-            this._config = Helper.fixReadOnlyOnObject(this._config, 'calendars', this._calendars);
-            this._isThemesInDarkMode = Helper.isDarkMode;
-        }
+        
+      
         let cardClasses = [];
         if (this._noCardBackground) {
             cardClasses.push('nobackground');
@@ -273,17 +293,12 @@ export class WeekPlannerCard extends LitElement {
                         ''
                     }
                     <div class="container">
-                        <!--
-                        <button class="clickable button_calendar_view" style="left: 2em;" @click="${() => {this._setViewType(VIEW_TYPE.Day) }}">${this._getViewTypeIcon(VIEW_TYPE.Day)}</button>
-                        <button class="clickable button_calendar_view" style="left: 4em;" @click="${() => {this._setViewType(VIEW_TYPE.Days) }}">${this._getViewTypeIcon(VIEW_TYPE.Days)}</button>
-                        -->
                         ${this._showCalendarProfil ?
                             html`${this._renderCalendarProfil()}` :
                             ''
                         }
                         ${this._renderCalendars()}
                         ${this._renderDays()}
-
                     </div>
                     ${this._renderEventDetailsDialog()}
                     ${this._isLoading ?
@@ -337,18 +352,26 @@ export class WeekPlannerCard extends LitElement {
         if (!this._calendars) {
             return html``;
         }
+
+        //const result = d.filter((value, index) => d.indexOf(value) === index);
+        const calendarsLength = this._calendars.filter((c) => c.showProfil ?? true)?.length;
+        //${((1/this._calendars.length)*100)}
         return html`
 
         <table cellspacing="0" cellpadding="0" border="0" style="border: 0px none;width: 100%;position: unset;">
             <tbody>
                 <tr>
-            ${this._calendars.map((calendar) => {
-                
+
+            
+            ${
+                //this._calendars.map((calendar) => {
+            this._calendars.filter((c) => c.showProfil ?? true).map((calendar) => {
                 const img = calendar.image ?? "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEBLAEsAAD/4QBWRXhpZgAATU0AKgAAAAgABAEaAAUAAAABAAAAPgEbAAUAAAABAAAARgEoAAMAAAABAAIAAAITAAMAAAABAAEAAAAAAAAAAAEsAAAAAQAAASwAAAAB/+0ALFBob3Rvc2hvcCAzLjAAOEJJTQQEAAAAAAAPHAFaAAMbJUccAQAAAgAEAP/hDW5odHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvADw/eHBhY2tldCBiZWdpbj0n77u/JyBpZD0nVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkJz8+Cjx4OnhtcG1ldGEgeG1sbnM6eD0nYWRvYmU6bnM6bWV0YS8nIHg6eG1wdGs9J0ltYWdlOjpFeGlmVG9vbCAxMS44OCc+CjxyZGY6UkRGIHhtbG5zOnJkZj0naHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyc+CgogPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9JycKICB4bWxuczp0aWZmPSdodHRwOi8vbnMuYWRvYmUuY29tL3RpZmYvMS4wLyc+CiAgPHRpZmY6UmVzb2x1dGlvblVuaXQ+MjwvdGlmZjpSZXNvbHV0aW9uVW5pdD4KICA8dGlmZjpYUmVzb2x1dGlvbj4zMDAvMTwvdGlmZjpYUmVzb2x1dGlvbj4KICA8dGlmZjpZUmVzb2x1dGlvbj4zMDAvMTwvdGlmZjpZUmVzb2x1dGlvbj4KIDwvcmRmOkRlc2NyaXB0aW9uPgoKIDxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PScnCiAgeG1sbnM6eG1wPSdodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvJz4KICA8eG1wOkNyZWF0b3JUb29sPkFkb2JlIFN0b2NrIFBsYXRmb3JtPC94bXA6Q3JlYXRvclRvb2w+CiA8L3JkZjpEZXNjcmlwdGlvbj4KCiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0nJwogIHhtbG5zOnhtcE1NPSdodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vJz4KICA8eG1wTU06RG9jdW1lbnRJRD54bXAuaWlkOjc3MTQ0MzVhLTcyYjYtNGUyYy04YTNhLWY3Nzg1Nzg1NzZjMTwveG1wTU06RG9jdW1lbnRJRD4KICA8eG1wTU06SW5zdGFuY2VJRD5hZG9iZTpkb2NpZDpzdG9jazoyMDg1YzhmYi1iMmE5LTQ1MjUtOWFjNC00ZDQ4N2JjY2VmMWU8L3htcE1NOkluc3RhbmNlSUQ+CiAgPHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD5hZG9iZTpkb2NpZDpzdG9jazo4NTg1MTAyNTY8L3htcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD4KIDwvcmRmOkRlc2NyaXB0aW9uPgo8L3JkZjpSREY+CjwveDp4bXBtZXRhPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAo8P3hwYWNrZXQgZW5kPSd3Jz8+/9sAQwAD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";
                 const background = calendar.name ? calendar.color : 'transparent';
                 
+                
                 return html`  
-                <td class="calendar-profil-cell" width="${((1/this._calendars.length)*100)}%" style="">
+                <td class="calendar-profil-cell" width="${((1/calendarsLength)*100)}%" style="">
                     <div class="calendar-profil-label-badge"> 
                         <div class="value"> 
                             <img class="calendar-profil-picture" style="border-color: ${calendar.color};" src="${img}"/>
@@ -455,6 +478,25 @@ export class WeekPlannerCard extends LitElement {
         }
 
     }
+
+    _renderEventIcon(event) {
+        let test = event?.summary ?? null;
+        let icon2 = null;
+        if ((typeof test !== "undefined") && (typeof test !== "null")) {
+            test = test.toLowerCase();
+            let position = 0;
+            Object.keys(this._event_icons ?? {}).forEach(key => {
+                if(test.startsWith(key.toLowerCase(),position)){
+                    icon2 = this._event_icons[key];
+                }
+            });
+        }
+        if ((typeof icon2 !== "undefined") && (typeof icon2 !== "null")) {
+            return html`<ha-icon icon="${icon2}"></ha-icon>`;
+        }else{
+            return html``;
+        }
+    }
     _renderDays() {
         if (!this._days) {
             return html``;
@@ -529,6 +571,7 @@ export class WeekPlannerCard extends LitElement {
                                                                 ${event.end ? ' - ' + event.end.toFormat(this._timeFormat) : ''}
                                                             `
                                                         }
+                                                        ${this._renderEventIcon(event)}
                                                     </div>
                                                     <div class="title">
                                                         ${event.summary}
@@ -640,7 +683,7 @@ export class WeekPlannerCard extends LitElement {
     }
     _renderEventDetailsDialogHeading() {
         return html`
-            <div class="header_title">
+            <div class="header_title textselect">
 
             ${this._currentEventDetails.summary.length === 0 ?
                 html`
@@ -776,6 +819,22 @@ export class WeekPlannerCard extends LitElement {
             }, 50)
             return;
         }
+
+        
+        //for (let obj of this._calendars) {
+        //    obj = Helper.fixReadOnlyOnObject(obj,'color');
+
+        //    obj['color'] = Helper.getColorConfig(obj['color'],this._calendarColors);
+            //obj['color'] = this._getCalendarColor(obj['color']);
+        //}
+
+
+        
+        //for (let calendar of this._calendars) {
+        //    calendar = Helper.fixReadOnlyOnObject(calendar,'color');
+        //    calendar['color'] = this._getCalendarColor(calendar['color']);
+
+        //}
 
         this._updateEvents();
     }
@@ -953,7 +1012,6 @@ export class WeekPlannerCard extends LitElement {
             return;
         }
 
-        Helper.isDarkMode = this?.hass?.themes?.darkMode ?? false;
 
 
 
@@ -973,10 +1031,14 @@ export class WeekPlannerCard extends LitElement {
 
 
 
-
+        
 
         
-        this._calendars.forEach(calendar => {
+        this._calendars.forEach(obj => {
+            let calendar = Helper.fixReadOnlyOnObject(obj,'color');
+            
+            //calendar['color'] = this._getCalendarColor(calendar['color']);
+            //calendar['color'] = Helper.getColorConfig(calendar['color'],this._calendarColors);
             this._loading++;
             this.hass.callApi(
                 'get',

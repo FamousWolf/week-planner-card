@@ -1,11 +1,13 @@
 import { html, LitElement } from 'lit';
 import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';
 import { DateTime, Settings as LuxonSettings, Info as LuxonInfo } from 'luxon';
-import styles from './card.styles';
+import { styles } from './card.styles';
 import { Helper } from './helpers/helper.js';
-import { HaFormSwitch } from './helpers/ha-form-switch.js';
+import { CalendarObj, CalendarEditorObj } from './helpers/types.js';
+import { HaFormSwitch, HaFormLabel } from './helpers/ha-form-switch.js';
 
 
+customElements.define("ha-form-label", HaFormLabel);
 customElements.define("ha-form-switch", HaFormSwitch);
 // Finally we create and register the editor itself
 
@@ -16,13 +18,13 @@ customElements.define("ha-form-switch", HaFormSwitch);
 
 class MyCustomCardEditor extends LitElement {
     
-    static styles = styles;
+    static styles = [styles];
     _showConfig = false;
-    
+    _initialized = false;
+    _sortCalendar = false;
     _weather;
     _calendars;
     _texts;
-
     /**
      * Get properties
      *
@@ -32,78 +34,60 @@ class MyCustomCardEditor extends LitElement {
         return {
             hass: {},
             _config: {},
-            _config_edit: {},
             _texts: {},
             _weather: {}
         }
     }
     firstUpdated(_changedProperties){
-        
-        //this._calendars = this._calendars.sort((a, b) => b.enabled - a.enabled);
-        //alert("MyCustomCardEditor firstUpdated d");
-
-        //handle_event
-        
-       
     }
-    //themes_updated
-
+    disconnectedCallback(){
+        if(this._sortCalendar){
+            this._calendars.sort((a, b) => b.enabled - a.enabled)
+            this._sortCalendar = false;
+        }
+        this._updateCalendarColors();
+    }
 
     // setConfig works the same way as for the card itself
     setConfig(config) {
         this._config = Helper.getDefaultConfig(config, this.hass);
-        Helper.isDarkMode = this.hass.themes?.darkMode ?? false;
-        
-        //this._config = config;
-        this._config_edit = config;
-
         this._updateCalendarEntities();
-        
-    
         if((this._config.calendars ?? []).length == 0){
             this._config['hideNoEvent'] = true
         }
-        
         this._weather = this._config.weather ?? {};
-
-        
-
         this._texts = this._config.texts ?? {};
         this._config.texts = this._texts;
-
-        
-        
     }
   
-
+   
 
     
     _updateCalendarColors(){
-
-        //const obj = this._getAvailableCalendarColors(this._config['calendars'], this._calendars.length);
-
-        //let l = Object.keys(obj)
-        //let i = 0;
-        for (let object of this._calendars) {
-
-            //let obj = Helper.fixReadOnlyOnObject(object,'color', object.color ?? '')
-
-            const key = object.color.replace("#", '');
-            const arr = [Helper.darkModeCalendarColors[key], Helper.lightModeCalendarColors[key]];
-            const text = arr.find(x=>x!==undefined);
-            let _calendarColors = (this.hass?.themes?.darkMode ?? false) ? Helper.darkModeCalendarColors:Helper.lightModeCalendarColors;
-            const _color0 = '#'+Object.keys(_calendarColors).find(key => _calendarColors[key] === text);
-            object['color'] = _color0;
-
-            //let updatedCalendar = this._config['calendars'].find(c => c.entity == object.entity);
-            //if ((typeof updatedCalendar !== "undefined") && (typeof updatedCalendar !== "null")) {
-            //    object.color = updatedCalendar.color ?? object.color;
-            //}else{
-            //    object.color = '#'+l[i];
-            //    i = i+1;
-            //}
+        let i = 0;
+        let _calendars = [];
+        for (let object of this._config.calendars) {
+            if (!(object.hasOwnProperty('color') && !Helper.isNullOrUndefinedOrEmpty(object['color']))) {
+                let updatedCalendar = this._calendars.find(c => c.entity == object.entity);
+                if (!Helper.isNullOrUndefined(updatedCalendar)) {
+                    if (updatedCalendar.hasOwnProperty('color') && !Helper.isNullOrUndefinedOrEmpty(updatedCalendar['color'])) {
+                        object = Helper.fixReadOnlyOnObject(object,'color', updatedCalendar['color']);
+                        i=i+1;
+                    }
+                }
+            }
+            _calendars.push(object);
         }
-        
+        if(i>0){
+            this._config = Helper.fixReadOnlyOnObject(this._config,'calendars');
+            this._config.calendars = _calendars;
+            const event = new CustomEvent("config-changed", {
+                detail: { config: this._config },
+                bubbles: true,
+                composed: true,
+              });
+              this.dispatchEvent(event);
+        }
     }
  
 
@@ -139,35 +123,95 @@ class MyCustomCardEditor extends LitElement {
                 )
             })
 
-            
-            this._calendars = calendarEntities.map((obj) => ({
+            //let gg = calendarEntities.map((obj) => (new CalendarEditorObj(obj)));
+           /*  const gg = calendarEntities.map((obj) => (new CalendarEditorObj({
                 enabled: false,
                 image: '',
-                color: String(''),
+                color: '',
                 entity: obj.entity_id,
                 friendly_name: obj.stateObj.attributes.friendly_name,
                 name: obj.stateObj.attributes.friendly_name
-            })); 
+            })));
 
+            console.log(gg) */
+
+            //const ddd = calendarEntities.map((obj) => (new CalendarEditorObj(obj)));
+            //console.log(ddd)
+          /*   this._calendars = calendarEntities.map((obj) => ({
+                enabled: false,
+                image: '',
+                color: '',
+                entity: obj.entity_id,
+                friendly_name: obj.stateObj.attributes.friendly_name,
+                name: obj.stateObj.attributes.friendly_name
+            }));  */
+            this._calendars= calendarEntities.map((obj) => (new CalendarEditorObj(obj)));
+
+
+            let tmp_calendar_colors = (JSON.parse(localStorage.getItem('calendar_colors')) || []);
+
+
+            let i = 0;
             for (let object of this._calendars) {
+                let updatedCalendar = this._config['calendars'].find(c => c.entity == object.entity);
+                if (Helper.isNullOrUndefined(updatedCalendar)) {
+                    i = Helper.getFreeColorIndex(i,this._config['calendars']);
+                    object.color = Helper.getColorByIndex(i);
+                    i = i+1;
+                }else{
+                    
+
+                    if (updatedCalendar.hasOwnProperty('color') && !Helper.isNullOrUndefinedOrEmpty(updatedCalendar['color'])) {
+                        object['color'] = updatedCalendar['color'];
+                    }else{
+                        let tmp = tmp_calendar_colors.find(c => c.entity == object.entity);
+                        if (Helper.isNullOrUndefined(tmp)) {
+                            i = Helper.getFreeColorIndex(i,this._config['calendars']);
+                            object.color = Helper.getColorByIndex(i);
+                            i = i+1;
+                        }else{
+                            object['color'] = tmp['color'];
+                        }
+                        
+                    }
+                    
+                    object.image = updatedCalendar.image ?? '';
+                    object.name = updatedCalendar.name ?? '';
+                    object['showProfil'] = (new CalendarEditorObj(updatedCalendar)).showProfil;
+                    object.enabled = true;
+                }
+            }
+            if (!Helper.isNullOrUndefined(localStorage.getItem('calendar_colors'))) {
+                localStorage.removeItem('calendar_colors');
+            }
+            
+            //getNextIndex
+
+            /* for (let object of this._calendars) {
+                object.color = Helper.getColorByIndex(i);
                 let updatedCalendar = this._config['calendars'].find(c => c.entity == object.entity);
                 if ((typeof updatedCalendar !== "undefined") && (typeof updatedCalendar !== "null")) {
                     object.name = updatedCalendar.name ?? '';
-                    object.color = updatedCalendar.color ?? '';
+                    object.color = updatedCalendar.color ?? Helper.getColorByIndex(i);
                     object.image = updatedCalendar.image ?? '';
                     object.enabled = true;
                 }
+                i = i+1;
 
-                const key = object.color.replace("#", '');
-                const arr = [Helper.darkModeCalendarColors[key], Helper.lightModeCalendarColors[key]];
-                const text = arr.find(x=>x!==undefined);
-                let _calendarColors = (this.hass?.themes?.darkMode ?? false) ? Helper.darkModeCalendarColors:Helper.lightModeCalendarColors;
-                object.color = '#'+Object.keys(_calendarColors).find(key => _calendarColors[key] === text);
+                
+                //const key = object.color.replace("#", '');
+                //const arr = [Helper.darkModeCalendarColors[key], Helper.lightModeCalendarColors[key]];
+                //const text = arr.find(x=>x!==undefined);
+                //let _calendarColors = (this.hass?.themes?.darkMode ?? false) ? Helper.darkModeCalendarColors:Helper.lightModeCalendarColors;
+                //object.color = '#'+Object.keys(_calendarColors).find(key => _calendarColors[key] === text);
                 //object.color = Helper.updateCalendarColor(object).color ?? '';
-            }
-
+            } */
+            this._calendars.sort((a, b) => b.enabled - a.enabled)
             this._updateCalendarColors();
         }
+
+        
+
     }
     
     //_computeTextsLabel(schema) {
@@ -372,16 +416,17 @@ class MyCustomCardEditor extends LitElement {
             this._config['type'] = "custom:week-planner-card";
         }
 
+        
 
-        let configuration = {
+        /* let configuration = {
             enabled: false,
             entity: null,
             friendly_name: '',
             color: '',
             name: '',
             image: ''
-        };
-
+        }; */
+        let configuration = new CalendarEditorObj();
         let _calendars = this._calendars;
        
         let _updatedCalendar = _calendars.find(c => c.entity == ev.detail.value.entity);
@@ -400,21 +445,54 @@ class MyCustomCardEditor extends LitElement {
         });
 
         
+
         for (let object of this._calendars) {
+            if (object.entity === _config.entity) {
+                //object = CalendarEditorObj.updateHelper(object,_config)
+
+                object.name = _config.name ?? object.name;
+                object.color = _config.color ?? object.color;
+                object.image = _config.image ?? object.image;
+                object.enabled = _config.enabled;
+                object['showProfil'] = _config.showProfil;
+            }
+        } 
+
+        /* for (let object of this._calendars) {
             if (object.entity === _config.entity) {
                 object.name = _config.name ?? object.name;
                 object.color = _config.color ?? object.color;
                 object.image = _config.image ?? object.image;
                 object.enabled = _config.enabled;
             }
-        } 
+        }  */
 
         
 
 
         _config = this._removeNullUndefinedWithReduce(_config, false);
 
-       
+      /*   if ((typeof updatedCalendar !== "undefined") && (typeof updatedCalendar !== "null")) {
+            for (let object of this._config['calendars']) {
+                if (object.entity == _config.entity) {
+                    if (_config.enabled) {
+                        //object = new CalendarObj(_config);
+                        object = Helper.fixReadOnlyOnObject(object,'showProfil');
+                        object = CalendarObj.updateHelper(object,_config);
+                        //object.entity= _config.entity;
+                    }else{
+                        this._config['calendars'] = this._config['calendars'].filter(c => c.entity !== _config.entity)
+                    }
+                }
+            }
+        }else{
+            if(_config.enabled){
+                this._config['calendars'].push(new CalendarObj(_config));
+            }
+            else{
+                this._config['calendars'] = this._config['calendars'].filter(c => c.entity !== _config.entity)
+            }
+        } */
         
         if ((typeof updatedCalendar !== "undefined") && (typeof updatedCalendar !== "null")) {
             for (let object of this._config['calendars']) {
@@ -430,6 +508,7 @@ class MyCustomCardEditor extends LitElement {
                             object['image'] = _config.image;
                         }
                         object.entity= _config.entity;
+                        object['showProfil'] = _config.showProfil;
                     }else{
                         this._config['calendars'] = this._config['calendars'].filter(c => c.entity !== _config.entity)
                     }
@@ -445,8 +524,10 @@ class MyCustomCardEditor extends LitElement {
             }
         }
 
-        this._updateCalendarColors();
+        
     
+        this._sortCalendar = true;
+
         const event = new CustomEvent("config-changed", {
             detail: { config: this._config },
             bubbles: true,
@@ -456,57 +537,89 @@ class MyCustomCardEditor extends LitElement {
 
     }
     _renderCalendarColorOption(text,color) {
-        return html`<span style="background-color: #${color}; border-radius: 50%; width: 20px; float: left; margin-right: 5px;">&nbsp;</span>${text}`;
+        return html`<span style="background-color: ${color}; border-radius: 50%; width: 20px; float: left; margin-right: 5px;">&nbsp;</span>${text}`;
     }
 
     
   
 
-    _renderCalendarHeader(calendar) {
-
-        return html`
-        <h3><span style="background-color: ${calendar.color}; border-radius: 50%; width: 20px; float: left; margin-right: 5px;">&nbsp;</span>${calendar.name}</h3>
-
-         <ha-form
-            .hass=${this.hass}
-            .data=${calendar}
-            .schema=${[
-                {name: "enabled", type: 'switch'}
-            ]}
-            .computeLabel=${this._computeCalendarLabel}
-            @value-changed=${this._calendarValueChanged} 
-            ></ha-form>
-        `;
-    }
-
     _renderCalendar() {
         if (!this._calendars) {
             return html``;
         }
+        //let colorMode = (this.hass?.themes?.darkMode ?? false) ? "dark" : "light";
+        //const optionsCalendarColors = Object.keys(this._calendarColors).map((key) => ({ 'label': this._renderCalendarColorOption(key, (this._calendarColors[key])[colorMode]), 'value':key}));
 
-        const _calendarColors = (this.hass?.themes?.darkMode ?? false) ? Helper.darkModeCalendarColors:Helper.lightModeCalendarColors;
-        let optionsCalendarColors = Object.keys(_calendarColors).map((key) => ({ 'label': this._renderCalendarColorOption(_calendarColors[key], key), 'value': `#${key}`}));
+
+        //Helper.Colors
+        
+        
+        let optionsCalendarColors = Helper.Colors.map((color) => ({ 'label': this._renderCalendarColorOption(color, color), 'value': color}));
      
 
         
         return html`
 
-
-
-
-
-    
-
-
-            
             ${this._calendars.map((calendar) => {
                 const _optionsCalendarColors = optionsCalendarColors;
                 return html` 
                 
+                <ha-expansion-panel outlined>
+                    <h3 slot="header">
+                    <ha-icon style=${calendar.color ? `color: ${calendar.color}` : ""} icon=${calendar.enabled ? "mdi:check-circle" : "mdi:circle"}></ha-icon>
+                    ${calendar.name}
+                    </h3>
+                    <div class="content">
+                            ${calendar.enabled ?
+                                html`
+                                    <ha-form
+                                        .hass=${this.hass}
+                                        .data=${calendar}
+                                        .schema=${[
+                                            {name: "entity"},
+                                            {name: "enabled", type: 'switch'},
+                                            {name: "color", disabled: !(calendar.enabled), selector: { select: { mode: "dropdown", options: _optionsCalendarColors}}},
+                                            {name: "showProfil", disabled: !(calendar.enabled), type: 'switch'},
+                                            {disabled: !(calendar.enabled), title: Helper.localize('settings.calendar.image'), type: 'expandable', schema:[
+                                                {name: "image", value: calendar.image, selector: { image: { original: true, crop: {round: true } }}}
+                                            ]},
+                                            {label: this.hass.formatEntityAttributeValue(this.hass.states[calendar.entity], 'friendly_name'), type: 'label'},
+                                            {name: "name", disabled: !(calendar.enabled), type: 'string'}
+                                        ]}
+                                        .computeLabel=${this._computeCalendarLabel}
+                                        @value-changed=${this._calendarValueChanged} 
+                                        >
+                                    </ha-form>
+                                ` :
+                                html`
+                                    <ha-form
+                                        .hass=${this.hass}
+                                        .data=${calendar}
+                                        .schema=${[
+                                            {name: "entity"},
+                                            {name: "enabled", type: 'switch'}
+                                        ]}
+                                        .computeLabel=${this._computeCalendarLabel}
+                                        @value-changed=${this._calendarValueChanged} 
+                                        >
+                                    </ha-form>`
+                            }
+                    </div>
+                </ha-expansion-panel></br>
+
+
+
+
+
+
+
+
+
+
+                <!--
                 <ha-card class="calendar-settings"> 
                     <div class="header" style="display: ruby-text;">
-                        <h3><span style="background-color: ${calendar.color}; border-radius: 50%; width: 20px; float: left; margin-right: 5px;">&nbsp;</span>${this.hass.formatEntityAttributeValue(this.hass.states[calendar.entity], 'friendly_name')}</h3>
-                        
+                        <h3><span style="background-color: ${calendar.color}; border-radius: 50%; width: 20px; float: left; margin-right: 5px;">&nbsp;</span>${calendar.name}</h3>
                         <ha-form
                             .hass=${this.hass}
                             .data=${calendar}
@@ -517,11 +630,6 @@ class MyCustomCardEditor extends LitElement {
                             @value-changed=${this._calendarValueChanged} 
                             >
                         </ha-form>
-
-                         <!--
-                         ${this._renderCalendarHeader(calendar)}
-                         -->
-
                     </div> 
                     <div class="info"> 
                             ${calendar.enabled ?
@@ -531,6 +639,8 @@ class MyCustomCardEditor extends LitElement {
                                         .data=${calendar}
                                         .schema=${[
                                             {name: "entity"},
+                                            {label: this.hass.formatEntityAttributeValue(this.hass.states[calendar.entity], 'friendly_name'),  disabled: !(calendar.enabled), type: 'label'},
+                                            {name: "showProfil",  disabled: !(calendar.enabled), type: 'switch'},
                                             {name: "color", disabled: !(calendar.enabled), selector: { select: { mode: "dropdown", options: _optionsCalendarColors}}},
                                             {title: Helper.localize('settings.calendar.image'), type: 'expandable', schema:[
                                                 {name: "image", value: calendar.image, disabled: !(calendar.enabled), selector: { image: { original: true, crop: {round: true } }}}
@@ -549,21 +659,31 @@ class MyCustomCardEditor extends LitElement {
                 </ha-card>
                 
                 
-                </br>`;
+                </br>
+                -->
+                `;
 
 
                 
             })} 
         `;
     }
-
-    render() {
-        if (!this.hass) {
-            return html``;
+    _waitForHassAndConfig() {
+        if (!this.hass || !this._calendars) {
+            window.setTimeout(() => {
+                this._waitForHassAndConfig();
+            }, 50)
+            return;
         }
 
+    }
+    render() {
+        if (!this._initialized) {
+            this._initialized = true;
+            this._waitForHassAndConfig();
+        }
 
-        Helper.isDarkMode =  this.hass?.themes?.darkMode ?? false;
+        //Helper.isDarkMode =  this.hass?.themes?.darkMode ?? false;
         
 
         let optionsStartingDay = Object.keys(Helper.StartingDayEnum).map((key) => ({ 'label': `${Helper.StartingDayEnum[key].startsWith('texts.') ?  Helper.localize(Helper.StartingDayEnum[key]) :  Helper.StartingDayEnum[key]}`, 'value': key}));
