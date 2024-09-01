@@ -119,6 +119,7 @@ export class WeekPlannerCard extends LitElement {
         this._showLocation = config.showLocation ?? false;
         this._hidePastEvents = config.hidePastEvents ?? false;
         this._hideDaysWithoutEvents = config.hideDaysWithoutEvents ?? false;
+        this._filter = config.filter ?? false;
         if (config.locale) {
             LuxonSettings.defaultLocale = config.locale;
         }
@@ -463,6 +464,10 @@ export class WeekPlannerCard extends LitElement {
                 'calendars/' + calendar.entity + '?start=' + encodeURIComponent(startDate.toISO()) + '&end=' + encodeURIComponent(endDate.toISO())
             ).then(response => {
                 response.forEach(event => {
+                    if (this._isFilterEvent(event)) {
+                        return;
+                    }
+
                     let startDate = this._convertApiDate(event.start);
                     let endDate = this._convertApiDate(event.end);
                     if (this._hidePastEvents && endDate < now) {
@@ -500,6 +505,14 @@ export class WeekPlannerCard extends LitElement {
         }, 50);
 
         this._loading--;
+    }
+
+    _isFilterEvent(event) {
+        if (!this._filter) {
+            return false;
+        }
+
+        return event.summary.match(this._filter);
     }
 
     _addEvent(event, startDate, endDate, fullDay, calendar) {
