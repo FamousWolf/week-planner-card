@@ -219,16 +219,15 @@ export class WeekPlannerCard extends LitElement {
                 if (this._hideDaysWithoutEvents && day.events.length === 0 && !this._isToday(day.date)) {
                     return html``;
                 }
-                
                 return html`
-                    <div class="day ${day.class}">
+                    <div class="day ${day.class}" data-date="${day.date.day}" data-weekday="${day.date.weekday}" data-month="${day.date.month}" data-year="${day.date.year}" data-week="${day.date.weekNumber}">
                         <div class="date">
                             ${this._dayFormat ?
                                     unsafeHTML(day.date.toFormat(this._dayFormat)) :
                                     html`
                                         <span class="number">${day.date.day}</span>
-                                    <span class="text">${this._getWeekDayText(day.date)}</span>
-                                `
+                                        <span class="text">${this._getWeekDayText(day.date)}</span>
+                                    `
                             }
                         </div>
                         ${day.weather ?
