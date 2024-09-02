@@ -80,10 +80,11 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 
 ### Calendars
 
-| Name           | Type        | Default      | Supported options                   | Description                                          | Version |
-|----------------|-------------|--------------|-------------------------------------|------------------------------------------------------|---------|
-| `entity`       | string      | **Required** | `calendar.my_calendar`              | Entity ID                                            | 1.0.0   |
-| `color`        | string      | optional     | Any CSS color                       | Color used for events from the calendar              | 1.0.0   |
+| Name     | Type   | Default      | Supported options      | Description                             | Version |
+|----------|--------|--------------|------------------------|-----------------------------------------|---------|
+| `entity` | string | **Required** | `calendar.my_calendar` | Entity ID                               | 1.0.0   |
+| `name`   | string | optional     | Any text               | Name of the calendar                    | 1.7.0   |
+| `color`  | string | optional     | Any CSS color          | Color used for events from the calendar | 1.0.0   |
 
 ### Texts
 
