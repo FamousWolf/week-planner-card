@@ -73,6 +73,7 @@ export class WeekPlannerCard extends LitElement {
     _showLocation;
     _hidePastEvents;
     _hideDaysWithoutEvents;
+    _filter;
 
     /**
      * Get properties
@@ -107,6 +108,7 @@ export class WeekPlannerCard extends LitElement {
         this._numberOfDays = this._getNumberOfDays(config.days ?? 7);
         this._hideWeekend = config.hideWeekend ?? false;
         this._startingDay = config.startingDay ?? 'today';
+        this._startingDayOffset = config.startingDayOffset ?? 0;
         this._startDate = this._getStartDate();
         this._updateInterval = config.updateInterval ?? 60;
         this._noCardBackground = config.noCardBackground ?? false;
@@ -732,6 +734,10 @@ export class WeekPlannerCard extends LitElement {
             case 'month':
                 startDate = startDate.startOf('month');
                 break;
+        }
+
+        if (this._startingDayOffset !== 0) {
+            startDate = startDate.plus({ days: this._startingDayOffset });
         }
 
         if (this._hideWeekend && startDate.weekday >= 6) {
