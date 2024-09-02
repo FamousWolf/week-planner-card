@@ -482,7 +482,9 @@ export class WeekPlannerCard extends LitElement {
             this._subscribeToWeatherForecast();
         }
 
+        let calendarNumber = 0;
         this._calendars.forEach(calendar => {
+            let calendarSorting = calendarNumber;
             this._loading++;
             this.hass.callApi(
                 'get',
@@ -501,9 +503,9 @@ export class WeekPlannerCard extends LitElement {
                     let fullDay = this._isFullDay(startDate, endDate);
 
                     if (!fullDay && !this._isSameDay(startDate, endDate)) {
-                        this._handleMultiDayEvent(event, startDate, endDate, calendar);
+                        this._handleMultiDayEvent(event, startDate, endDate, calendar, calendarSorting);
                     } else {
-                        this._addEvent(event, startDate, endDate, fullDay, calendar);
+                        this._addEvent(event, startDate, endDate, fullDay, calendar, calendarSorting);
                     }
                 });
 
@@ -513,6 +515,7 @@ export class WeekPlannerCard extends LitElement {
                 this._loading = 0;
                 throw new Error(this._error);
             });
+            calendarNumber++;
         });
 
         let checkLoading = window.setInterval(() => {
@@ -540,7 +543,7 @@ export class WeekPlannerCard extends LitElement {
         return event.summary.match(this._filter);
     }
 
-    _addEvent(event, startDate, endDate, fullDay, calendar) {
+    _addEvent(event, startDate, endDate, fullDay, calendar, calendarSorting) {
         if (this._hideWeekend && startDate.weekday >= 6) {
             return;
         }
@@ -561,6 +564,7 @@ export class WeekPlannerCard extends LitElement {
             fullDay: fullDay,
             color: calendar.color ?? 'inherit',
             calendar: calendar.entity,
+            calendarSorting: calendarSorting,
             class: this._getEventClass(startDate, endDate, fullDay)
         });
     }
@@ -612,13 +616,13 @@ export class WeekPlannerCard extends LitElement {
         return classes.join(' ');
     }
 
-    _handleMultiDayEvent(event, startDate, endDate, calendar) {
+    _handleMultiDayEvent(event, startDate, endDate, calendar, calendarSorting) {
         while (startDate < endDate) {
             let eventStartDate = startDate;
             startDate = startDate.plus({ days: 1 }).startOf('day');
             let eventEndDate = startDate < endDate ? startDate : endDate;
 
-            this._addEvent(event, eventStartDate, eventEndDate, this._isFullDay(eventStartDate, eventEndDate), calendar);
+            this._addEvent(event, eventStartDate, eventEndDate, this._isFullDay(eventStartDate, eventEndDate), calendar, calendarSorting);
         }
     }
 
@@ -647,7 +651,11 @@ export class WeekPlannerCard extends LitElement {
                 const dateKey = startDate.toISODate();
                 if (this._events.hasOwnProperty(dateKey)) {
                     events = this._events[dateKey].sort((event1, event2) => {
-                        return event1.start > event2.start ? 1 : (event1.start < event2.start) ? -1 : 0;
+                        if (event1.start === event2.start) {
+                            return event1.calendarSorting < event2.calendarSorting ? 1 : (event1.calendarSorting > event2.calendarSorting) ? -1 : 0;
+                        }
+
+                        return event1.start > event2.start ? 1 : -1;
                     });
                 }
 
