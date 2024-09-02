@@ -76,6 +76,7 @@ export class WeekPlannerCard extends LitElement {
     _hidePastEvents;
     _hideDaysWithoutEvents;
     _filter;
+    _showLegend;
 
     /**
      * Get properties
@@ -124,6 +125,7 @@ export class WeekPlannerCard extends LitElement {
         this._hidePastEvents = config.hidePastEvents ?? false;
         this._hideDaysWithoutEvents = config.hideDaysWithoutEvents ?? false;
         this._filter = config.filter ?? false;
+        this._showLegend = config.showLegend ?? false;
         if (config.locale) {
             LuxonSettings.defaultLocale = config.locale;
         }
@@ -202,6 +204,7 @@ export class WeekPlannerCard extends LitElement {
                         ''
                     }
                     <div class="container">
+                        ${this._renderLegend()}
                         ${this._renderDays()}
                     </div>
                     ${this._renderEventDetailsDialog()}
@@ -211,6 +214,24 @@ export class WeekPlannerCard extends LitElement {
                     }
                 </div>
             </ha-card>
+        `;
+    }
+
+    _renderLegend() {
+        if (!this._showLegend) {
+            return html``;
+        }
+
+        return html`
+            <div class="legend">
+                <ul>
+                    ${this._calendars.map((calendar) => {
+                        return html`
+                            <li style="--legend-calendar-color: ${calendar.color}">${calendar.name ?? calendar.entity}</li>
+                        `;
+                    })}
+                </ul>
+            </div>
         `;
     }
 

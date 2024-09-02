@@ -2,6 +2,8 @@ import { css } from 'lit';
 
 export default css`
     ha-card {
+        --legend-spacing: 15px;
+        --legend-dot-size: 10px;
         --days-spacing: 15px;
         --day-date-number-font-size: 3.5em;
         --day-date-number-line-height: 1.2em;
@@ -45,6 +47,30 @@ export default css`
         display: flex;
         flex-wrap: wrap;
         gap: var(--days-spacing);
+    }
+    
+    .container .legend ul {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--legend-spacing);
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+    
+    .container .legend ul li {
+        display: block;
+    }
+
+    .container .legend ul li:before {
+        content: '';
+        display: inline-block;
+        width: var(--legend-dot-size);
+        height: var(--legend-dot-size);
+        background-color: var(--legend-calendar-color, var(--divider-color, #ffffff));
+        border-radius: 50%;
+        margin: 0 5px 0 0;
+        vertical-align: middle;
     }
 
     .container .day {
