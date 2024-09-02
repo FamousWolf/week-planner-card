@@ -33,7 +33,7 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 
 ### Manual
 
-1. Download and copy `eweek-planner-card.js` from the [latest release](https://github.com/FamousWolf/week-planner-card/releases/latest) into your `config/www` directory.
+1. Download and copy `week-planner-card.js` from the [latest release](https://github.com/FamousWolf/week-planner-card/releases/latest) into your `config/www` directory.
 2. Add the resource reference to Home Assistant configuration using one of these methods:
   - **Edit your configuration.yaml**
     Add:
