@@ -69,6 +69,8 @@ export class WeekPlannerCard extends LitElement {
     _locationLink;
     _startDate;
     _hideWeekend;
+    _startingDay;
+    _startingDayOffset;
     _weatherForecast = null;
     _showLocation;
     _hidePastEvents;
