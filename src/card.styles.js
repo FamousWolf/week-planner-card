@@ -48,7 +48,11 @@ export default css`
         flex-wrap: wrap;
         gap: var(--days-spacing);
     }
-    
+
+    .container .legend {
+        width: 100%;
+    }
+
     .container .legend ul {
         display: flex;
         flex-wrap: wrap;
