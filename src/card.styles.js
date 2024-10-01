@@ -2,6 +2,8 @@ import { css } from 'lit';
 
 export default css`
     ha-card {
+        --navigation-spacing: 15px;
+        --navigation-month-font-size: 2em;
         --legend-spacing: 15px;
         --legend-dot-size: 10px;
         --days-columns: 7;
@@ -52,6 +54,38 @@ export default css`
   
     .container.hasActions {
       cursor: pointer;
+    }
+
+    .container .navigation {
+        width: 100%;
+        display: flex;
+    }
+
+    .container .navigation ul {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--navigation-spacing);
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        width: 50%;
+    }
+
+    .monthUl {
+        justify-content: flex-start;
+    }
+
+    .navMonth {
+        font-size: var(--navigation-month-font-size);
+        color: var(--primary-text-color);
+    }
+
+    .navUl {
+        justify-content: flex-end;
+    }
+    
+    .container .navigation ul li {
+        display: block;
     }
 
     .container .legend {
