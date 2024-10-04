@@ -77,6 +77,7 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 | `hidePastEvents`        | boolean          | false                                              | `false` \| `true`                                                                                                                           | Do not show past events                                                                | 1.3.0   |
 | `hideDaysWithoutEvents` | boolean          | false                                              | `false` \| `true`                                                                                                                           | Do not show days without events, except for today                                      | 1.4.0   |
 | `filter`                | string           | optional                                           | Any regular expression                                                                                                                      | Remove events that match the regular expression                                        | 1.7.0   |
+| `showLegend`          | boolean          | false                                              | `false` \| `true`                                                                                                                           | Show event location in overview                                                        | 1.?.0   |
 
 ### Calendars
 
