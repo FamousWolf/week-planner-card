@@ -563,6 +563,8 @@ export class WeekPlannerCard extends LitElement {
             originalEnd: this._convertApiDate(event.end),
             fullDay: fullDay,
             color: calendar.color ?? 'inherit',
+            background: calendar.background,
+            calendarName: calendar.name,
             calendar: calendar.entity,
             calendarSorting: calendarSorting,
             class: this._getEventClass(startDate, endDate, fullDay)
