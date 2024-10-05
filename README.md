@@ -77,7 +77,7 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 | `hidePastEvents`        | boolean          | false                                              | `false` \| `true`                                                                                                                           | Do not show past events                                                                | 1.3.0   |
 | `hideDaysWithoutEvents` | boolean          | false                                              | `false` \| `true`                                                                                                                           | Do not show days without events, except for today                                      | 1.4.0   |
 | `filter`                | string           | optional                                           | Any regular expression                                                                                                                      | Remove events that match the regular expression                                        | 1.7.0   |
-| `showLegend`          | boolean          | false                                              | `false` \| `true`                                                                                                                           | Show event location in overview                                                        | 1.?.0   |
+| `showLegend`          | boolean          | false                                              | `false` \| `true`                                                                                                                           | Show event location in overview                                                        | 1.7.0   |
 
 ### Calendars
 
@@ -86,6 +86,7 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 | `entity` | string | **Required** | `calendar.my_calendar` | Entity ID                               | 1.0.0   |
 | `name`   | string | optional     | Any text               | Name of the calendar                    | 1.7.0   |
 | `color`  | string | optional     | Any CSS color          | Color used for events from the calendar | 1.0.0   |
+| `background`   | string | optional     | Any CSS color               | Background color used for events from the calendar                  | 1.8.0   |
 
 ### Texts
 
@@ -159,9 +160,11 @@ calendars:
 type: custom:week-planner-card
 calendars:
   - entity: calendar.my_calendar_1
-    color: '#e6c229'
+    color: rgba(230,194,41,0)
+    background: rgba(230,194,41,0.3)
   - entity: calendar.my_calendar_2
-    color: '#1a8fe3'
+    color: rgba(26,143,227,1)
+    background: rgba(26,143,227,0.3)
 weather:
   entity: weather.my_weather_service
   showTemperature: true
