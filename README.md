@@ -87,6 +87,8 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 | `name`   | string | optional     | Any text               | Name of the calendar                    | 1.7.0   |
 | `color`  | string | optional     | Any CSS color          | Color used for events from the calendar | 1.0.0   |
 | `background`   | string | optional     | Any CSS color               | Background color used for events from the calendar                  | 1.8.0   |
+| `primarytext`   | string | optional     | Any CSS color               | Title color used for events from the calendar                  | 1.8.0   |
+| `secondarytext`   | string | optional     | Any CSS color               | Time color used for events from the calendar                  | 1.8.0   |
 
 ### Texts
 
