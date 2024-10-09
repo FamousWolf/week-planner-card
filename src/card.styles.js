@@ -154,6 +154,10 @@ export default css`
         margin: 0 0 3px 0;
     }
 
+    .container .day .events .event .title {
+        color: var(--primary-text-color, ##212121);
+    }
+    
     .container .day .events .event .location {
         margin: 3px 0 0 0;
         --mdc-icon-size: var(--event-icon-size);
