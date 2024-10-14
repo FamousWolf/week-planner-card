@@ -491,7 +491,7 @@ export class WeekPlannerCard extends LitElement {
                 'calendars/' + calendar.entity + '?start=' + encodeURIComponent(startDate.toISO()) + '&end=' + encodeURIComponent(endDate.toISO())
             ).then(response => {
                 response.forEach(event => {
-                    if (this._isFilterEvent(event)) {
+                    if (this._isFilterEvent(event, calendar.filter ?? '')) {
                         return;
                     }
 
@@ -535,12 +535,9 @@ export class WeekPlannerCard extends LitElement {
         this._loading--;
     }
 
-    _isFilterEvent(event) {
-        if (!this._filter) {
-            return false;
-        }
-
-        return event.summary.match(this._filter);
+    _isFilterEvent(event, calendarFilter) {
+        return this._filter && event.summary.match(this._filter)
+            || calendarFilter && event.summary.match(calendarFilter);
     }
 
     _addEvent(event, startDate, endDate, fullDay, calendar, calendarSorting) {
