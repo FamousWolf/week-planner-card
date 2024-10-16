@@ -67,6 +67,7 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 | `updateInterval`        | number           | 60                                                 | Any positive integer number                                                                                                                 | Seconds between checks for new events                                                  | 1.0.0   |
 | `calendars`             | object list      | **Required**                                       | See [Calendars](#calendars)                                                                                                                 | Calendars shown in this card                                                           | 1.0.0   |
 | `texts`                 | object list      | {}                                                 | See [Texts](#texts)                                                                                                                         | Texts used in the card                                                                 | 1.0.0   |
+| `actions`               | object list      | {}                                                 | See [Actions](#actions)                                                                                                                     | Actions for the card                                                                   | 1.8.0   |
 | `weather`               | object           | optional                                           | See [Weather](#weather)                                                                                                                     | Configuration for optional weather forecast                                            | 1.1.0   |
 | `dayFormat`             | string           | optional                                           | See [Luxon format](https://moment.github.io/luxon/#/formatting?id=table-of-tokens)                                                          | Format of the date at the top of the day. This is not escaped, so HTML is allowed here | 1.6.0   |
 | `dateFormat`            | string           | `cccc d LLLL yyyy`                                 | See [Luxon format](https://moment.github.io/luxon/#/formatting?id=table-of-tokens)                                                          | Format of the date in event details                                                    | 1.0.0   |
@@ -103,6 +104,9 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 | `thursday`  | string | Name of Thursday based on locale  | Any text          | Text used to override Thursdays                                                 | 1.1.0   |
 | `friday`    | string | Name of Friday based on locale    | Any text          | Text used to override Fridays                                                   | 1.1.0   |
 | `saturday`  | string | Name of Saturday based on locale  | Any text          | Text used to override Saturdays                                                 | 1.1.0   |
+
+### Actions
+See [Actions documentation](https://www.home-assistant.io/dashboards/actions/). Currently only the tab action is supported.
 
 ### Weather
 

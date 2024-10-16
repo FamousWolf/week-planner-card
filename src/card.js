@@ -77,6 +77,7 @@ export class WeekPlannerCard extends LitElement {
     _hideDaysWithoutEvents;
     _filter;
     _showLegend;
+    _actions;
 
     /**
      * Get properties
@@ -126,6 +127,7 @@ export class WeekPlannerCard extends LitElement {
         this._hideDaysWithoutEvents = config.hideDaysWithoutEvents ?? false;
         this._filter = config.filter ?? false;
         this._showLegend = config.showLegend ?? false;
+        this._actions = config.actions ?? false;
         if (config.locale) {
             LuxonSettings.defaultLocale = config.locale;
         }
@@ -203,7 +205,7 @@ export class WeekPlannerCard extends LitElement {
                         html`<h1 class="card-title">${this._title}</h1>` :
                         ''
                     }
-                    <div class="container">
+                    <div class="container${this._actions ? ' hasActions' : ''}" @click="${this._handleContainerClick}">
                         ${this._renderLegend()}
                         ${this._renderDays()}
                     </div>
@@ -697,7 +699,30 @@ export class WeekPlannerCard extends LitElement {
         }
     }
 
+    _handleContainerClick(e) {
+        if (!this._actions) {
+            return;
+        }
+
+        const event = new Event(
+            'hass-action', {
+                bubbles: true,
+                composed: true,
+            }
+        );
+        event.detail = {
+            config: this._actions,
+            action: 'tap',
+        }
+        this.dispatchEvent(event);
+
+        e.stopImmediatePropagation();
+    }
+
     _handleEventClick(event) {
+        if (this._actions) {
+            return;
+        }
         this._currentEventDetails = event;
     }
 
