@@ -48,6 +48,10 @@ export default css`
         flex-wrap: wrap;
         gap: var(--days-spacing);
     }
+  
+    .container.hasActions {
+      cursor: pointer;
+    }
 
     .container .legend {
         width: 100%;

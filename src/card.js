@@ -75,8 +75,10 @@ export class WeekPlannerCard extends LitElement {
     _showLocation;
     _hidePastEvents;
     _hideDaysWithoutEvents;
+    _hideTodayWithoutEvents;
     _filter;
     _showLegend;
+    _actions;
 
     /**
      * Get properties
@@ -124,8 +126,10 @@ export class WeekPlannerCard extends LitElement {
         this._showLocation = config.showLocation ?? false;
         this._hidePastEvents = config.hidePastEvents ?? false;
         this._hideDaysWithoutEvents = config.hideDaysWithoutEvents ?? false;
+        this._hideTodayWithoutEvents = config.hideTodayWithoutEvents ?? false;
         this._filter = config.filter ?? false;
         this._showLegend = config.showLegend ?? false;
+        this._actions = config.actions ?? false;
         if (config.locale) {
             LuxonSettings.defaultLocale = config.locale;
         }
@@ -203,7 +207,7 @@ export class WeekPlannerCard extends LitElement {
                         html`<h1 class="card-title">${this._title}</h1>` :
                         ''
                     }
-                    <div class="container">
+                    <div class="container${this._actions ? ' hasActions' : ''}" @click="${this._handleContainerClick}">
                         ${this._renderLegend()}
                         ${this._renderDays()}
                     </div>
@@ -226,9 +230,13 @@ export class WeekPlannerCard extends LitElement {
             <div class="legend">
                 <ul>
                     ${this._calendars.map((calendar) => {
-                        return html`
-                            <li style="--legend-calendar-color: ${calendar.color}">${calendar.name ?? calendar.entity}</li>
-                        `;
+                        if (!calendar.hideInLegend) {
+                            return html`
+                                <li style="--legend-calendar-color: ${calendar.color}">
+                                    ${calendar.name ?? calendar.entity}
+                                </li>
+                            `;
+                        }
                     })}
                 </ul>
             </div>
@@ -242,7 +250,7 @@ export class WeekPlannerCard extends LitElement {
 
         return html`
             ${this._days.map((day) => {
-                if (this._hideDaysWithoutEvents && day.events.length === 0 && !this._isToday(day.date)) {
+                if (this._hideDaysWithoutEvents && day.events.length === 0 && (this._hideTodayWithoutEvents || !this._isToday(day.date))) {
                     return html``;
                 }
                 return html`
@@ -491,7 +499,7 @@ export class WeekPlannerCard extends LitElement {
                 'calendars/' + calendar.entity + '?start=' + encodeURIComponent(startDate.toISO()) + '&end=' + encodeURIComponent(endDate.toISO())
             ).then(response => {
                 response.forEach(event => {
-                    if (this._isFilterEvent(event)) {
+                    if (this._isFilterEvent(event, calendar.filter ?? '')) {
                         return;
                     }
 
@@ -535,12 +543,9 @@ export class WeekPlannerCard extends LitElement {
         this._loading--;
     }
 
-    _isFilterEvent(event) {
-        if (!this._filter) {
-            return false;
-        }
-
-        return event.summary.match(this._filter);
+    _isFilterEvent(event, calendarFilter) {
+        return this._filter && event.summary.match(this._filter)
+            || calendarFilter && event.summary.match(calendarFilter);
     }
 
     _addEvent(event, startDate, endDate, fullDay, calendar, calendarSorting) {
@@ -700,7 +705,30 @@ export class WeekPlannerCard extends LitElement {
         }
     }
 
+    _handleContainerClick(e) {
+        if (!this._actions) {
+            return;
+        }
+
+        const event = new Event(
+            'hass-action', {
+                bubbles: true,
+                composed: true,
+            }
+        );
+        event.detail = {
+            config: this._actions,
+            action: 'tap',
+        }
+        this.dispatchEvent(event);
+
+        e.stopImmediatePropagation();
+    }
+
     _handleEventClick(event) {
+        if (this._actions) {
+            return;
+        }
         this._currentEventDetails = event;
     }
 
