@@ -75,6 +75,7 @@ export class WeekPlannerCard extends LitElement {
     _showLocation;
     _hidePastEvents;
     _hideDaysWithoutEvents;
+    _hideTodayWithoutEvents;
     _filter;
     _showLegend;
     _actions;
@@ -125,6 +126,7 @@ export class WeekPlannerCard extends LitElement {
         this._showLocation = config.showLocation ?? false;
         this._hidePastEvents = config.hidePastEvents ?? false;
         this._hideDaysWithoutEvents = config.hideDaysWithoutEvents ?? false;
+        this._hideTodayWithoutEvents = config.hideTodayWithoutEvents ?? false;
         this._filter = config.filter ?? false;
         this._showLegend = config.showLegend ?? false;
         this._actions = config.actions ?? false;
@@ -248,7 +250,7 @@ export class WeekPlannerCard extends LitElement {
 
         return html`
             ${this._days.map((day) => {
-                if (this._hideDaysWithoutEvents && day.events.length === 0 && !this._isToday(day.date)) {
+                if (this._hideDaysWithoutEvents && day.events.length === 0 && (this._hideTodayWithoutEvents || !this._isToday(day.date))) {
                     return html``;
                 }
                 return html`
