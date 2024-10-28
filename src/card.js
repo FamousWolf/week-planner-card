@@ -228,9 +228,13 @@ export class WeekPlannerCard extends LitElement {
             <div class="legend">
                 <ul>
                     ${this._calendars.map((calendar) => {
-                        return html`
-                            <li style="--legend-calendar-color: ${calendar.color}">${calendar.name ?? calendar.entity}</li>
-                        `;
+                        if (!calendar.hideInLegend) {
+                            return html`
+                                <li style="--legend-calendar-color: ${calendar.color}">
+                                    ${calendar.name ?? calendar.entity}
+                                </li>
+                            `;
+                        }
                     })}
                 </ul>
             </div>
