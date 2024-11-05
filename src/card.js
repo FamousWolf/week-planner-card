@@ -319,6 +319,12 @@ export class WeekPlannerCard extends LitElement {
                                                     class="event ${event.class}"
                                                     data-entity="${event.calendar}"
                                                     data-additional-entities="${event.otherCalendars.join(',')}"
+                                                    data-summary="${event.summary}"
+                                                    data-location="${event.location ?? ''}"
+                                                    data-start-hour="${event.start.toFormat('H')}"
+                                                    data-start-minute="${event.start.toFormat('mm')}"
+                                                    data-end-hour="${event.end.toFormat('H')}"
+                                                    data-end-minute="${event.end.toFormat('mm')}"
                                                     style="--border-color: ${event.color}"
                                                     @click="${() => {
                                                         this._handleEventClick(event)
