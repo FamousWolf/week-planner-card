@@ -79,6 +79,7 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 | `hideDaysWithoutEvents`  | boolean          | false                                              | `false` \| `true`                                                                                                                           | Do not show days without events, except for today                                      | 1.4.0   |
 | `hideTodayWithoutEvents` | boolean          | false                                              | `false` \| `true`                                                                                                                           | Also do not show today without events if `hideDaysWithoutEvents` is set                | 1.8.0   |
 | `filter`                 | string           | optional                                           | Any regular expression                                                                                                                      | Remove events that match the regular expression                                        | 1.7.0   |
+| `combineSimilarEvents`   | boolean          | false                                              | `false` \| `true`                                                                                                                           | Combine events with the same start date/time, end date/time and title                  | 1.9.0   |
 
 ### Calendars
 
