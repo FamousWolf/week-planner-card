@@ -113,12 +113,13 @@ See [Actions documentation](https://www.home-assistant.io/dashboards/actions/). 
 
 ### Weather
 
-| Name                 | Type    | Default      | Supported options            | Description          | Version |
-|----------------------|---------|--------------|------------------------------|----------------------|---------|
-| `entity`             | string  | **Required** | `weather.my_weather_service` | Entity ID            | 1.1.0   |
-| `showCondition`      | boolean | true         | `false` \| `true`            | Show condition icon  | 1.1.0   |
-| `showTemperature`    | boolean | false        | `false` \| `true`            | Show temperature     | 1.1.0   |
-| `showLowTemperature` | boolean | false        | `false` \| `true`            | Show low temperature | 1.1.0   |
+| Name                 | Type    | Default      | Supported options            | Description                                                                    | Version |
+|----------------------|---------|--------------|------------------------------|--------------------------------------------------------------------------------|---------|
+| `entity`             | string  | **Required** | `weather.my_weather_service` | Entity ID                                                                      | 1.1.0   |
+| `useTwiceDaily`      | boolean | false        | `false` \| `true`            | Use twice daily forecast if your weather entity doesn't support daily forecast | 1.8.0   |
+| `showCondition`      | boolean | true         | `false` \| `true`            | Show condition icon                                                            | 1.1.0   |
+| `showTemperature`    | boolean | false        | `false` \| `true`            | Show temperature                                                               | 1.1.0   |
+| `showLowTemperature` | boolean | false        | `false` \| `true`            | Show low temperature                                                           | 1.1.0   |
 
 ## Custom styling using cardmod
 

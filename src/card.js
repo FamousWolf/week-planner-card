@@ -496,7 +496,7 @@ export class WeekPlannerCard extends LitElement {
             }
         }, {
             type: 'weather/subscribe_forecast',
-            forecast_type: 'daily',
+            forecast_type: this._weather.useTwiceDaily ? 'twice_daily' : 'daily',
             entity_id: this._weather.entity
         });
     }
@@ -699,6 +699,11 @@ export class WeekPlannerCard extends LitElement {
         const weatherState = this._weather ? this.hass.states[this._weather.entity] : null;
         let weatherForecast = {};
         this._weatherForecast?.forEach((forecast) => {
+            // Only use day time forecasts
+            if (forecast.hasOwnProperty('is_daytime') && forecast.is_daytime === false) {
+                return;
+            }
+
             const dateKey = DateTime.fromISO(forecast.datetime).toISODate();
             weatherForecast[dateKey] = {
                 icon: this._getWeatherIcon(forecast),
