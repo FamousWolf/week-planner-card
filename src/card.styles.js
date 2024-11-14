@@ -137,7 +137,6 @@ export default css`
     .container .day .events .none,
     .container .day .events .event {
         margin-bottom: var(--event-spacing);
-        padding: var(--event-padding);
         background-color: var(--event-background-color);
         border-radius: 0 var(--event-border-radius) var(--event-border-radius) 0;
         font-size: var(--event-font-size);
@@ -145,12 +144,24 @@ export default css`
     }
 
     .container .day .events .none {
+        padding: var(--event-padding);
         border-radius: var(--event-border-radius);
     }
 
     .container .day .events .event {
+        display: flex;
         border-left: var(--event-border-width) solid var(--border-color, var(--divider-color, #ffffff));
         cursor: pointer;
+    }
+
+    .container .day .events .event .additionalColor {
+        width: var(--event-border-width);
+        background-color: var(--event-additional-color);
+    }
+
+    .container .day .events .event .inner {
+        flex-grow: 1;
+        padding: var(--event-padding);
     }
 
     .container .day .events .event .time {

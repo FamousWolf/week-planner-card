@@ -39,7 +39,7 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
     Add:
     ```yaml
     resources:
-      - url: /local/week-planner-card.js?version=1.8.0
+      - url: /local/week-planner-card.js?version=1.9.0
     type: module
     ```
   - **Using the graphical editor**
@@ -79,6 +79,7 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 | `hideDaysWithoutEvents`  | boolean          | false                                              | `false` \| `true`                                                                                                                           | Do not show days without events, except for today                                      | 1.4.0   |
 | `hideTodayWithoutEvents` | boolean          | false                                              | `false` \| `true`                                                                                                                           | Also do not show today without events if `hideDaysWithoutEvents` is set                | 1.8.0   |
 | `filter`                 | string           | optional                                           | Any regular expression                                                                                                                      | Remove events that match the regular expression                                        | 1.7.0   |
+| `combineSimilarEvents`   | boolean          | false                                              | `false` \| `true`                                                                                                                           | Combine events with the same start date/time, end date/time and title                  | 1.9.0   |
 
 ### Calendars
 
@@ -112,16 +113,17 @@ See [Actions documentation](https://www.home-assistant.io/dashboards/actions/). 
 
 ### Weather
 
-| Name                 | Type    | Default      | Supported options            | Description          | Version |
-|----------------------|---------|--------------|------------------------------|----------------------|---------|
-| `entity`             | string  | **Required** | `weather.my_weather_service` | Entity ID            | 1.1.0   |
-| `showCondition`      | boolean | true         | `false` \| `true`            | Show condition icon  | 1.1.0   |
-| `showTemperature`    | boolean | false        | `false` \| `true`            | Show temperature     | 1.1.0   |
-| `showLowTemperature` | boolean | false        | `false` \| `true`            | Show low temperature | 1.1.0   |
+| Name                 | Type    | Default      | Supported options            | Description                                                                    | Version |
+|----------------------|---------|--------------|------------------------------|--------------------------------------------------------------------------------|---------|
+| `entity`             | string  | **Required** | `weather.my_weather_service` | Entity ID                                                                      | 1.1.0   |
+| `useTwiceDaily`      | boolean | false        | `false` \| `true`            | Use twice daily forecast if your weather entity doesn't support daily forecast | 1.9.0   |
+| `showCondition`      | boolean | true         | `false` \| `true`            | Show condition icon                                                            | 1.1.0   |
+| `showTemperature`    | boolean | false        | `false` \| `true`            | Show temperature                                                               | 1.1.0   |
+| `showLowTemperature` | boolean | false        | `false` \| `true`            | Show low temperature                                                           | 1.1.0   |
 
 ## Custom styling using cardmod
 
-Like with most cards, you can add custom styling to this card using [card_mod](https://github.com/thomasloven/lovelace-card-mod). To make it easier to add custom styles to days and/or events, there are several classes that days and events can have.
+Like with most cards, you can add custom styling to this card using [card_mod](https://github.com/thomasloven/lovelace-card-mod). To make it easier to add custom styles to days and/or events, there are several classes that days and events can have. Additionally, there are data attributes you can use in CSS selectors.
 
 ### Day classes
 
@@ -140,6 +142,17 @@ Like with most cards, you can add custom styling to this card using [card_mod](h
 | `friday`    | Day is a friday    | 1.6.0   |
 | `saturday`  | Day is a saturday  | 1.6.0   |
 
+### Day data attributes
+
+| Data attribute | Description        | Version |
+|----------------|--------------------|---------|
+| `data-date`    | The day number     | 1.7.0   |
+| `data-weekday` | The weekday number | 1.7.0   |
+| `data-month`   | The month number   | 1.7.0   |
+| `data-year`    | The year           | 1.7.0   |
+| `data-week`    | The week number    | 1.7.0   |
+
+
 ### Event classes
 
 | Class     | Description              | Version |
@@ -148,6 +161,19 @@ Like with most cards, you can add custom styling to this card using [card_mod](h
 | `ongoing` | Currently ongoing        | 1.5.0   |
 | `future`  | Event in the future      | 1.5.0   |
 | `past`    | Event in the past        | 1.5.0   |
+
+### Event data attributes
+
+| Data attribute             | Description                                                     | Version |
+|----------------------------|-----------------------------------------------------------------|---------|
+| `data-entity`              | The calendar entity                                             | 1.6.0   |
+| `data-additional-entities` | Comma-separated list of additional entities for combined events | 1.9.0   |
+| `data-summary`             | The event title                                                 | 1.9.0   |
+| `data-location`            | The event location                                              | 1.9.0   |
+| `data-start-hour`          | The event start hour                                            | 1.9.0   |
+| `data-start-minute`        | The event start minute                                          | 1.9.0   |
+| `data-end-hour`            | The event end hour                                              | 1.9.0   |
+| `data-end-minute`          | The event end minute                                            | 1.9.0   |
 
 ## Examples
 
@@ -213,6 +239,23 @@ card_mod:
   style: |
     .event.past {
       opacity: .3;
+    }
+```
+
+### Custom event style based on title text with card_mod
+
+This will style events with `Word1` as part of the title or `Word2` as the exact title with a red background.
+
+```yaml
+type: custom:week-planner-card
+calendars:
+  - entity: calendar.my_calendar_1
+  - color: #e6c229
+card_mod:
+  style: |
+    .event[data-summary~="Word1"],
+    .event[data-summary="Word2"] {
+      background-color: #ff0000 !important;
     }
 ```
 
