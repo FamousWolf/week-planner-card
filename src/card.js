@@ -279,7 +279,11 @@ export class WeekPlannerCard extends LitElement {
                     ${this._calendars.map((calendar) => {
                         if (!calendar.hideInLegend) {
                             return html`
-                                <li style="--legend-calendar-color: ${calendar.color}">
+                                <li class="${calendar.icon ? 'icon' : 'noIcon'}" style="--legend-calendar-color: ${calendar.color}">
+                                    ${calendar.icon ?
+                                        html`<ha-icon icon="${calendar.icon}"></ha-icon>` :
+                                        ''
+                                    }
                                     ${calendar.name ?? calendar.entity}
                                 </li>
                             `;
@@ -383,26 +387,34 @@ export class WeekPlannerCard extends LitElement {
                                                     <div class="inner">
                                                         <div class="time">
                                                             ${event.fullDay ?
-                                                                    html`${this._language.fullDay}` :
-                                                                    html`
-                                                                        ${event.start.toFormat(this._timeFormat)}
-                                                                        ${event.end ? ' - ' + event.end.toFormat(this._timeFormat) : ''}
-                                                                    `
+                                                                html`${this._language.fullDay}` :
+                                                                html`
+                                                                    ${event.start.toFormat(this._timeFormat)}
+                                                                    ${event.end ? ' - ' + event.end.toFormat(this._timeFormat) : ''}
+                                                                `
                                                             }
                                                         </div>
                                                         <div class="title">
                                                             ${event.summary}
                                                         </div>
                                                         ${this._showLocation && event.location ?
-                                                                html`
-                                                                    <div class="location">
-                                                                        <ha-icon icon="mdi:map-marker"></ha-icon>
-                                                                        ${event.location}
-                                                                    </div>
-                                                                ` :
-                                                                ''
+                                                            html`
+                                                                <div class="location">
+                                                                    <ha-icon icon="mdi:map-marker"></ha-icon>
+                                                                    ${event.location}
+                                                                </div>
+                                                            ` :
+                                                            ''
                                                         }
                                                     </div>
+                                                    ${event.icon ?
+                                                        html`
+                                                            <div class="icon">
+                                                                <ha-icon icon="${event.icon}"></ha-icon>
+                                                            </div>
+                                                        ` :
+                                                        ''
+                                                    }
                                                 </div>
                                             `
                                         }
@@ -673,6 +685,7 @@ export class WeekPlannerCard extends LitElement {
                 originalEnd: this._convertApiDate(event.end),
                 fullDay: fullDay,
                 color: calendar.color ?? 'inherit',
+                icon: calendar.icon ?? null,
                 otherColors: [],
                 calendar: calendar.entity,
                 otherCalendars: [],
