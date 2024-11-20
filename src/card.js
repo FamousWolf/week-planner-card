@@ -78,9 +78,50 @@ export class WeekPlannerCard extends LitElement {
     _hideDaysWithoutEvents;
     _hideTodayWithoutEvents;
     _filter;
+    _filterText;
     _combineSimilarEvents;
     _showLegend;
     _actions;
+
+    /**
+     * Get config element
+     *
+     * @returns {HTMLElement}
+     */
+    static getConfigElement() {
+        // Create and return an editor element
+        return document.createElement("week-planner-card-editor");
+    }
+
+    /**
+     * Get stub config
+     *
+     * @returns {}
+     */
+    static getStubConfig() {
+        return {
+            calendars: [],
+            days: 7,
+            startingDay: 'today',
+            startingDayOffset: 0,
+            hideWeekend: false,
+            noCardBackground: false,
+            compact: false,
+            weather: {
+                showCondition: true,
+                showTemperature: false,
+                showLowTemperature: false,
+                useTwiceDaily: false,
+            },
+            locale: 'en',
+            showLocation: false,
+            hidePastEvents: false,
+            hideDaysWithoutEvents: false,
+            hideTodayWithoutEvents: false,
+            combineSimilarEvents: false,
+            showLegend: false
+        };
+    }
 
     /**
      * Get properties
@@ -130,6 +171,7 @@ export class WeekPlannerCard extends LitElement {
         this._hideDaysWithoutEvents = config.hideDaysWithoutEvents ?? false;
         this._hideTodayWithoutEvents = config.hideTodayWithoutEvents ?? false;
         this._filter = config.filter ?? false;
+        this._filterText = config.filterText ?? false;
         this._combineSimilarEvents = config.combineSimilarEvents ?? false;
         this._showLegend = config.showLegend ?? false;
         this._actions = config.actions ?? false;
@@ -175,6 +217,10 @@ export class WeekPlannerCard extends LitElement {
             configuration.entity = weatherConfiguration;
         } else {
             Object.assign(configuration, weatherConfiguration);
+        }
+
+        if (!configuration.hasOwnProperty('entity') || configuration.entity === null) {
+            return null;
         }
 
         return configuration;
@@ -235,7 +281,11 @@ export class WeekPlannerCard extends LitElement {
                     ${this._calendars.map((calendar) => {
                         if (!calendar.hideInLegend) {
                             return html`
-                                <li style="--legend-calendar-color: ${calendar.color}">
+                                <li class="${calendar.icon ? 'icon' : 'noIcon'}" style="--legend-calendar-color: ${calendar.color}">
+                                    ${calendar.icon ?
+                                        html`<ha-icon icon="${calendar.icon}"></ha-icon>` :
+                                        ''
+                                    }
                                     ${calendar.name ?? calendar.entity}
                                 </li>
                             `;
@@ -339,26 +389,34 @@ export class WeekPlannerCard extends LitElement {
                                                     <div class="inner">
                                                         <div class="time">
                                                             ${event.fullDay ?
-                                                                    html`${this._language.fullDay}` :
-                                                                    html`
-                                                                        ${event.start.toFormat(this._timeFormat)}
-                                                                        ${event.end ? ' - ' + event.end.toFormat(this._timeFormat) : ''}
-                                                                    `
+                                                                html`${this._language.fullDay}` :
+                                                                html`
+                                                                    ${event.start.toFormat(this._timeFormat)}
+                                                                    ${event.end ? ' - ' + event.end.toFormat(this._timeFormat) : ''}
+                                                                `
                                                             }
                                                         </div>
                                                         <div class="title">
                                                             ${event.summary}
                                                         </div>
                                                         ${this._showLocation && event.location ?
-                                                                html`
-                                                                    <div class="location">
-                                                                        <ha-icon icon="mdi:map-marker"></ha-icon>
-                                                                        ${event.location}
-                                                                    </div>
-                                                                ` :
-                                                                ''
+                                                            html`
+                                                                <div class="location">
+                                                                    <ha-icon icon="mdi:map-marker"></ha-icon>
+                                                                    ${event.location}
+                                                                </div>
+                                                            ` :
+                                                            ''
                                                         }
                                                     </div>
+                                                    ${event.icon ?
+                                                        html`
+                                                            <div class="icon">
+                                                                <ha-icon icon="${event.icon}"></ha-icon>
+                                                            </div>
+                                                        ` :
+                                                        ''
+                                                    }
                                                 </div>
                                             `
                                         }
@@ -523,6 +581,10 @@ export class WeekPlannerCard extends LitElement {
 
         let calendarNumber = 0;
         this._calendars.forEach(calendar => {
+            if (!calendar.entity || !this.hass.states[calendar.entity]) {
+                return;
+            }
+
             if (!calendar.name) {
                 calendar = {
                     ...calendar,
@@ -616,7 +678,7 @@ export class WeekPlannerCard extends LitElement {
             }
         } else {
             this._calendarEvents[eventKey] = {
-                summary: event.summary ?? null,
+                summary: this._filterEventSummary(event.summary ?? null, calendar),
                 description: event.description ?? null,
                 location: event.location ?? null,
                 start: startDate,
@@ -625,6 +687,7 @@ export class WeekPlannerCard extends LitElement {
                 originalEnd: this._convertApiDate(event.end),
                 fullDay: fullDay,
                 color: calendar.color ?? 'inherit',
+                icon: calendar.icon ?? null,
                 otherColors: [],
                 calendar: calendar.entity,
                 otherCalendars: [],
@@ -634,6 +697,22 @@ export class WeekPlannerCard extends LitElement {
             }
             this._events[dateKey].push(eventKey);
         }
+    }
+
+    _filterEventSummary(summary, calendar) {
+        if (!summary) {
+            return '';
+        }
+
+        if (calendar.filterText) {
+            summary = summary.replace(new RegExp(calendar.filterText), '');
+        }
+
+        if (this._filterText) {
+            summary = summary.replace(new RegExp(this._filterText), '');
+        }
+
+        return summary;
     }
 
     _getEventClass(startDate, endDate, fullDay) {

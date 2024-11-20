@@ -39,7 +39,7 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
     Add:
     ```yaml
     resources:
-      - url: /local/week-planner-card.js?version=1.9.0
+      - url: /local/week-planner-card.js?version=1.10.0
     type: module
     ```
   - **Using the graphical editor**
@@ -79,6 +79,7 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 | `hideDaysWithoutEvents`  | boolean          | false                                              | `false` \| `true`                                                                                                                           | Do not show days without events, except for today                                      | 1.4.0   |
 | `hideTodayWithoutEvents` | boolean          | false                                              | `false` \| `true`                                                                                                                           | Also do not show today without events if `hideDaysWithoutEvents` is set                | 1.8.0   |
 | `filter`                 | string           | optional                                           | Any regular expression                                                                                                                      | Remove events that match the regular expression                                        | 1.7.0   |
+| `filterText`             | string           | optional                                           | Any regular expression                                                                                                                      | Remove text from events                                                                | 1.10.0  |
 | `combineSimilarEvents`   | boolean          | false                                              | `false` \| `true`                                                                                                                           | Combine events with the same start date/time, end date/time and title                  | 1.9.0   |
 | `showLegend`             | boolean          | false                                              | `false` \| `true`                                                                                                                           | Show calendar legend                                                                   | 1.7.0   |
 
@@ -89,7 +90,9 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 | `entity`       | string  | **Required** | `calendar.my_calendar` | Entity ID                                       | 1.0.0   |
 | `name`         | string  | optional     | Any text               | Name of the calendar                            | 1.7.0   |
 | `color`        | string  | optional     | Any CSS color          | Color used for events from the calendar         | 1.0.0   |
+| `icon`         | string  | optional     | Any icon               | Icon used for events from the calendar          | 1.10.0  |
 | `filter`       | string  | optional     | Any regular expression | Remove events that match the regular expression | 1.8.0   |
+| `filterText`   | string  | optional     | Any regular expression | Remove text from events                         | 1.10.0  |
 | `hideInLegend` | boolean | false        | `false` \| `true`      | Do not show the calendar in the legend          | 1.8.0   |
 
 ### Texts

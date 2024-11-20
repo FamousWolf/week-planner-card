@@ -68,9 +68,14 @@ export default css`
     
     .container .legend ul li {
         display: block;
+        --mdc-icon-size: 16px;
+    }
+    
+    .container .legend ul li ha-icon {
+        color: var(--legend-calendar-color, var(--divider-color, #ffffff));
     }
 
-    .container .legend ul li:before {
+    .container .legend ul li.noIcon:before {
         content: '';
         display: inline-block;
         width: var(--legend-dot-size);
@@ -157,6 +162,10 @@ export default css`
     .container .day .events .event .additionalColor {
         width: var(--event-border-width);
         background-color: var(--event-additional-color);
+    }
+
+    .container .day .events .event .icon {
+        padding: var(--event-padding);
     }
 
     .container .day .events .event .inner {
