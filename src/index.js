@@ -1,4 +1,5 @@
 import { WeekPlannerCard } from './card';
+import { WeekPlannerCardEditor } from "./editor";
 import { version } from '../package.json';
 
 customElements.define(
@@ -12,6 +13,11 @@ window.customCards.push({
     name: 'Week Planner Card',
     description: 'Card to display events for a number of days from one or several calendars.'
 });
+
+customElements.define(
+    'week-planner-card-editor',
+    WeekPlannerCardEditor
+);
 
 console.info(
     `%c WEEK-PLANNER-CARD %c v${version} `,

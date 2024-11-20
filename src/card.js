@@ -83,6 +83,46 @@ export class WeekPlannerCard extends LitElement {
     _actions;
 
     /**
+     * Get config element
+     *
+     * @returns {HTMLElement}
+     */
+    static getConfigElement() {
+        // Create and return an editor element
+        return document.createElement("week-planner-card-editor");
+    }
+
+    /**
+     * Get stub config
+     *
+     * @returns {}
+     */
+    static getStubConfig() {
+        return {
+            calendars: [],
+            days: 7,
+            startingDay: 'today',
+            startingDayOffset: 0,
+            hideWeekend: false,
+            noCardBackground: false,
+            compact: false,
+            weather: {
+                showCondition: true,
+                showTemperature: false,
+                showLowTemperature: false,
+                useTwiceDaily: false,
+            },
+            locale: 'en',
+            showLocation: false,
+            hidePastEvents: false,
+            hideDaysWithoutEvents: false,
+            hideTodayWithoutEvents: false,
+            combineSimilarEvents: false,
+            showLegend: false
+        };
+    }
+
+    /**
      * Get properties
      *
      * @return {Object}
@@ -175,6 +215,10 @@ export class WeekPlannerCard extends LitElement {
             configuration.entity = weatherConfiguration;
         } else {
             Object.assign(configuration, weatherConfiguration);
+        }
+
+        if (!configuration.hasOwnProperty('entity') || configuration.entity === null) {
+            return null;
         }
 
         return configuration;
@@ -523,6 +567,10 @@ export class WeekPlannerCard extends LitElement {
 
         let calendarNumber = 0;
         this._calendars.forEach(calendar => {
+            if (!calendar.entity || !this.hass.states[calendar.entity]) {
+                return;
+            }
+
             if (!calendar.name) {
                 calendar = {
                     ...calendar,
