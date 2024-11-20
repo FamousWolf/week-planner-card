@@ -78,6 +78,7 @@ export class WeekPlannerCard extends LitElement {
     _hideDaysWithoutEvents;
     _hideTodayWithoutEvents;
     _filter;
+    _filterText;
     _combineSimilarEvents;
     _showLegend;
     _actions;
@@ -170,6 +171,7 @@ export class WeekPlannerCard extends LitElement {
         this._hideDaysWithoutEvents = config.hideDaysWithoutEvents ?? false;
         this._hideTodayWithoutEvents = config.hideTodayWithoutEvents ?? false;
         this._filter = config.filter ?? false;
+        this._filterText = config.filterText ?? false;
         this._combineSimilarEvents = config.combineSimilarEvents ?? false;
         this._showLegend = config.showLegend ?? false;
         this._actions = config.actions ?? false;
@@ -676,7 +678,7 @@ export class WeekPlannerCard extends LitElement {
             }
         } else {
             this._calendarEvents[eventKey] = {
-                summary: event.summary ?? null,
+                summary: this._filterEventSummary(event.summary ?? null, calendar),
                 description: event.description ?? null,
                 location: event.location ?? null,
                 start: startDate,
@@ -695,6 +697,22 @@ export class WeekPlannerCard extends LitElement {
             }
             this._events[dateKey].push(eventKey);
         }
+    }
+
+    _filterEventSummary(summary, calendar) {
+        if (!summary) {
+            return '';
+        }
+
+        if (calendar.filterText) {
+            summary = summary.replace(new RegExp(calendar.filterText), '');
+        }
+
+        if (this._filterText) {
+            summary = summary.replace(new RegExp(this._filterText), '');
+        }
+
+        return summary;
     }
 
     _getEventClass(startDate, endDate, fullDay) {
