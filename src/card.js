@@ -82,6 +82,7 @@ export class WeekPlannerCard extends LitElement {
     _combineSimilarEvents;
     _showLegend;
     _actions;
+    _columns;
 
     /**
      * Get config element
@@ -175,6 +176,7 @@ export class WeekPlannerCard extends LitElement {
         this._combineSimilarEvents = config.combineSimilarEvents ?? false;
         this._showLegend = config.showLegend ?? false;
         this._actions = config.actions ?? false;
+        this._columns = config.columns ?? {};
         if (config.locale) {
             LuxonSettings.defaultLocale = config.locale;
         }
@@ -245,8 +247,27 @@ export class WeekPlannerCard extends LitElement {
             cardClasses.push('compact');
         }
 
+        const cardStyles = [
+            '--event-background-color: ' + this._eventBackground + ';'
+        ];
+        if (this._columns.extraLarge) {
+            cardStyles.push('--days-columns: ' + this._columns.extraLarge + ';');
+        }
+        if (this._columns.large) {
+            cardStyles.push('--days-columns-lg: ' + this._columns.large + ';');
+        }
+        if (this._columns.medium) {
+            cardStyles.push('--days-columns-md: ' + this._columns.medium + ';');
+        }
+        if (this._columns.small) {
+            cardStyles.push('--days-columns-sm: ' + this._columns.small + ';');
+        }
+        if (this._columns.extraSmall) {
+            cardStyles.push('--days-columns-xs: ' + this._columns.extraSmall + ';');
+        }
+
         return html`
-            <ha-card class="${cardClasses.join(' ')}" style="--event-background-color: ${this._eventBackground}">
+            <ha-card class="${cardClasses.join(' ')}" style="${cardStyles.join(' ')}">
                 <div class="card-content">
                     ${this._error ?
                         html`<ha-alert alert-type="error">${this._error}</ha-alert>` :
