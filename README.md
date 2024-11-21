@@ -82,6 +82,7 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 | `filterText`             | string           | optional                                           | Any regular expression                                                                                                                      | Remove text from events                                                                | 1.10.0  |
 | `combineSimilarEvents`   | boolean          | false                                              | `false` \| `true`                                                                                                                           | Combine events with the same start date/time, end date/time and title                  | 1.9.0   |
 | `showLegend`             | boolean          | false                                              | `false` \| `true`                                                                                                                           | Show calendar legend                                                                   | 1.7.0   |
+| `columns`                | object           | optional                                           | See [Columns](#columns)                                                                                                                     | Configuration to override the number of columns                                        | 1.11.0  |
 
 ### Calendars
 
@@ -124,6 +125,17 @@ See [Actions documentation](https://www.home-assistant.io/dashboards/actions/). 
 | `showCondition`      | boolean | true         | `false` \| `true`            | Show condition icon                                                            | 1.1.0   |
 | `showTemperature`    | boolean | false        | `false` \| `true`            | Show temperature                                                               | 1.1.0   |
 | `showLowTemperature` | boolean | false        | `false` \| `true`            | Show low temperature                                                           | 1.1.0   |
+
+### Columns
+By default, the columns are based on the width of the card. You can use these settings to override the default number of columns.
+
+| Name         | Type    | Default  | Supported options   | Description                                             | Version |
+|--------------|---------|----------|---------------------|---------------------------------------------------------|---------|
+| `extraLarge` | number  | optional | Any positive number | Number of columns when the card width is >= 1920 pixels | 1.11.0  |
+| `large`      | number  | optional | Any positive number | Number of columns when the card width is >= 1280 pixels | 1.11.0  |
+| `medium`     | number  | optional | Any positive number | Number of columns when the card width is >= 1024 pixels | 1.11.0  |
+| `small`      | number  | optional | Any positive number | Number of columns when the card width is >= 640 pixels  | 1.11.0  |
+| `extraSmall` | number  | optional | Any positive number | Number of columns when the card width is < 640 pixels   | 1.11.0  |
 
 ## Custom styling using cardmod
 

@@ -133,6 +133,17 @@ export class WeekPlannerCardEditor extends LitElement {
                     `
                 )}
                 ${this.addExpansionPanel(
+                    'Override columns',
+                    html`
+                        <p>The number of columns is based on the size of the card.</p>
+                        ${this.addTextField('columns.extraLarge', 'Extra large (>= 1920px)', 'number')}
+                        ${this.addTextField('columns.large', 'Large (>= 1280px)', 'number')}
+                        ${this.addTextField('columns.medium', 'Medium (>= 1024px)', 'number')}
+                        ${this.addTextField('columns.small', 'Small (>= 640px)', 'number')}
+                        ${this.addTextField('columns.extraSmall', 'Extra small (< 640px)', 'number')}
+                    `
+                )}
+                ${this.addExpansionPanel(
                     'Appearance',
                     html`
                         ${this.addBooleanField('showLegend', 'Show legend')}

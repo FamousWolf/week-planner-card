@@ -4,6 +4,7 @@ export default css`
     ha-card {
         --legend-spacing: 15px;
         --legend-dot-size: 10px;
+        --days-columns: 7;
         --days-spacing: 15px;
         --day-date-number-font-size: 3.5em;
         --day-date-number-line-height: 1.2em;
@@ -88,7 +89,7 @@ export default css`
 
     .container .day {
         position: relative;
-        width: calc((100% - 6 * var(--days-spacing)) / 7);
+        width: calc((100% - (var(--days-columns) - 1) * var(--days-spacing)) / var(--days-columns));
         margin: 0 0 var(--days-spacing) 0;
     }
 
@@ -236,33 +237,39 @@ export default css`
         }
     }
 
-    @container weekplanner (width <= 1280px) {
-        .container .day {
-            width: calc((100% - 4 * var(--days-spacing)) / 5);
+    @container weekplanner (width <= 1920px) {
+        ha-card .container .day {
+            --days-columns: var(--days-columns-lg, 7);
         }
-
         ha-card.compact .container .day {
-            width: calc((100% - 6 * var(--days-spacing)) / 7);
+            --days-columns: var(--days-columns-lg, 7);
+        }
+    }
+    
+    @container weekplanner (width <= 1280px) {
+        ha-card .container .day {
+            --days-columns: var(--days-columns-md, 5);
+        }
+        ha-card.compact .container .day {
+            --days-columns: var(--days-columns-md, 7);
         }
     }
 
     @container weekplanner (width <= 1024px) {
-        .container .day {
-            width: calc((100% - 2 * var(--days-spacing)) / 3);
+        ha-card .container .day {
+            --days-columns: var(--days-columns-sm, 3);
         }
-
         ha-card.compact .container .day {
-            width: calc((100% - 3 * var(--days-spacing)) / 4);
+            --days-columns: var(--days-columns-sm, 4);
         }
     }
-
+  
     @container weekplanner (width <= 640px) {
-        .container .day {
-            width: 100%;
+        ha-card .container .day {
+            --days-columns: var(--days-columns-xs, 1);
         }
-
         ha-card.compact .container .day {
-            width: calc((100% - var(--days-spacing)) / 2);
+            --days-columns: var(--days-columns-xs, 2);
         }
     }
 `;
