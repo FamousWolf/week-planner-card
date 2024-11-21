@@ -4,6 +4,17 @@ import styles from './editor.styles';
 export class WeekPlannerCardEditor extends LitElement {
     static styles = styles;
 
+    connectedCallback() {
+        super.connectedCallback();
+        this.loadCustomElements();
+    }
+
+    async loadCustomElements() {
+        if (!customElements.get("ha-entity-picker")) {
+            await customElements.get("hui-entities-card").getConfigElement();
+        }
+    }
+
     static get properties() {
         return {
             hass: {},
@@ -31,10 +42,10 @@ export class WeekPlannerCardEditor extends LitElement {
                                 ${this.addExpansionPanel(
                                     `Calendar: ${calendar.name ?? calendar.entity}`,
                                     html`
-                                        ${this.addTextField('calendars.' + index + '.entity', 'Entity')}
+                                        ${this.addEntityPickerField('calendars.' + index + '.entity', 'Entity', ['calendar'])}
                                         ${this.addTextField('calendars.' + index + '.name', 'Name')}
                                         ${this.addTextField('calendars.' + index + '.color', 'Color')}
-                                        ${this.addTextField('calendars.' + index + '.icon', 'Icon')}
+                                        ${this.addIconPickerField('calendars.' + index + '.icon', 'Icon')}
                                         ${this.addTextField('calendars.' + index + '.filter', 'Filter events (regex)')}
                                         ${this.addTextField('calendars.' + index + '.filterText', 'Filter event text (regex)')}
                                         ${this.addBooleanField('calendars.' + index + '.hideInLegend', 'Hide in legend')}
@@ -125,7 +136,7 @@ export class WeekPlannerCardEditor extends LitElement {
                 ${this.addExpansionPanel(
                     'Weather',
                     html`
-                        ${this.addTextField('weather.entity', 'Weather entity')}
+                        ${this.addEntityPickerField('weather.entity', 'Weather entity', ['weather'])}
                         ${this.addBooleanField('weather.showCondition', 'Show condition icon')}
                         ${this.addBooleanField('weather.showTemperature', 'Show temperature')}
                         ${this.addBooleanField('weather.showLowTemperature', 'Show low temperature')}
@@ -176,6 +187,31 @@ export class WeekPlannerCardEditor extends LitElement {
                 type="${type ?? 'text'}"
                 value="${this.getConfigValue(name)}"
                 @keyup="${this._valueChanged}"
+                @change="${this._valueChanged}"
+            />
+        `;
+    }
+
+    addEntityPickerField(name, label, includeDomains) {
+        return html`
+            <ha-entity-picker
+                .hass="${this.hass}"
+                name="${name}"
+                label="${label ?? name}"
+                value="${this.getConfigValue(name)}"
+                .includeDomains="${includeDomains}"
+                @change="${this._valueChanged}"
+            />
+        `;
+    }
+
+    addIconPickerField(name, label) {
+        return html`
+            <ha-icon-picker
+                .hass="${this.hass}"
+                name="${name}"
+                label="${label ?? name}"
+                value="${this.getConfigValue(name)}"
                 @change="${this._valueChanged}"
             />
         `;

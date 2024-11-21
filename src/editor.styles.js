@@ -5,7 +5,9 @@ export default css`
     ha-select,
     ha-formfield,
     ha-expansion-panel,
-    ha-button {
+    ha-button,
+    ha-entity-picker,
+    ha-icon-picker {
       margin: 8px 0;
     }
 `;
