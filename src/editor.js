@@ -136,7 +136,7 @@ export class WeekPlannerCardEditor extends LitElement {
                 ${this.addExpansionPanel(
                     'Weather',
                     html`
-                        ${this.addEntityPickerField('weather.entity', 'Weather entity', 'weather')}
+                        ${this.addEntityPickerField('weather.entity', 'Weather entity', ['weather'])}
                         ${this.addBooleanField('weather.showCondition', 'Show condition icon')}
                         ${this.addBooleanField('weather.showTemperature', 'Show temperature')}
                         ${this.addBooleanField('weather.showLowTemperature', 'Show low temperature')}
