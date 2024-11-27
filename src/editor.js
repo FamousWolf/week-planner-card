@@ -157,10 +157,16 @@ export class WeekPlannerCardEditor extends LitElement {
                 ${this.addExpansionPanel(
                     'Appearance',
                     html`
-                        ${this.addBooleanField('showLegend', 'Show legend')}
                         ${this.addBooleanField('noCardBackground', 'No card background')}
                         ${this.addTextField('eventBackground', 'Override events background color')}
                         ${this.addBooleanField('compact', 'Compact mode')}
+                    `
+                )}
+                ${this.addExpansionPanel(
+                    'Legend',
+                    html`
+                        ${this.addBooleanField('showLegend', 'Show legend')}
+                        ${this.addBooleanField('legendToggle', 'Toggle calendars by clicking on the legend')}
                     `
                 )}
                 ${this.addExpansionPanel(
