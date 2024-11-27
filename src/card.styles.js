@@ -72,8 +72,20 @@ export default css`
         --mdc-icon-size: 16px;
     }
     
+    .container .legend ul li.hasToggle {
+        cursor: pointer;
+    }
+
+    .container .legend ul li.hidden {
+        opacity: .5;
+    }
+
     .container .legend ul li ha-icon {
         color: var(--legend-calendar-color, var(--divider-color, #ffffff));
+    }
+
+    .container .legend ul li.hidden ha-icon {
+        color: var(--divider-color, #ffffff);
     }
 
     .container .legend ul li.noIcon:before {
@@ -85,6 +97,10 @@ export default css`
         border-radius: 50%;
         margin: 0 5px 0 0;
         vertical-align: middle;
+    }
+
+    .container .legend ul li.hidden.noIcon:before {
+        background-color: var(--divider-color, #ffffff);
     }
 
     .container .day {

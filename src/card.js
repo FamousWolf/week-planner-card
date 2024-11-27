@@ -81,6 +81,7 @@ export class WeekPlannerCard extends LitElement {
     _filterText;
     _combineSimilarEvents;
     _showLegend;
+    _legendToggle;
     _actions;
     _columns;
 
@@ -135,7 +136,8 @@ export class WeekPlannerCard extends LitElement {
             _config: { type: Object },
             _isLoading: { type: Boolean },
             _error: { type: String },
-            _currentEventDetails: { type: Object }
+            _currentEventDetails: { type: Object },
+            _hideCalendars: { type: Array }
         }
     }
 
@@ -175,8 +177,10 @@ export class WeekPlannerCard extends LitElement {
         this._filterText = config.filterText ?? false;
         this._combineSimilarEvents = config.combineSimilarEvents ?? false;
         this._showLegend = config.showLegend ?? false;
+        this._legendToggle = config.legendToggle ?? false;
         this._actions = config.actions ?? false;
         this._columns = config.columns ?? {};
+        this._hideCalendars = [];
         if (config.locale) {
             LuxonSettings.defaultLocale = config.locale;
         }
@@ -302,7 +306,9 @@ export class WeekPlannerCard extends LitElement {
                     ${this._calendars.map((calendar) => {
                         if (!calendar.hideInLegend) {
                             return html`
-                                <li class="${calendar.icon ? 'icon' : 'noIcon'}" style="--legend-calendar-color: ${calendar.color}">
+                                <li class="${calendar.icon ? 'icon' : 'noIcon'}${this._legendToggle ? ' hasToggle' : ''}${this._hideCalendars.indexOf(calendar.entity) === -1 ? '' : ' hidden'}" style="--legend-calendar-color: ${calendar.color ?? 'inherit'}" @click="${() => {
+                                    this._handleLegendClick(calendar)
+                                }}">
                                     ${calendar.icon ?
                                         html`<ha-icon icon="${calendar.icon}"></ha-icon>` :
                                         ''
@@ -373,81 +379,123 @@ export class WeekPlannerCard extends LitElement {
                             ''
                         }
                         <div class="events">
-                            ${day.events.length === 0 ?
-                                html`
-                                    <div class="none">
-                                        ${this._language.noEvents}
-                                    </div>
-                                ` :
-                                html`
-                                    ${day.events.map((eventKey) => {
-                                        const event = this._calendarEvents[eventKey];
-                                        if (!event) {
-                                            return html``;
-                                        } else {
-                                            return html`
-                                                <div
-                                                    class="event ${event.class}"
-                                                    data-entity="${event.calendar}"
-                                                    data-additional-entities="${event.otherCalendars.join(',')}"
-                                                    data-summary="${event.summary}"
-                                                    data-location="${event.location ?? ''}"
-                                                    data-start-hour="${event.start.toFormat('H')}"
-                                                    data-start-minute="${event.start.toFormat('mm')}"
-                                                    data-end-hour="${event.end.toFormat('H')}"
-                                                    data-end-minute="${event.end.toFormat('mm')}"
-                                                    style="--border-color: ${event.color}"
-                                                    @click="${() => {
-                                                        this._handleEventClick(event)
-                                                    }}"
-                                                >
-                                                    ${event.otherColors.map((color) => {
-                                                        return html`
-                                                            <div class="additionalColor"
-                                                                 style="--event-additional-color: ${color}"></div>
-                                                        `
-                                                    })}
-                                                    <div class="inner">
-                                                        <div class="time">
-                                                            ${event.fullDay ?
-                                                                html`${this._language.fullDay}` :
-                                                                html`
-                                                                    ${event.start.toFormat(this._timeFormat)}
-                                                                    ${event.end ? ' - ' + event.end.toFormat(this._timeFormat) : ''}
-                                                                `
-                                                            }
-                                                        </div>
-                                                        <div class="title">
-                                                            ${event.summary}
-                                                        </div>
-                                                        ${this._showLocation && event.location ?
-                                                            html`
-                                                                <div class="location">
-                                                                    <ha-icon icon="mdi:map-marker"></ha-icon>
-                                                                    ${event.location}
-                                                                </div>
-                                                            ` :
-                                                            ''
-                                                        }
-                                                    </div>
-                                                    ${event.icon ?
-                                                        html`
-                                                            <div class="icon">
-                                                                <ha-icon icon="${event.icon}"></ha-icon>
-                                                            </div>
-                                                        ` :
-                                                        ''
-                                                    }
-                                                </div>
-                                            `
-                                        }
-                                    })}
-                                `
-                            }
+                            ${this._renderEvents(day)}
                         </div>
                     </div>
                 `
             })}
+        `;
+    }
+
+    _renderEvents(day) {
+        const dayEvents = [];
+        day.events.map((eventKey) => {
+            if (!this._calendarEvents[eventKey]) {
+                return;
+            }
+
+            const event = Object.assign({}, this._calendarEvents[eventKey]);
+
+            // Remove events and colors for calendars that are hidden
+            const eventCalendars = [...event.calendars];
+            const colors = [...event.colors];
+            let i = 0;
+            while (i < eventCalendars.length) {
+                if (this._hideCalendars.indexOf(eventCalendars[i]) > -1) {
+                    eventCalendars.splice(i, 1);
+                    colors.splice(i, 1);
+                } else {
+                    i++;
+                }
+            }
+
+            if (eventCalendars.length === 0) {
+                return;
+            }
+
+            event.calendars = eventCalendars;
+            event.colors = colors;
+
+            dayEvents.push(event);
+        });
+
+        if (dayEvents.length === 0) {
+            return this._renderNoEvents();
+        }
+
+        return html`
+            ${dayEvents.map((event) => {
+                const doneColors = [event.colors[0]];
+                return html`
+                    <div
+                        class="event ${event.class}"
+                        data-entity="${event.calendars[0]}"
+                        data-additional-entities="${event.calendars.join(',')}"
+                        data-summary="${event.summary}"
+                        data-location="${event.location ?? ''}"
+                        data-start-hour="${event.start.toFormat('H')}"
+                        data-start-minute="${event.start.toFormat('mm')}"
+                        data-end-hour="${event.end.toFormat('H')}"
+                        data-end-minute="${event.end.toFormat('mm')}"
+                        style="--border-color: ${event.colors[0]}"
+                        @click="${() => {
+                            this._handleEventClick(event)
+                        }}"
+                    >
+                        ${event.colors.map((color) => {
+                            if (doneColors.indexOf(color) > -1) {
+                                return '';
+                            }
+                            doneColors.push(color);
+                            return html`
+                                <div
+                                    class="additionalColor"
+                                    style="--event-additional-color: ${color}"
+                                ></div>
+                            `
+                        })}
+                        <div class="inner">
+                            <div class="time">
+                                ${event.fullDay ?
+                                    html`${this._language.fullDay}` :
+                                    html`
+                                        ${event.start.toFormat(this._timeFormat)}
+                                        ${event.end ? ' - ' + event.end.toFormat(this._timeFormat) : ''}
+                                    `
+                                }
+                            </div>
+                            <div class="title">
+                                ${event.summary}
+                            </div>
+                            ${this._showLocation && event.location ?
+                                html`
+                                    <div class="location">
+                                        <ha-icon icon="mdi:map-marker"></ha-icon>
+                                        ${event.location}
+                                    </div>
+                                ` :
+                                ''
+                            }
+                        </div>
+                        ${event.icon ?
+                            html`
+                                <div class="icon">
+                                    <ha-icon icon="${event.icon}"></ha-icon>
+                                </div>
+                            ` :
+                            ''
+                        }
+                    </div>
+                `
+            })}
+        `;
+    }
+
+    _renderNoEvents() {
+        return html`
+            <div class="none">
+                ${this._language.noEvents}
+            </div>
         `;
     }
 
@@ -687,10 +735,8 @@ export class WeekPlannerCard extends LitElement {
         }
 
         if (this._calendarEvents.hasOwnProperty(eventKey)) {
-            this._calendarEvents[eventKey].otherCalendars.push(calendar.entity);
-            if (calendar.color && this._calendarEvents[eventKey].otherColors.indexOf(calendar.color) === -1) {
-                this._calendarEvents[eventKey].otherColors.push(calendar.color)
-            }
+            this._calendarEvents[eventKey].calendars.push(calendar.entity);
+            this._calendarEvents[eventKey].colors.push(calendar.color ?? 'inherit')
             if (calendar.name && this._calendarEvents[eventKey].calendarNames.indexOf(calendar.name) === -1) {
                 this._calendarEvents[eventKey].calendarNames.push(calendar.name);
             }
@@ -707,11 +753,9 @@ export class WeekPlannerCard extends LitElement {
                 end: endDate,
                 originalEnd: this._convertApiDate(event.end),
                 fullDay: fullDay,
-                color: calendar.color ?? 'inherit',
+                colors: [calendar.color ?? 'inherit'],
                 icon: calendar.icon ?? null,
-                otherColors: [],
-                calendar: calendar.entity,
-                otherCalendars: [],
+                calendars: [calendar.entity],
                 calendarSorting: calendarSorting,
                 calendarNames: [calendar.name],
                 class: this._getEventClass(startDate, endDate, fullDay)
@@ -901,6 +945,21 @@ export class WeekPlannerCard extends LitElement {
 
     _closeDialog() {
         this._currentEventDetails = null;
+    }
+
+    _handleLegendClick(calendar) {
+        if (!this._legendToggle) {
+            return;
+        }
+
+        const hideIndex = this._hideCalendars.indexOf(calendar.entity);
+        const hideCalendars = [...this._hideCalendars];
+        if (hideIndex > -1) {
+            hideCalendars.splice(hideIndex, 1);
+        } else {
+            hideCalendars.push(calendar.entity);
+        }
+        this._hideCalendars = hideCalendars;
     }
 
     _handleWeatherClick(e) {
