@@ -111,11 +111,13 @@ export class WeekPlannerCardEditor extends LitElement {
                         ${this.addBooleanField('hideWeekend', 'Hide weekend')}
                         ${this.addBooleanField('hideDaysWithoutEvents', 'Hide days without events except for today')}
                         ${this.addBooleanField('hideTodayWithoutEvents', 'Also hide today without events')}
+                        ${this.addTextField('maxDayEvents', 'Maximum number of events per day (0 is no maximum)', 'number', 0)}
                     `
                 )}
                 ${this.addExpansionPanel(
                     'Events',
                     html`
+                        ${this.addTextField('maxEvents', 'Maximum number of events (0 is no maximum)', 'number', 0)}
                         ${this.addBooleanField('hidePastEvents', 'Hide past events')}
                         ${this.addTextField('filter', 'Filter events (regex)')}
                         ${this.addTextField('filterText', 'Filter event text (regex)')}
@@ -177,6 +179,7 @@ export class WeekPlannerCardEditor extends LitElement {
                     html`
                         ${this.addTextField('texts.fullDay', 'Entire day')}
                         ${this.addTextField('texts.noEvents', 'No events')}
+                        ${this.addTextField('texts.moreEvents', 'More events')}
                         ${this.addTextField('texts.today', 'Today')}
                         ${this.addTextField('texts.tomorrow', 'Tomorrow')}
                         ${this.addTextField('texts.yesterday', 'Yesterday')}

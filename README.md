@@ -60,6 +60,8 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 | `type`                   | string           | **Required**                                       | `custom:week-planner-card`                                                                                                                  | Type of the card                                                                       | 1.0.0   |
 | `title`                  | string           | optional                                           | Any string                                                                                                                                  | Card title                                                                             | 1.6.0   |
 | `days`                   | number \| string | 7                                                  | Any positive integer number \| `month`                                                                                                      | The number of days to show                                                             | 1.0.0   |
+| `maxEvents`              | number           | 0                                                  | Any positive integer number                                                                                                                 | The maximum number of events to show (0 is no maximum)                                 | 1.11.0  |
+| `maxDayEvents`           | number           | 0                                                  | Any positive integer number                                                                                                                 | The maximum number of events to show per day (0 is no maximum)                         | 1.11.0  |
 | `startingDay`            | string           | `today`                                            | `today` \| `tomorrow` \| `yesterday` \| `sunday` \| `monday` \| `tuesday` \| `wednesday` \| `thursday` \| `friday` \| `saturday` \| `month` | Day to start with                                                                      | 1.2.0   |
 | `startingDayOffset`      | number           | 0                                                  | Any integer number                                                                                                                          | Add or subtract days from starting day                                                 | 1.7.0   |
 | `hideWeekend`            | boolean          | false                                              | `false` \| `true`                                                                                                                           | Do not show Saturday and Sunday                                                        | 1.2.0   |
@@ -104,20 +106,21 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 
 ### Texts
 
-| Name        | Type   | Default                           | Supported options | Description                                                                     | Version |
-|-------------|--------|-----------------------------------|-------------------|---------------------------------------------------------------------------------|---------|
-| `fullDay`   | string | `Entire day`                      | Any text          | Text shown for full day events instead of time                                  | 1.0.0   |
-| `noEvents`  | string | `No events`                       | Any text          | Text shown when there are no events for a day                                   | 1.0.0   |
-| `today`     | string | `Today`                           | Any text          | Text shown for today instead of the week day. Set to empty to show week day     | 1.0.0   |
-| `tomorrow`  | string | `Tomorrow`                        | Any text          | Text shown for tomorrow instead of the week day. Set to empty to show week day  | 1.0.0   |
-| `yesterday` | string | `Yesterday`                       | Any text          | Text shown for yesterday instead of the week day. Set to empty to show week day | 1.2.0   |
-| `sunday`    | string | Name of Sunday based on locale    | Any text          | Text used to override Sundays                                                   | 1.1.0   |
-| `monday`    | string | Name of Monday based on locale    | Any text          | Text used to override Mondays                                                   | 1.1.0   |
-| `tuesday`   | string | Name of Tuesday based on locale   | Any text          | Text used to override Tuesdays                                                  | 1.1.0   |
-| `wednesday` | string | Name of Wednesday based on locale | Any text          | Text used to override Wednesdays                                                | 1.1.0   |
-| `thursday`  | string | Name of Thursday based on locale  | Any text          | Text used to override Thursdays                                                 | 1.1.0   |
-| `friday`    | string | Name of Friday based on locale    | Any text          | Text used to override Fridays                                                   | 1.1.0   |
-| `saturday`  | string | Name of Saturday based on locale  | Any text          | Text used to override Saturdays                                                 | 1.1.0   |
+| Name         | Type   | Default                           | Supported options | Description                                                                     | Version |
+|--------------|--------|-----------------------------------|-------------------|---------------------------------------------------------------------------------|---------|
+| `fullDay`    | string | `Entire day`                      | Any text          | Text shown for full day events instead of time                                  | 1.0.0   |
+| `noEvents`   | string | `No events`                       | Any text          | Text shown when there are no events for a day                                   | 1.0.0   |
+| `moreEvents` | string | `More events`                     | Any text          | Text shown when there are more events for a day                                 | 1.11.0  |
+| `today`      | string | `Today`                           | Any text          | Text shown for today instead of the week day. Set to empty to show week day     | 1.0.0   |
+| `tomorrow`   | string | `Tomorrow`                        | Any text          | Text shown for tomorrow instead of the week day. Set to empty to show week day  | 1.0.0   |
+| `yesterday`  | string | `Yesterday`                       | Any text          | Text shown for yesterday instead of the week day. Set to empty to show week day | 1.2.0   |
+| `sunday`     | string | Name of Sunday based on locale    | Any text          | Text used to override Sundays                                                   | 1.1.0   |
+| `monday`     | string | Name of Monday based on locale    | Any text          | Text used to override Mondays                                                   | 1.1.0   |
+| `tuesday`    | string | Name of Tuesday based on locale   | Any text          | Text used to override Tuesdays                                                  | 1.1.0   |
+| `wednesday`  | string | Name of Wednesday based on locale | Any text          | Text used to override Wednesdays                                                | 1.1.0   |
+| `thursday`   | string | Name of Thursday based on locale  | Any text          | Text used to override Thursdays                                                 | 1.1.0   |
+| `friday`     | string | Name of Friday based on locale    | Any text          | Text used to override Fridays                                                   | 1.1.0   |
+| `saturday`   | string | Name of Saturday based on locale  | Any text          | Text used to override Saturdays                                                 | 1.1.0   |
 
 ### Actions
 See [Actions documentation](https://www.home-assistant.io/dashboards/actions/). Currently only the tab action is supported.
