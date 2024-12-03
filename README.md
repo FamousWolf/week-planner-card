@@ -28,8 +28,8 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 ### HACS (Recommended)
 
 1. Make sure [HACS](https://hacs.xyz) is installed and working.
-2. Add this repository (https://github.com/FamousWolf/week-planner-card) via [HACS Custom repositories](https://hacs.xyz/docs/faq/custom_repositories)
-3. Download and install using HACS
+2. Add this repository (https://github.com/FamousWolf/week-planner-card) via [HACS Custom repositories](https://hacs.xyz/docs/faq/custom_repositories). Type should be `Dashboard`.
+3. Download and install using HACS.
 
 ### Manual
 
@@ -44,9 +44,11 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
     ```
   - **Using the graphical editor**
     1. Make sure advanced mode is enabled in your user profile
-    2. Navigate to Configuration -> Lovelace Dashboards -> Resources Tab. Hit orange (+) icon
-    3. Enter URL `/local/week-planner-card.js` and select type "JavaScript Module".
-    4. Restart Home Assistant.
+    2. Navigate to "Settings" -> "Dashboards".
+    3. Click on the 3 vertical dots in the top right corner and select "Resources".
+    4. Click on the "Add resource" button in the bottom right corner.
+    5. Enter URL `/local/week-planner-card.js` and select type "JavaScript Module".
+    6. Restart Home Assistant.
 
 
 ## Configuration
