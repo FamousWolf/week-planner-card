@@ -46,6 +46,7 @@ export class WeekPlannerCardEditor extends LitElement {
                                         ${this.addTextField('calendars.' + index + '.name', 'Name')}
                                         ${this.addTextField('calendars.' + index + '.color', 'Color')}
                                         ${this.addIconPickerField('calendars.' + index + '.icon', 'Icon')}
+                                        ${this.addTextField('calendars.' + index + '.eventTitleField', 'Event title field', 'text', 'summary')}
                                         ${this.addTextField('calendars.' + index + '.filter', 'Filter events (regex)')}
                                         ${this.addTextField('calendars.' + index + '.filterText', 'Filter event text (regex)')}
                                         ${this.addBooleanField('calendars.' + index + '.hideInLegend', 'Hide in legend')}
@@ -119,6 +120,8 @@ export class WeekPlannerCardEditor extends LitElement {
                         ${this.addTextField('filter', 'Filter events (regex)')}
                         ${this.addTextField('filterText', 'Filter event text (regex)')}
                         ${this.addBooleanField('combineSimilarEvents', 'Combine similar events')}
+                        ${this.addBooleanField('showTitle', 'Show title in overview', true)}
+                        ${this.addBooleanField('showDescription', 'Show description in overview')}
                         ${this.addBooleanField('showLocation', 'Show location in overview')}
                         ${this.addTextField('locationLink', 'Override location link base URL')}
                     `
@@ -196,50 +199,50 @@ export class WeekPlannerCardEditor extends LitElement {
         `;
     }
 
-    addTextField(name, label, type) {
+    addTextField(name, label, type, defaultValue) {
         return html`
             <ha-textfield
                 name="${name}"
                 label="${label ?? name}"
                 type="${type ?? 'text'}"
-                value="${this.getConfigValue(name)}"
+                value="${this.getConfigValue(name, defaultValue)}"
                 @keyup="${this._valueChanged}"
                 @change="${this._valueChanged}"
             />
         `;
     }
 
-    addEntityPickerField(name, label, includeDomains) {
+    addEntityPickerField(name, label, includeDomains, defaultValue) {
         return html`
             <ha-entity-picker
                 .hass="${this.hass}"
                 name="${name}"
                 label="${label ?? name}"
-                value="${this.getConfigValue(name)}"
+                value="${this.getConfigValue(name, defaultValue)}"
                 .includeDomains="${includeDomains}"
                 @change="${this._valueChanged}"
             />
         `;
     }
 
-    addIconPickerField(name, label) {
+    addIconPickerField(name, label, defaultValue) {
         return html`
             <ha-icon-picker
                 .hass="${this.hass}"
                 name="${name}"
                 label="${label ?? name}"
-                value="${this.getConfigValue(name)}"
+                value="${this.getConfigValue(name, defaultValue)}"
                 @change="${this._valueChanged}"
             />
         `;
     }
 
-    addSelectField(name, label, options, clearable) {
+    addSelectField(name, label, options, clearable, defaultValue) {
         return html`
             <ha-select
                 name="${name}"
                 label="${label ?? name}"
-                value="${this.getConfigValue(name)}"
+                value="${this.getConfigValue(name, defaultValue)}"
                 .clearable="${clearable}"
                 @change="${this._valueChanged}"
                 @closed="${(event) => { event.stopPropagation(); } /* Prevent a bug where the editor dialog also closes. See https://github.com/material-components/material-web/issues/1150 */}"
@@ -255,14 +258,14 @@ export class WeekPlannerCardEditor extends LitElement {
         `;
     }
 
-    addBooleanField(name, label) {
+    addBooleanField(name, label, defaultValue) {
         return html`
             <ha-formfield
                 label="${label ?? name}"
             >
                 <ha-switch
                     name="${name}"
-                    .checked="${this.getConfigValue(name)}"
+                    .checked="${this.getConfigValue(name, defaultValue)}"
                     value="true"
                     @change="${this._valueChanged}"
                 />
@@ -306,12 +309,14 @@ export class WeekPlannerCardEditor extends LitElement {
         this.setConfigValue(target.attributes.name.value, value);
     }
 
-    getConfigValue(key) {
+    getConfigValue(key, defaultValue) {
         if (!this._config) {
             return '';
         }
 
-        return key.split('.').reduce((o, i) => o[i] ?? '', this._config) ?? '';
+        defaultValue = defaultValue ?? '';
+
+        return key.split('.').reduce((o, i) => o[i] ?? defaultValue, this._config) ?? defaultValue;
     }
 
     setConfigValue(key, value) {

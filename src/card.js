@@ -169,6 +169,8 @@ export class WeekPlannerCard extends LitElement {
         this._dateFormat = config.dateFormat ?? 'cccc d LLLL yyyy';
         this._timeFormat = config.timeFormat ?? 'HH:mm';
         this._locationLink = config.locationLink ?? 'https://www.google.com/maps/search/?api=1&query=';
+        this._showTitle = config.showTitle ?? true;
+        this._showDescription = config.showDescription ?? false;
         this._showLocation = config.showLocation ?? false;
         this._hidePastEvents = config.hidePastEvents ?? false;
         this._hideDaysWithoutEvents = config.hideDaysWithoutEvents ?? false;
@@ -464,9 +466,22 @@ export class WeekPlannerCard extends LitElement {
                                     `
                                 }
                             </div>
-                            <div class="title">
-                                ${event.summary}
-                            </div>
+                            ${this._showTitle ?
+                                    html`
+                                        <div class="title">
+                                            ${event.summary}
+                                        </div>
+                                    ` :
+                                    ''
+                            }
+                            ${this._showDescription ?
+                                html`
+                                    <div class="description">
+                                        ${unsafeHTML(event.description)}
+                                    </div>
+                                ` :
+                                ''
+                            }
                             ${this._showLocation && event.location ?
                                 html`
                                     <div class="location">
@@ -729,9 +744,11 @@ export class WeekPlannerCard extends LitElement {
             this._events[dateKey] = [];
         }
 
-        let eventKey = startDate.toISO() + '-' + endDate.toISO() + '-' + event.summary;
+        let title = calendar.eventTitleField ? event[calendar.eventTitleField] : event.summary;
+
+        let eventKey = startDate.toISO() + '-' + endDate.toISO() + '-' + title;
         if (!this._combineSimilarEvents) {
-            eventKey = startDate.toISO() + '-' + endDate.toISO() + '-' + event.summary + '-' + calendar.entity;
+            eventKey = startDate.toISO() + '-' + endDate.toISO() + '-' + title + '-' + calendar.entity;
         }
 
         if (this._calendarEvents.hasOwnProperty(eventKey)) {
@@ -745,7 +762,7 @@ export class WeekPlannerCard extends LitElement {
             }
         } else {
             this._calendarEvents[eventKey] = {
-                summary: this._filterEventSummary(event.summary ?? null, calendar),
+                summary: this._filterEventSummary(title ?? null, calendar),
                 description: event.description ?? null,
                 location: event.location ?? null,
                 start: startDate,

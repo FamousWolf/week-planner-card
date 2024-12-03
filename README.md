@@ -76,6 +76,8 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 | `timeFormat`             | string           | `HH:mm`                                            | See [Luxon format](https://moment.github.io/luxon/#/formatting?id=table-of-tokens)                                                          | Format of the time                                                                     | 1.0.0   |
 | `locale`                 | string           | `en`                                               | Any locale string supported by Luxon                                                                                                        | Locale used for day and month texts                                                    | 1.1.0   |
 | `locationLink`           | string           | `https://www.google.com/maps/search/?api=1&query=` | Any URL                                                                                                                                     | Link used for event location in the detail popup                                       | 1.1.0   |
+| `showTitle`              | boolean          | true                                               | `false` \| `true`                                                                                                                           | Show event title in overview                                                           | 1.11.0  |
+| `showDescription`        | boolean          | false                                              | `false` \| `true`                                                                                                                           | Show event description in overview                                                     | 1.11.0  |
 | `showLocation`           | boolean          | false                                              | `false` \| `true`                                                                                                                           | Show event location in overview                                                        | 1.3.0   |
 | `hidePastEvents`         | boolean          | false                                              | `false` \| `true`                                                                                                                           | Do not show past events                                                                | 1.3.0   |
 | `hideDaysWithoutEvents`  | boolean          | false                                              | `false` \| `true`                                                                                                                           | Do not show days without events, except for today                                      | 1.4.0   |
@@ -89,15 +91,16 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 
 ### Calendars
 
-| Name           | Type    | Default      | Supported options      | Description                                     | Version |
-|----------------|---------|--------------|------------------------|-------------------------------------------------|---------|
-| `entity`       | string  | **Required** | `calendar.my_calendar` | Entity ID                                       | 1.0.0   |
-| `name`         | string  | optional     | Any text               | Name of the calendar                            | 1.7.0   |
-| `color`        | string  | optional     | Any CSS color          | Color used for events from the calendar         | 1.0.0   |
-| `icon`         | string  | optional     | Any icon               | Icon used for events from the calendar          | 1.10.0  |
-| `filter`       | string  | optional     | Any regular expression | Remove events that match the regular expression | 1.8.0   |
-| `filterText`   | string  | optional     | Any regular expression | Remove text from events                         | 1.10.0  |
-| `hideInLegend` | boolean | false        | `false` \| `true`      | Do not show the calendar in the legend          | 1.8.0   |
+| Name              | Type    | Default      | Supported options      | Description                                            | Version |
+|-------------------|---------|--------------|------------------------|--------------------------------------------------------|---------|
+| `entity`          | string  | **Required** | `calendar.my_calendar` | Entity ID                                              | 1.0.0   |
+| `name`            | string  | optional     | Any text               | Name of the calendar                                   | 1.7.0   |
+| `color`           | string  | optional     | Any CSS color          | Color used for events from the calendar                | 1.0.0   |
+| `icon`            | string  | optional     | Any icon               | Icon used for events from the calendar                 | 1.10.0  |
+| `eventTitleField` | string  | optional     | Any text               | Name of the title field for events (usually `summary`) | 1.11.0  |
+| `filter`          | string  | optional     | Any regular expression | Remove events that match the regular expression        | 1.8.0   |
+| `filterText`      | string  | optional     | Any regular expression | Remove text from events                                | 1.10.0  |
+| `hideInLegend`    | boolean | false        | `false` \| `true`      | Do not show the calendar in the legend                 | 1.8.0   |
 
 ### Texts
 
