@@ -157,6 +157,7 @@ export default css`
     }
 
     .container .day .events .none,
+    .container .day .events .more,
     .container .day .events .event {
         margin-bottom: var(--event-spacing);
         background-color: var(--event-background-color);
@@ -165,7 +166,8 @@ export default css`
         line-height: var(--event-line-height);
     }
 
-    .container .day .events .none {
+    .container .day .events .none,
+    .container .day .events .more {
         padding: var(--event-padding);
         border-radius: var(--event-border-radius);
     }

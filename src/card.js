@@ -182,6 +182,8 @@ export class WeekPlannerCard extends LitElement {
         this._legendToggle = config.legendToggle ?? false;
         this._actions = config.actions ?? false;
         this._columns = config.columns ?? {};
+        this._maxEvents = config.maxEvents ?? false;
+        this._maxDayEvents = config.maxDayEvents ?? false;
         this._hideCalendars = [];
         if (config.locale) {
             LuxonSettings.defaultLocale = config.locale;
@@ -191,6 +193,7 @@ export class WeekPlannerCard extends LitElement {
             {
                 fullDay: 'Entire day',
                 noEvents: 'No events',
+                moreEvents: 'More events',
                 today: 'Today',
                 tomorrow: 'Tomorrow',
                 yesterday: 'Yesterday',
@@ -425,6 +428,12 @@ export class WeekPlannerCard extends LitElement {
             return this._renderNoEvents();
         }
 
+        let moreEvents = false;
+        if (this._maxDayEvents > 0 && dayEvents.length > this._maxDayEvents) {
+            dayEvents.splice(this._maxDayEvents);
+            moreEvents = true;
+        }
+
         return html`
             ${dayEvents.map((event) => {
                 const doneColors = [event.colors[0]];
@@ -503,6 +512,14 @@ export class WeekPlannerCard extends LitElement {
                     </div>
                 `
             })}
+            ${moreEvents ?
+                html`
+                    <div class="more">
+                        ${this._language.moreEvents}
+                    </div>
+                ` :
+                ''
+            }
         `;
     }
 
@@ -877,6 +894,7 @@ export class WeekPlannerCard extends LitElement {
         let startDate = this._startDate;
         let endDate = this._startDate.plus({ days: this._numberOfDays });
 
+        let numberOfEvents = 0;
         while (startDate < endDate) {
             if (!this._hideWeekend || startDate.weekday < 6) {
                 let events = [];
@@ -890,6 +908,13 @@ export class WeekPlannerCard extends LitElement {
 
                         return this._calendarEvents[event1].start > this._calendarEvents[event2].start ? 1 : -1;
                     });
+
+                    const previousNumberOfEvents = numberOfEvents;
+                    numberOfEvents += events.length;
+
+                    if (this._maxEvents > 0 && numberOfEvents > this._maxEvents) {
+                        events.splice(this._maxEvents - numberOfEvents);
+                    }
                 }
 
                 days.push({
@@ -898,6 +923,10 @@ export class WeekPlannerCard extends LitElement {
                     weather: weatherForecast[dateKey] ?? null,
                     class: this._getDayClass(startDate)
                 });
+
+                if (this._maxEvents > 0 && numberOfEvents >= this._maxEvents) {
+                    break;
+                }
             }
 
             startDate = startDate.plus({ days: 1 });
