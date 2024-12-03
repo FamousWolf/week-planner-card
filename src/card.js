@@ -84,6 +84,7 @@ export class WeekPlannerCard extends LitElement {
     _legendToggle;
     _actions;
     _columns;
+    _loader;
 
     /**
      * Get config element
@@ -134,7 +135,6 @@ export class WeekPlannerCard extends LitElement {
         return {
             _days: { type: Array },
             _config: { type: Object },
-            _isLoading: { type: Boolean },
             _error: { type: String },
             _currentEventDetails: { type: Object },
             _hideCalendars: { type: Array }
@@ -243,6 +243,10 @@ export class WeekPlannerCard extends LitElement {
      * @return {Object}
      */
     render() {
+        if (!this._loader) {
+            this._loader = this._getLoader();
+        }
+
         if (!this._initialized) {
             this._initialized = true;
             this._waitForHassAndConfig();
@@ -291,10 +295,7 @@ export class WeekPlannerCard extends LitElement {
                         ${this._renderDays()}
                     </div>
                     ${this._renderEventDetailsDialog()}
-                    ${this._isLoading ?
-                        html`<div class="loader"></div>` :
-                        ''
-                    }
+                    ${this._loader}
                 </div>
             </ha-card>
         `;
@@ -623,6 +624,21 @@ export class WeekPlannerCard extends LitElement {
         `;
     }
 
+    _getLoader() {
+        const loader = document.createElement('div');
+        loader.className = 'loader';
+        loader.style.display = 'none';
+        return loader;
+    }
+
+    _updateLoader() {
+        if (this._loading > 0) {
+            this._loader.style.display = 'inherit';
+        } else {
+            this._loader.style.display = 'none';
+        }
+    }
+
     _getWeatherIcon(weatherState) {
         const condition = weatherState?.condition;
         if (!condition) {
@@ -646,6 +662,7 @@ export class WeekPlannerCard extends LitElement {
 
     _subscribeToWeatherForecast() {
         this._loading++;
+        this._updateLoader();
         let loadingWeather = true;
         this.hass.connection.subscribeMessage((event) => {
             this._weatherForecast = event.forecast ?? [];
@@ -666,7 +683,7 @@ export class WeekPlannerCard extends LitElement {
         }
 
         this._loading++;
-        this._isLoading = true;
+        this._updateLoader();
         this._error = '';
         this._events = {};
         this._calendarEvents = {};
@@ -735,7 +752,7 @@ export class WeekPlannerCard extends LitElement {
                 if (!this._error) {
                     this._updateCard();
                 }
-                this._isLoading = false;
+                this._updateLoader();
 
                 window.setTimeout(() => {
                     this._updateEvents();
