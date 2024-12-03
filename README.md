@@ -28,8 +28,8 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 ### HACS (Recommended)
 
 1. Make sure [HACS](https://hacs.xyz) is installed and working.
-2. Add this repository (https://github.com/FamousWolf/week-planner-card) via [HACS Custom repositories](https://hacs.xyz/docs/faq/custom_repositories)
-3. Download and install using HACS
+2. Add this repository (https://github.com/FamousWolf/week-planner-card) via [HACS Custom repositories](https://hacs.xyz/docs/faq/custom_repositories). Type should be `Dashboard`.
+3. Download and install using HACS.
 
 ### Manual
 
@@ -39,14 +39,16 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
     Add:
     ```yaml
     resources:
-      - url: /local/week-planner-card.js?version=1.10.1
+      - url: /local/week-planner-card.js?version=1.11.0
     type: module
     ```
   - **Using the graphical editor**
     1. Make sure advanced mode is enabled in your user profile
-    2. Navigate to Configuration -> Lovelace Dashboards -> Resources Tab. Hit orange (+) icon
-    3. Enter URL `/local/week-planner-card.js` and select type "JavaScript Module".
-    4. Restart Home Assistant.
+    2. Navigate to "Settings" -> "Dashboards".
+    3. Click on the 3 vertical dots in the top right corner and select "Resources".
+    4. Click on the "Add resource" button in the bottom right corner.
+    5. Enter URL `/local/week-planner-card.js` and select type "JavaScript Module".
+    6. Restart Home Assistant.
 
 
 ## Configuration
@@ -58,6 +60,8 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 | `type`                   | string           | **Required**                                       | `custom:week-planner-card`                                                                                                                  | Type of the card                                                                       | 1.0.0   |
 | `title`                  | string           | optional                                           | Any string                                                                                                                                  | Card title                                                                             | 1.6.0   |
 | `days`                   | number \| string | 7                                                  | Any positive integer number \| `month`                                                                                                      | The number of days to show                                                             | 1.0.0   |
+| `maxEvents`              | number           | 0                                                  | Any positive integer number                                                                                                                 | The maximum number of events to show (0 is no maximum)                                 | 1.11.0  |
+| `maxDayEvents`           | number           | 0                                                  | Any positive integer number                                                                                                                 | The maximum number of events to show per day (0 is no maximum)                         | 1.11.0  |
 | `startingDay`            | string           | `today`                                            | `today` \| `tomorrow` \| `yesterday` \| `sunday` \| `monday` \| `tuesday` \| `wednesday` \| `thursday` \| `friday` \| `saturday` \| `month` | Day to start with                                                                      | 1.2.0   |
 | `startingDayOffset`      | number           | 0                                                  | Any integer number                                                                                                                          | Add or subtract days from starting day                                                 | 1.7.0   |
 | `hideWeekend`            | boolean          | false                                              | `false` \| `true`                                                                                                                           | Do not show Saturday and Sunday                                                        | 1.2.0   |
@@ -74,6 +78,8 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 | `timeFormat`             | string           | `HH:mm`                                            | See [Luxon format](https://moment.github.io/luxon/#/formatting?id=table-of-tokens)                                                          | Format of the time                                                                     | 1.0.0   |
 | `locale`                 | string           | `en`                                               | Any locale string supported by Luxon                                                                                                        | Locale used for day and month texts                                                    | 1.1.0   |
 | `locationLink`           | string           | `https://www.google.com/maps/search/?api=1&query=` | Any URL                                                                                                                                     | Link used for event location in the detail popup                                       | 1.1.0   |
+| `showTitle`              | boolean          | true                                               | `false` \| `true`                                                                                                                           | Show event title in overview                                                           | 1.11.0  |
+| `showDescription`        | boolean          | false                                              | `false` \| `true`                                                                                                                           | Show event description in overview                                                     | 1.11.0  |
 | `showLocation`           | boolean          | false                                              | `false` \| `true`                                                                                                                           | Show event location in overview                                                        | 1.3.0   |
 | `hidePastEvents`         | boolean          | false                                              | `false` \| `true`                                                                                                                           | Do not show past events                                                                | 1.3.0   |
 | `hideDaysWithoutEvents`  | boolean          | false                                              | `false` \| `true`                                                                                                                           | Do not show days without events, except for today                                      | 1.4.0   |
@@ -82,35 +88,39 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 | `filterText`             | string           | optional                                           | Any regular expression                                                                                                                      | Remove text from events                                                                | 1.10.0  |
 | `combineSimilarEvents`   | boolean          | false                                              | `false` \| `true`                                                                                                                           | Combine events with the same start date/time, end date/time and title                  | 1.9.0   |
 | `showLegend`             | boolean          | false                                              | `false` \| `true`                                                                                                                           | Show calendar legend                                                                   | 1.7.0   |
+| `legendToggle`           | boolean          | false                                              | `false` \| `true`                                                                                                                           | Toggle calendars by clicking on the legend                                             | 1.11.0  |
+| `columns`                | object           | optional                                           | See [Columns](#columns)                                                                                                                     | Configuration to override the number of columns                                        | 1.11.0  |
 
 ### Calendars
 
-| Name           | Type    | Default      | Supported options      | Description                                     | Version |
-|----------------|---------|--------------|------------------------|-------------------------------------------------|---------|
-| `entity`       | string  | **Required** | `calendar.my_calendar` | Entity ID                                       | 1.0.0   |
-| `name`         | string  | optional     | Any text               | Name of the calendar                            | 1.7.0   |
-| `color`        | string  | optional     | Any CSS color          | Color used for events from the calendar         | 1.0.0   |
-| `icon`         | string  | optional     | Any icon               | Icon used for events from the calendar          | 1.10.0  |
-| `filter`       | string  | optional     | Any regular expression | Remove events that match the regular expression | 1.8.0   |
-| `filterText`   | string  | optional     | Any regular expression | Remove text from events                         | 1.10.0  |
-| `hideInLegend` | boolean | false        | `false` \| `true`      | Do not show the calendar in the legend          | 1.8.0   |
+| Name              | Type    | Default      | Supported options      | Description                                            | Version |
+|-------------------|---------|--------------|------------------------|--------------------------------------------------------|---------|
+| `entity`          | string  | **Required** | `calendar.my_calendar` | Entity ID                                              | 1.0.0   |
+| `name`            | string  | optional     | Any text               | Name of the calendar                                   | 1.7.0   |
+| `color`           | string  | optional     | Any CSS color          | Color used for events from the calendar                | 1.0.0   |
+| `icon`            | string  | optional     | Any icon               | Icon used for events from the calendar                 | 1.10.0  |
+| `eventTitleField` | string  | optional     | Any text               | Name of the title field for events (usually `summary`) | 1.11.0  |
+| `filter`          | string  | optional     | Any regular expression | Remove events that match the regular expression        | 1.8.0   |
+| `filterText`      | string  | optional     | Any regular expression | Remove text from events                                | 1.10.0  |
+| `hideInLegend`    | boolean | false        | `false` \| `true`      | Do not show the calendar in the legend                 | 1.8.0   |
 
 ### Texts
 
-| Name        | Type   | Default                           | Supported options | Description                                                                     | Version |
-|-------------|--------|-----------------------------------|-------------------|---------------------------------------------------------------------------------|---------|
-| `fullDay`   | string | `Entire day`                      | Any text          | Text shown for full day events instead of time                                  | 1.0.0   |
-| `noEvents`  | string | `No events`                       | Any text          | Text shown when there are no events for a day                                   | 1.0.0   |
-| `today`     | string | `Today`                           | Any text          | Text shown for today instead of the week day. Set to empty to show week day     | 1.0.0   |
-| `tomorrow`  | string | `Tomorrow`                        | Any text          | Text shown for tomorrow instead of the week day. Set to empty to show week day  | 1.0.0   |
-| `yesterday` | string | `Yesterday`                       | Any text          | Text shown for yesterday instead of the week day. Set to empty to show week day | 1.2.0   |
-| `sunday`    | string | Name of Sunday based on locale    | Any text          | Text used to override Sundays                                                   | 1.1.0   |
-| `monday`    | string | Name of Monday based on locale    | Any text          | Text used to override Mondays                                                   | 1.1.0   |
-| `tuesday`   | string | Name of Tuesday based on locale   | Any text          | Text used to override Tuesdays                                                  | 1.1.0   |
-| `wednesday` | string | Name of Wednesday based on locale | Any text          | Text used to override Wednesdays                                                | 1.1.0   |
-| `thursday`  | string | Name of Thursday based on locale  | Any text          | Text used to override Thursdays                                                 | 1.1.0   |
-| `friday`    | string | Name of Friday based on locale    | Any text          | Text used to override Fridays                                                   | 1.1.0   |
-| `saturday`  | string | Name of Saturday based on locale  | Any text          | Text used to override Saturdays                                                 | 1.1.0   |
+| Name         | Type   | Default                           | Supported options | Description                                                                     | Version |
+|--------------|--------|-----------------------------------|-------------------|---------------------------------------------------------------------------------|---------|
+| `fullDay`    | string | `Entire day`                      | Any text          | Text shown for full day events instead of time                                  | 1.0.0   |
+| `noEvents`   | string | `No events`                       | Any text          | Text shown when there are no events for a day                                   | 1.0.0   |
+| `moreEvents` | string | `More events`                     | Any text          | Text shown when there are more events for a day                                 | 1.11.0  |
+| `today`      | string | `Today`                           | Any text          | Text shown for today instead of the week day. Set to empty to show week day     | 1.0.0   |
+| `tomorrow`   | string | `Tomorrow`                        | Any text          | Text shown for tomorrow instead of the week day. Set to empty to show week day  | 1.0.0   |
+| `yesterday`  | string | `Yesterday`                       | Any text          | Text shown for yesterday instead of the week day. Set to empty to show week day | 1.2.0   |
+| `sunday`     | string | Name of Sunday based on locale    | Any text          | Text used to override Sundays                                                   | 1.1.0   |
+| `monday`     | string | Name of Monday based on locale    | Any text          | Text used to override Mondays                                                   | 1.1.0   |
+| `tuesday`    | string | Name of Tuesday based on locale   | Any text          | Text used to override Tuesdays                                                  | 1.1.0   |
+| `wednesday`  | string | Name of Wednesday based on locale | Any text          | Text used to override Wednesdays                                                | 1.1.0   |
+| `thursday`   | string | Name of Thursday based on locale  | Any text          | Text used to override Thursdays                                                 | 1.1.0   |
+| `friday`     | string | Name of Friday based on locale    | Any text          | Text used to override Fridays                                                   | 1.1.0   |
+| `saturday`   | string | Name of Saturday based on locale  | Any text          | Text used to override Saturdays                                                 | 1.1.0   |
 
 ### Actions
 See [Actions documentation](https://www.home-assistant.io/dashboards/actions/). Currently only the tab action is supported.
@@ -124,6 +134,17 @@ See [Actions documentation](https://www.home-assistant.io/dashboards/actions/). 
 | `showCondition`      | boolean | true         | `false` \| `true`            | Show condition icon                                                            | 1.1.0   |
 | `showTemperature`    | boolean | false        | `false` \| `true`            | Show temperature                                                               | 1.1.0   |
 | `showLowTemperature` | boolean | false        | `false` \| `true`            | Show low temperature                                                           | 1.1.0   |
+
+### Columns
+By default, the columns are based on the width of the card. You can use these settings to override the default number of columns.
+
+| Name         | Type    | Default  | Supported options   | Description                                             | Version |
+|--------------|---------|----------|---------------------|---------------------------------------------------------|---------|
+| `extraLarge` | number  | optional | Any positive number | Number of columns when the card width is >= 1920 pixels | 1.11.0  |
+| `large`      | number  | optional | Any positive number | Number of columns when the card width is >= 1280 pixels | 1.11.0  |
+| `medium`     | number  | optional | Any positive number | Number of columns when the card width is >= 1024 pixels | 1.11.0  |
+| `small`      | number  | optional | Any positive number | Number of columns when the card width is >= 640 pixels  | 1.11.0  |
+| `extraSmall` | number  | optional | Any positive number | Number of columns when the card width is < 640 pixels   | 1.11.0  |
 
 ## Custom styling using cardmod
 

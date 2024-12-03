@@ -4,6 +4,7 @@ export default css`
     ha-card {
         --legend-spacing: 15px;
         --legend-dot-size: 10px;
+        --days-columns: 7;
         --days-spacing: 15px;
         --day-date-number-font-size: 3.5em;
         --day-date-number-line-height: 1.2em;
@@ -71,8 +72,20 @@ export default css`
         --mdc-icon-size: 16px;
     }
     
+    .container .legend ul li.hasToggle {
+        cursor: pointer;
+    }
+
+    .container .legend ul li.hidden {
+        opacity: .5;
+    }
+
     .container .legend ul li ha-icon {
         color: var(--legend-calendar-color, var(--divider-color, #ffffff));
+    }
+
+    .container .legend ul li.hidden ha-icon {
+        color: var(--divider-color, #ffffff);
     }
 
     .container .legend ul li.noIcon:before {
@@ -86,9 +99,13 @@ export default css`
         vertical-align: middle;
     }
 
+    .container .legend ul li.hidden.noIcon:before {
+        background-color: var(--divider-color, #ffffff);
+    }
+
     .container .day {
         position: relative;
-        width: calc((100% - 6 * var(--days-spacing)) / 7);
+        width: calc((100% - (var(--days-columns) - 1) * var(--days-spacing)) / var(--days-columns));
         margin: 0 0 var(--days-spacing) 0;
     }
 
@@ -140,6 +157,7 @@ export default css`
     }
 
     .container .day .events .none,
+    .container .day .events .more,
     .container .day .events .event {
         margin-bottom: var(--event-spacing);
         background-color: var(--event-background-color);
@@ -148,7 +166,8 @@ export default css`
         line-height: var(--event-line-height);
     }
 
-    .container .day .events .none {
+    .container .day .events .none,
+    .container .day .events .more {
         padding: var(--event-padding);
         border-radius: var(--event-border-radius);
     }
@@ -236,33 +255,39 @@ export default css`
         }
     }
 
-    @container weekplanner (width <= 1280px) {
-        .container .day {
-            width: calc((100% - 4 * var(--days-spacing)) / 5);
+    @container weekplanner (width <= 1920px) {
+        ha-card .container .day {
+            --days-columns: var(--days-columns-lg, 7);
         }
-
         ha-card.compact .container .day {
-            width: calc((100% - 6 * var(--days-spacing)) / 7);
+            --days-columns: var(--days-columns-lg, 7);
+        }
+    }
+    
+    @container weekplanner (width <= 1280px) {
+        ha-card .container .day {
+            --days-columns: var(--days-columns-md, 5);
+        }
+        ha-card.compact .container .day {
+            --days-columns: var(--days-columns-md, 7);
         }
     }
 
     @container weekplanner (width <= 1024px) {
-        .container .day {
-            width: calc((100% - 2 * var(--days-spacing)) / 3);
+        ha-card .container .day {
+            --days-columns: var(--days-columns-sm, 3);
         }
-
         ha-card.compact .container .day {
-            width: calc((100% - 3 * var(--days-spacing)) / 4);
+            --days-columns: var(--days-columns-sm, 4);
         }
     }
-
+  
     @container weekplanner (width <= 640px) {
-        .container .day {
-            width: 100%;
+        ha-card .container .day {
+            --days-columns: var(--days-columns-xs, 1);
         }
-
         ha-card.compact .container .day {
-            width: calc((100% - var(--days-spacing)) / 2);
+            --days-columns: var(--days-columns-xs, 2);
         }
     }
 `;
