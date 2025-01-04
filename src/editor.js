@@ -51,11 +51,12 @@ export class WeekPlannerCardEditor extends LitElement {
                                         ${this.addTextField('calendars.' + index + '.filterText', 'Filter event text (regex)')}
                                         ${this.addBooleanField('calendars.' + index + '.hideInLegend', 'Hide in legend')}
                                         ${this.addButton('Remove calendar', 'mdi:trash-can', () => {
-                                            const config = Object.assign({}, this._config);
+                                            const config = JSON.parse(JSON.stringify(this._config));
                                             if (config.calendars.length === 1) {
                                                 config.calendars = [];
                                             } else {
                                                 delete config.calendars[index];
+                                                config.calendars = config.calendars.filter(Boolean);
                                             }
                                             this._config = config;
                                             this.dispatchConfigChangedEvent();
@@ -323,7 +324,7 @@ export class WeekPlannerCardEditor extends LitElement {
     }
 
     setConfigValue(key, value) {
-        const config = Object.assign({}, this._config);
+        const config = JSON.parse(JSON.stringify(this._config));
         const keyParts = key.split('.');
         const lastKeyPart = keyParts.pop();
         const lastObject = keyParts.reduce((objectPart, keyPart) => {
