@@ -28,7 +28,7 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 ### HACS (Recommended)
 
 1. Make sure [HACS](https://hacs.xyz) is installed and working.
-2. Add this repository (https://github.com/FamousWolf/week-planner-card) via [HACS Custom repositories](https://hacs.xyz/docs/faq/custom_repositories). Type should be `Dashboard`.
+2. Search for `week-planner-card`.
 3. Download and install using HACS.
 
 ### Manual
