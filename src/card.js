@@ -794,6 +794,10 @@ export class WeekPlannerCard extends LitElement {
             if (calendarSorting < this._calendarEvents[eventKey].calendarSorting) {
                 this._calendarEvents[eventKey].calendarSorting = calendarSorting;
             }
+            if (calendar.maxEvents > 0 && this._calendarEvents[eventKey].calendarMaxEvents < calendar.maxEvents) {
+                this._calendarEvents[eventKey].calendarMaxEvents = calendar.maxEvents;
+                this._calendarEvents[eventKey].calendarMaxEventsCalendar = calendar.name;
+            }
         } else {
             this._calendarEvents[eventKey] = {
                 summary: this._filterEventSummary(title ?? null, calendar),
@@ -809,6 +813,8 @@ export class WeekPlannerCard extends LitElement {
                 calendars: [calendar.entity],
                 calendarSorting: calendarSorting,
                 calendarNames: [calendar.name],
+                calendarMaxEvents: calendar.maxEvents ?? 0,
+                calendarMaxEventsCalendar: calendar.name,
                 class: this._getEventClass(startDate, endDate, fullDay)
             }
             this._events[dateKey].push(eventKey);
@@ -926,7 +932,24 @@ export class WeekPlannerCard extends LitElement {
                         return this._calendarEvents[event1].start > this._calendarEvents[event2].start ? 1 : -1;
                     });
 
-                    const previousNumberOfEvents = numberOfEvents;
+                    let matchingEventsCount = {};
+                    events = events.filter((event, index, self) => {
+                        let limit = this._calendarEvents[event].calendarMaxEvents;
+                        if (limit === 0) {
+                            return true; // no limit set
+                        }
+                        
+                        let limitingCalendar = this._calendarEvents[event].calendarMaxEventsCalendar;
+                        if (!(limitingCalendar in matchingEventsCount)) {
+                            matchingEventsCount[limitingCalendar] = 0;
+                        }
+                        if (matchingEventsCount[limitingCalendar] < limit) {
+                            matchingEventsCount[limitingCalendar]++;
+                            return true;
+                        }
+                        return false;
+                    });
+
                     numberOfEvents += events.length;
 
                     if (this._maxEvents > 0 && numberOfEvents > this._maxEvents) {
