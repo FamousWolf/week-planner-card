@@ -79,6 +79,7 @@ export class WeekPlannerCard extends LitElement {
     _hideTodayWithoutEvents;
     _filter;
     _filterText;
+    _replaceTitleText;
     _combineSimilarEvents;
     _showLegend;
     _legendToggle;
@@ -177,6 +178,7 @@ export class WeekPlannerCard extends LitElement {
         this._hideTodayWithoutEvents = config.hideTodayWithoutEvents ?? false;
         this._filter = config.filter ?? false;
         this._filterText = config.filterText ?? false;
+        this._replaceTitleText = config.replaceTitleText ?? false;
         this._combineSimilarEvents = config.combineSimilarEvents ?? false;
         this._showLegend = config.showLegend ?? false;
         this._legendToggle = config.legendToggle ?? false;
@@ -778,7 +780,7 @@ export class WeekPlannerCard extends LitElement {
             this._events[dateKey] = [];
         }
 
-        let title = calendar.eventTitleField ? event[calendar.eventTitleField] : event.summary;
+        const title = this._filterEventSummary(event, calendar);
 
         let eventKey = startDate.toISO() + '-' + endDate.toISO() + '-' + title;
         if (!this._combineSimilarEvents) {
@@ -796,7 +798,7 @@ export class WeekPlannerCard extends LitElement {
             }
         } else {
             this._calendarEvents[eventKey] = {
-                summary: this._filterEventSummary(title ?? null, calendar),
+                summary: title,
                 description: event.description ?? null,
                 location: event.location ?? null,
                 start: startDate,
@@ -815,7 +817,9 @@ export class WeekPlannerCard extends LitElement {
         }
     }
 
-    _filterEventSummary(summary, calendar) {
+    _filterEventSummary(event, calendar) {
+        let summary = calendar.eventTitleField ? event[calendar.eventTitleField] : event.summary;
+
         if (!summary) {
             return '';
         }
@@ -826,6 +830,20 @@ export class WeekPlannerCard extends LitElement {
 
         if (this._filterText) {
             summary = summary.replace(new RegExp(this._filterText), '');
+        }
+
+        if (calendar.replaceTitleText) {
+            for (const search in calendar.replaceTitleText) {
+                const replace = calendar.replaceTitleText[search];
+                summary = summary.replace(search, replace);
+            }
+        }
+
+        if (this._replaceTitleText) {
+            for (const search in this._replaceTitleText) {
+                const replace = this._replaceTitleText[search];
+                summary = summary.replace(search, replace);
+            }
         }
 
         return summary;
