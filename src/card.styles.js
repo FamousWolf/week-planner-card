@@ -2,10 +2,11 @@ import { css } from 'lit';
 
 export default css`
     ha-card {
-        --navigation-spacing: 15px;
-        --navigation-month-font-size: 2em;
+        --header-spacing: 15px;
         --legend-spacing: 15px;
         --legend-dot-size: 10px;
+        --navigation-spacing: 5px;
+        --navigation-month-font-size: 2em;
         --days-columns: 7;
         --days-spacing: 15px;
         --day-date-number-font-size: 3.5em;
@@ -55,41 +56,12 @@ export default css`
     .container.hasActions {
       cursor: pointer;
     }
-
-    .container .navigation {
+  
+    .container .header {
         width: 100%;
-        display: flex;
-    }
-
-    .container .navigation ul {
         display: flex;
         flex-wrap: wrap;
-        gap: var(--navigation-spacing);
-        margin: 0;
-        padding: 0;
-        list-style: none;
-        width: 50%;
-    }
-
-    .monthUl {
-        justify-content: flex-start;
-    }
-
-    .navMonth {
-        font-size: var(--navigation-month-font-size);
-        color: var(--primary-text-color);
-    }
-
-    .navUl {
-        justify-content: flex-end;
-    }
-    
-    .container .navigation ul li {
-        display: block;
-    }
-
-    .container .legend {
-        width: 100%;
+        gap: var(--header-spacing);
     }
 
     .container .legend ul {
@@ -135,6 +107,29 @@ export default css`
 
     .container .legend ul li.hidden.noIcon:before {
         background-color: var(--divider-color, #ffffff);
+    }
+
+    .container .navigation {
+        display: flex;
+        gap: var(--navigation-spacing);
+    }
+
+    .container .navigation .month {
+        font-size: var(--navigation-month-font-size);
+    }
+
+    .container .navigation ul {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--navigation-spacing);
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .container .navigation ul li {
+        display: block;
+        cursor: pointer;
     }
 
     .container .day {
@@ -308,6 +303,10 @@ export default css`
     }
 
     @container weekplanner (width <= 1024px) {
+        ha-card .container .header .legend,
+        ha-card .container .header .navigation {
+            width: 100%;
+        }
         ha-card .container .day {
             --days-columns: var(--days-columns-sm, 3);
         }
