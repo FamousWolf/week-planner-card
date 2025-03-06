@@ -56,9 +56,9 @@ export class WeekPlannerCard extends LitElement {
     _loading = 0;
     _events = {};
     _calendarEvents = {};
-    _jsonDays = '';
     _calendars;
     _numberOfDays;
+    _numberOfDaysIsMonth;
     _updateInterval;
     _noCardBackground;
     _eventBackground;
@@ -79,12 +79,16 @@ export class WeekPlannerCard extends LitElement {
     _hideTodayWithoutEvents;
     _filter;
     _filterText;
+    _replaceTitleText;
     _combineSimilarEvents;
     _showLegend;
     _legendToggle;
     _actions;
     _columns;
     _loader;
+    _showNavigation;
+    _navigationOffset = 0;
+    _updateEventsTimeouts = [];
 
     /**
      * Get config element
@@ -153,11 +157,13 @@ export class WeekPlannerCard extends LitElement {
             throw new Error('No calendars are configured');
         }
 
+        this._numberOfDaysIsMonth = this._isNumberOfDaysMonth(config.days ?? 7);
         this._title = config.title ?? null;
         this._calendars = config.calendars;
         this._weather = this._getWeatherConfig(config.weather);
         this._numberOfDays = this._getNumberOfDays(config.days ?? 7);
         this._hideWeekend = config.hideWeekend ?? false;
+        this._showNavigation = config.showNavigation ?? false;
         this._startingDay = config.startingDay ?? 'today';
         this._startingDayOffset = config.startingDayOffset ?? 0;
         this._startDate = this._getStartDate();
@@ -177,6 +183,7 @@ export class WeekPlannerCard extends LitElement {
         this._hideTodayWithoutEvents = config.hideTodayWithoutEvents ?? false;
         this._filter = config.filter ?? false;
         this._filterText = config.filterText ?? false;
+        this._replaceTitleText = config.replaceTitleText ?? false;
         this._combineSimilarEvents = config.combineSimilarEvents ?? false;
         this._showLegend = config.showLegend ?? false;
         this._legendToggle = config.legendToggle ?? false;
@@ -207,6 +214,10 @@ export class WeekPlannerCard extends LitElement {
             },
             config.texts ?? {}
         );
+    }
+
+    _isNumberOfDaysMonth(numberOfDays) {
+        return numberOfDays === 'month';
     }
 
     _getWeatherConfig(weatherConfiguration) {
@@ -291,13 +302,26 @@ export class WeekPlannerCard extends LitElement {
                         ''
                     }
                     <div class="container${this._actions ? ' hasActions' : ''}" @click="${this._handleContainerClick}">
-                        ${this._renderLegend()}
+                        ${this._renderHeader()}
                         ${this._renderDays()}
                     </div>
                     ${this._renderEventDetailsDialog()}
                     ${this._loader}
                 </div>
             </ha-card>
+        `;
+    }
+
+    _renderHeader() {
+        if (!this._showLegend && !this._showNavigation) {
+            return html``;
+        }
+
+        return html`
+            <div class="header">
+                ${this._renderNavigation()}
+                ${this._renderLegend()}
+            </div>
         `;
     }
 
@@ -325,6 +349,23 @@ export class WeekPlannerCard extends LitElement {
                         }
                     })}
                 </ul>
+            </div>
+        `;
+    }
+
+    _renderNavigation() {
+        if (!this._showNavigation) {
+            return html``;
+        }
+
+        return html`
+            <div class="navigation">
+                <ul>
+                    <li @click="${this._handleNavigationPreviousClick}"><ha-icon icon="mdi:arrow-left"></ha-icon></li>
+                    <li @click="${this._handleNavigationOriginalClick}"><ha-icon icon="mdi:circle-medium"></ha-icon></li>
+                    <li @click="${this._handleNavigationNextClick}"><ha-icon icon="mdi:arrow-right"></ha-icon></li>
+                </ul>
+                <div class="month">${this._startDate.toFormat('MMMM')}</div>
             </div>
         `;
     }
@@ -684,6 +725,9 @@ export class WeekPlannerCard extends LitElement {
 
         this._loading++;
         this._updateLoader();
+
+        this._clearUpdateEventsTimeouts();
+
         this._error = '';
         this._events = {};
         this._calendarEvents = {};
@@ -692,6 +736,7 @@ export class WeekPlannerCard extends LitElement {
         let startDate = this._startDate;
         let endDate = this._startDate.plus({ days: this._numberOfDays });
         let now = DateTime.now();
+        let runStartdate = this._startDate.toISO();
 
         if (this._weather && this._weatherForecast === null) {
             this._subscribeToWeatherForecast();
@@ -715,6 +760,11 @@ export class WeekPlannerCard extends LitElement {
                 'get',
                 'calendars/' + calendar.entity + '?start=' + encodeURIComponent(startDate.toISO()) + '&end=' + encodeURIComponent(endDate.toISO())
             ).then(response => {
+                if (this._startDate.toISO() !== runStartdate) {
+                    this._loading--;
+                    return;
+                }
+
                 response.forEach(event => {
                     if (this._isFilterEvent(event, calendar.filter ?? '')) {
                         return;
@@ -754,13 +804,21 @@ export class WeekPlannerCard extends LitElement {
                 }
                 this._updateLoader();
 
-                window.setTimeout(() => {
-                    this._updateEvents();
-                }, this._updateInterval * 1000);
+                this._updateEventsTimeouts.push(
+                    window.setTimeout(() => {
+                        this._updateEvents();
+                    }, this._updateInterval * 1000)
+                );
             }
         }, 50);
 
         this._loading--;
+    }
+
+    _clearUpdateEventsTimeouts() {
+        this._updateEventsTimeouts.forEach(timeout => {
+            clearTimeout(timeout);
+        });
     }
 
     _isFilterEvent(event, calendarFilter) {
@@ -778,7 +836,7 @@ export class WeekPlannerCard extends LitElement {
             this._events[dateKey] = [];
         }
 
-        let title = calendar.eventTitleField ? event[calendar.eventTitleField] : event.summary;
+        const title = this._filterEventSummary(event, calendar);
 
         let eventKey = startDate.toISO() + '-' + endDate.toISO() + '-' + title;
         if (!this._combineSimilarEvents) {
@@ -796,7 +854,7 @@ export class WeekPlannerCard extends LitElement {
             }
         } else {
             this._calendarEvents[eventKey] = {
-                summary: this._filterEventSummary(title ?? null, calendar),
+                summary: title,
                 description: event.description ?? null,
                 location: event.location ?? null,
                 start: startDate,
@@ -815,7 +873,9 @@ export class WeekPlannerCard extends LitElement {
         }
     }
 
-    _filterEventSummary(summary, calendar) {
+    _filterEventSummary(event, calendar) {
+        let summary = calendar.eventTitleField ? event[calendar.eventTitleField] : event.summary;
+
         if (!summary) {
             return '';
         }
@@ -826,6 +886,20 @@ export class WeekPlannerCard extends LitElement {
 
         if (this._filterText) {
             summary = summary.replace(new RegExp(this._filterText), '');
+        }
+
+        if (calendar.replaceTitleText) {
+            for (const search in calendar.replaceTitleText) {
+                const replace = calendar.replaceTitleText[search];
+                summary = summary.replace(search, replace);
+            }
+        }
+
+        if (this._replaceTitleText) {
+            for (const search in this._replaceTitleText) {
+                const replace = this._replaceTitleText[search];
+                summary = summary.replace(search, replace);
+            }
         }
 
         return summary;
@@ -949,11 +1023,7 @@ export class WeekPlannerCard extends LitElement {
             startDate = startDate.plus({ days: 1 });
         }
 
-        const jsonDays = JSON.stringify(days)
-        if (jsonDays !== this._jsonDays) {
-            this._days = days;
-            this._jsonDays = jsonDays;
-        }
+        this._days = days;
     }
 
     _getWeekDayText(date) {
@@ -1025,6 +1095,21 @@ export class WeekPlannerCard extends LitElement {
         this._hideCalendars = hideCalendars;
     }
 
+    _handleNavigationOriginalClick() {
+        this._navigationOffset = 0;
+        this._updateEvents();
+    }
+
+    _handleNavigationNextClick(event) {
+        this._navigationOffset++;
+        this._updateEvents();
+    }
+
+    _handleNavigationPreviousClick(event) {
+        this._navigationOffset--;
+        this._updateEvents();
+    }
+
     _handleWeatherClick(e) {
         const event = new Event(
             'hass-more-info', {
@@ -1041,7 +1126,7 @@ export class WeekPlannerCard extends LitElement {
     }
 
     _getNumberOfDays(numberOfDays) {
-        if (numberOfDays === 'month') {
+        if (this._numberOfDaysIsMonth) {
             numberOfDays = DateTime.now().daysInMonth;
         }
 
@@ -1050,6 +1135,14 @@ export class WeekPlannerCard extends LitElement {
 
     _getStartDate(alternativeStartingDay) {
         let startDate = DateTime.now();
+
+        if (this._navigationOffset !== 0) {
+            if (this._numberOfDaysIsMonth) {
+                startDate = startDate.plus({ months: this._navigationOffset })
+            } else {
+                startDate = startDate.plus({ days: this._numberOfDays * this._navigationOffset })
+            }
+        }
 
         switch (alternativeStartingDay ?? this._startingDay) {
             case 'yesterday':
