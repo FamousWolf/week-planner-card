@@ -50,6 +50,7 @@ export class WeekPlannerCardEditor extends LitElement {
                                         ${this.addTextField('calendars.' + index + '.filter', 'Filter events (regex)')}
                                         ${this.addTextField('calendars.' + index + '.filterText', 'Filter event text (regex)')}
                                         ${this.addBooleanField('calendars.' + index + '.hideInLegend', 'Hide in legend')}
+                                        ${this.addTextField('calendars.' + index + '.maxEvents', 'Maximum number of events from this calendar (0 is no maximum)', 'number', 0)}
                                         ${this.addButton('Remove calendar', 'mdi:trash-can', () => {
                                             const config = JSON.parse(JSON.stringify(this._config));
                                             if (config.calendars.length === 1) {
