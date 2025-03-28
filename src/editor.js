@@ -174,6 +174,9 @@ export class WeekPlannerCardEditor extends LitElement {
                     html`
                         ${this.addBooleanField('showLegend', 'Show legend')}
                         ${this.addBooleanField('legendToggle', 'Toggle calendars by clicking on the legend')}
+                        ${this.getConfigValue('legendToggle') ? 
+                            this.addMultiSelectCalendarsField('toggledOffByDefault', 'Calendars toggled off by default') : 
+                            ''}
                     `
                 )}
                 ${this.addExpansionPanel(
@@ -204,6 +207,52 @@ export class WeekPlannerCardEditor extends LitElement {
         `;
     }
 
+    addMultiSelectCalendarsField(name, label) {
+        if (!this._config || !this._config.calendars) {
+            return html``;
+        }
+        
+        // Get calendar options from the config
+        const options = this._config.calendars.map(calendar => ({
+            value: calendar.entity,
+            label: calendar.name || calendar.entity
+        }));
+        
+        // Get current value as array
+        const currentValue = Array.isArray(this._config[name]) ? this._config[name] : [];
+        
+        return html`
+            <div>
+                <label>${label}</label>
+                <div style="display: flex; flex-direction: column; margin-top: 8px; margin-bottom: 16px;">
+                    ${options.map(option => html`
+                        <ha-formfield label="${option.label}">
+                            <ha-checkbox
+                                .checked=${currentValue.includes(option.value)}
+                                @change=${(e) => this._multiSelectChanged(e, name, option.value)}
+                            ></ha-checkbox>
+                        </ha-formfield>
+                    `)}
+                </div>
+            </div>
+        `;
+    }
+    
+    _multiSelectChanged(event, name, value) {
+        const checked = event.target.checked;
+        // Make sure we're working with an array
+        let currentValue = Array.isArray(this._config[name]) ? [...this._config[name]] : [];
+        
+        if (checked && !currentValue.includes(value)) {
+            currentValue.push(value);
+        } else if (!checked && currentValue.includes(value)) {
+            currentValue = currentValue.filter(v => v !== value);
+        }
+        
+        // Set the updated value in the config
+        this.setConfigValue(name, currentValue);
+    }
+    
     addTextField(name, label, type, defaultValue) {
         return html`
             <ha-textfield

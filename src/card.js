@@ -187,11 +187,12 @@ export class WeekPlannerCard extends LitElement {
         this._combineSimilarEvents = config.combineSimilarEvents ?? false;
         this._showLegend = config.showLegend ?? false;
         this._legendToggle = config.legendToggle ?? false;
+        this._toggledOffByDefault = config.toggledOffByDefault ?? [];
         this._actions = config.actions ?? false;
         this._columns = config.columns ?? {};
         this._maxEvents = config.maxEvents ?? false;
         this._maxDayEvents = config.maxDayEvents ?? false;
-        this._hideCalendars = [];
+        this._hideCalendars = [...(this._toggledOffByDefault || [])];
         if (config.locale) {
             LuxonSettings.defaultLocale = config.locale;
         }
