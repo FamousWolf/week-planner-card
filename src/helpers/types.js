@@ -76,7 +76,7 @@ export class CalendarEditorObj extends CalendarObj {
   constructor(options) {
     super(options);
     this.friendly_name = options?.stateObj?.attributes?.friendly_name || options?.friendly_name || null;
-
+    
 
     if (typeof options?.enabled == "boolean"){
       this.enabled = options.enabled;

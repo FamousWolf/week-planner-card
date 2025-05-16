@@ -22,13 +22,13 @@ class i18nextHelper{
          
     }
     static loadPath(lng, namespace) {
-        let path = `/hacsfiles/week-planner-card/en_app.json`;
+        let path = `/hacsfiles/Home-Assistant_week-planner-card/en_app.json`;
         switch (namespace[0]) {
             case 'app':
-                path = `/hacsfiles/week-planner-card/${lng[0]}_${namespace[0]}.json`;
+                path = `/hacsfiles/Home-Assistant_week-planner-card/${lng[0]}_${namespace[0]}.json`;
                 break;
             case 'config':
-                path = `/hacsfiles/week-planner-card/custom_${namespace[0]}.json`;
+                path = `/hacsfiles/Home-Assistant_week-planner-card/custom_${namespace[0]}.json`;
                 break;
             default:
                 break;
@@ -769,7 +769,7 @@ export class Helper{
                 ns: ['app'],
                 fallbackLng: 'en',
                 backend: {
-                    loadPath: '/hacsfiles/week-planner-card/{{lng}}_{{ns}}.json'
+                    loadPath: '/hacsfiles/Home-Assistant_week-planner-card/{{lng}}_{{ns}}.json'
                 }
             };
             i18next.use(backend);
