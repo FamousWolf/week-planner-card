@@ -22,13 +22,13 @@ class i18nextHelper{
          
     }
     static loadPath(lng, namespace) {
-        let path = `/hacsfiles/Home-Assistant_week-planner-card/en_app.json`;
+        let path = `/hacsfiles/family-week-planner-card/en_app.json`;
         switch (namespace[0]) {
             case 'app':
-                path = `/hacsfiles/Home-Assistant_week-planner-card/${lng[0]}_${namespace[0]}.json`;
+                path = `/hacsfiles/family-week-planner-card/${lng[0]}_${namespace[0]}.json`;
                 break;
             case 'config':
-                path = `/hacsfiles/Home-Assistant_week-planner-card/custom_${namespace[0]}.json`;
+                path = `/hacsfiles/family-week-planner-card/custom_${namespace[0]}.json`;
                 break;
             default:
                 break;
@@ -769,7 +769,7 @@ export class Helper{
                 ns: ['app'],
                 fallbackLng: 'en',
                 backend: {
-                    loadPath: '/hacsfiles/Home-Assistant_week-planner-card/{{lng}}_{{ns}}.json'
+                    loadPath: '/hacsfiles/family-week-planner-card/{{lng}}_{{ns}}.json'
                 }
             };
             i18next.use(backend);
@@ -815,7 +815,7 @@ export class Helper{
         let _config = Object.assign({}, config);
 
         if (!_config.hasOwnProperty('type')){
-            _config['type'] = "custom:week-planner-card";
+            _config['type'] = "custom:family-week-planner-card";
         }
 
         _config['days'] = config.days ?? 7;

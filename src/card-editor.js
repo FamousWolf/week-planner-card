@@ -284,7 +284,7 @@ class MyCustomCardEditor extends LitElement {
           return;
         }
         if (!this._config.hasOwnProperty('type')){
-            this._config['type'] = "custom:week-planner-card";
+            this._config['type'] = "custom:family-week-planner-card";
         }
 
 
@@ -315,7 +315,7 @@ class MyCustomCardEditor extends LitElement {
           return;
         }
         if (!this._config.hasOwnProperty('type')){
-            this._config['type'] = "custom:week-planner-card";
+            this._config['type'] = "custom:family-week-planner-card";
         }
 
 
@@ -374,7 +374,7 @@ class MyCustomCardEditor extends LitElement {
           return;
         }
         if (!this._config.hasOwnProperty('type')){
-            this._config['type'] = "custom:week-planner-card";
+            this._config['type'] = "custom:family-week-planner-card";
         }
 
        
@@ -423,7 +423,7 @@ class MyCustomCardEditor extends LitElement {
           return;
         }
         if (!this._config.hasOwnProperty('type')){
-            this._config['type'] = "custom:week-planner-card";
+            this._config['type'] = "custom:family-week-planner-card";
         }
 
         

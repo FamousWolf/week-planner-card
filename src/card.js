@@ -198,7 +198,7 @@ export class WeekPlannerCard extends LitElement {
 
      
         return {
-            type: 'custom:week-planner-card',
+            type: 'custom:family-week-planner-card',
             calendars: [],
         };
         //return { calendars: { type: Object }};

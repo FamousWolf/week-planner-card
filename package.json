@@ -1,9 +1,9 @@
 {
-  "name": "week-planner-card",
+  "name": "family-week-planner-card",
   "version": "1.4.0",
   "description": "Custom Home Assistant card to display events for a number of days from one or several calendars.",
   "source": "src/index.js",
-  "module": "dist/week-planner-card.js",
+  "module": "dist/family-week-planner-card.js",
   "targets": {
     "module": {
       "includeNodeModules": true,
@@ -21,9 +21,10 @@
     "start": "node src/index.js",
     "watch": "parcel watch",
     "build": "parcel build",
-    "build:l": "(npm run clean && sleep 1) && npm install && npm run build && ( sleep 1 && npm run cp:locales && npm run cp:dist)",
+    "build:ld": "(npm run clean && sleep 1) && npm install && npm run build && ( sleep 1 && npm run cp:locales && npm run cp:dist)",
+    "build:l": "(npm run clean && sleep 1) && npm install && npm run build && ( sleep 1 && npm run cp:locales)",
     "cp:locales": "cp -r ./src/locales/ ./dist",
-    "cp:dist": "cp ./dist/* /Volumes/config/www/community/week-planner-card",
+    "cp:dist": "cp ./dist/* /Volumes/config/www/community/family-week-planner-card",
     "clean": "npm run clean:dist && npm run clean:node_modules && npm run clean:parcel-cache ",
     "clean:parcel-cache": "find . -name \".parcel-cache\" -type d -prune -exec rm -rf '{}' +",
     "clean:node_modules": "find . -name \"node_modules\" -type d -prune -exec rm -rf '{}' +",
@@ -31,7 +32,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Smeltvig/week-planner-card.git"
+    "url": "git+https://github.com/Smeltvig/family-week-planner-card.git"
   },
   "keywords": [
     "lovelace"
@@ -39,9 +40,9 @@
   "author": "Thomas",
   "licence": "MIT",
   "bugs": {
-    "url": "https://github.com/Smeltvig/week-planner-card/issues"
+    "url": "https://github.com/Smeltvig/family-week-planner-card/issues"
   },
-  "homepage": "https://github.com/Smeltvig/week-planner-card",
+  "homepage": "https://github.com/Smeltvig/family-week-planner-card",
   "devDependencies": {
     "@parcel/optimizer-data-url": "^2.12.0",
     "@parcel/transformer-inline-string": "^2.11.0",
