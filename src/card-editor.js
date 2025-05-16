@@ -728,7 +728,7 @@ class MyCustomCardEditor extends LitElement {
                     .schema=${[
                         {name: "days", type: 'integer'},
                         {name: "startingDay", selector: { select: { mode: "dropdown", options: optionsStartingDay}}},
-                        {name: "hideWeekend", type: 'switch'},
+                        {name: "hideWeekend", type: 'switch', label: 'ddd'},
                         {name: "noCardBackground",  type: 'switch'},
                         {name: "hideNoEvent",  type: 'switch'},
                         {name: "showCalendarProfil",  type: 'switch'},
