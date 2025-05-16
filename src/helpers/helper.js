@@ -37,12 +37,477 @@ class i18nextHelper{
     }
 }
 
+/* class ChoreToDoItem {
+    status = String();
+    summary = String();
+    uid = String();
+    due = String();
+    description = String();
+
+    constructor(options) {
+        Object.defineProperties(this, {
+            status: { writable: true, enumerable: true,  configurable: true },
+            summary: { writable: true, enumerable: true,  configurable: true },
+            uid: { writable: true, enumerable: true,  configurable: true },
+            due: { writable: true, enumerable: true,  configurable: true },
+            description: { writable: true, enumerable: true,  configurable: true }
+        });
+    
+               
+        this.status = options?.entity_id || options?.status || this.status;
+        this.summary = options?.summary || this.summary;
+        this.uid = options?.uid || this.uid;
+        this.due = options?.due || this.due;
+        this.description = options?.description || this.description;
+      }
+} */
+
+/* export class ChoreToDo2 {
+    #hass;
+    entity = String();
+    name = String();
+    id = String();
+    parent_id = String();
+    items = [];
+    
+
+    constructor(hass, options) {
 
 
+        this.entity = options?.entity_id || options?.entity || this.entity;
+        this.name = options?.attributes?.friendly_name || options?.name || this.name;
+
+        //element.entity_id, element?.attributes?.friendly_name ?? ''
+
+        this.#hass = hass;
+        //this.entity = entity;
+        //this.name = name;
+
+        this.update()
+
+       if (this.hass) {
+
+            if (!this.subscribe) {
+                this.subscribe = this.hass.connection.subscribeMessage((event) => {
+
+                    console.log(event)
+
+                    this.__hass.callWS({
+                        "type": "call_service",
+                        "domain": "todo",
+                        "service": "get_items",
+                        "target": { "entity_id": this.entity },
+                        "return_response": new Boolean(true)
+                    }).then(response => {
+                        console.log(response)
+                        //resolve(new ChoreToDo(response))
+                        //resolve(response);
+                    }).catch(error => {
+                        console.error(error)
+                        //reject(error);
+                    }); 
+
+
+                    //this._chores.forEach((chore) => {
+
+                        //ToDo_Helper.getChoresToDo(this.hass, chore)
+                        //    .then(response => {
+                        //        console.log(response)
+                        //    }).catch(error => {
+                        //        console.error(error)
+                        //    });
+                    //});
+                }, {
+                    type: 'subscribe_entities',
+                    entity_id: this.entity
+                });
+            }
+        } 
+        
+
+      //this.id = options && options.id || String();
+      //this.parent_id = options && options.parent_id || String();
+      //this.items = options && options.items || [];
+    }
+
+    update() {
+        if (!this.#hass) {
+            return false;
+        }
+
+
+
+        this.#hass.callWS({
+            "type": "call_service",
+            "domain": "todo",
+            "service": "get_items",
+            "target": { "entity_id": this.entity },
+            "return_response": new Boolean(true)
+        }).then(options => {
+            //console.log(options)
+            this.id = options?.context?.id || this.id;
+            this.parent_id = options?.context?.parent_id || this.parent_id;
+            this.items = [];
+            let myList = options?.response[this.entity]?.items ?? [];
+            myList.forEach((item) => {
+                this.items.push(new ChoreToDoItem(item));
+            });
+
+            //this.items = options && options.items || [];
+            //resolve(new ChoreToDo(response))
+            //resolve(response);
+        }).catch(error => {
+            //console.error(error)
+            //reject(error);
+        });
+
+
+       this.hass.callApi(
+            'get',
+            'states'
+        ).then(response => {
+            
+            const newArray = response.filter((el) => {
+                return el.entity_id.startsWith("todo.");
+            });
+            newArray.forEach((element) => {
+                //if(ToDo_Helper.entityArray.indexOf(element.entity_id) == -1) {
+                    //ToDo_Helper.entityArray2.push(element.entity_id);
+                //    ToDo_Helper.entityArray.push(new ChoreToDo2(ToDo_Helper.hass, element.entity_id));
+                //}
+            });
+            //resolve(ToDo_Helper.entityArray);
+        }).catch(error => {
+            //console.error(error)
+            //reject(error);
+        });
+    }
+} 
+*/
+
+/* export class ChoreToDo {
+    entity = String();
+    name = String();
+    id = String();
+    parent_id = String();
+    items = [];
+    
+
+    constructor(options) {
+      Object.defineProperties(this, {
+        entity: { writable: true, enumerable: true,  configurable: true },
+        name: { writable: true, enumerable: true,  configurable: true },
+        id: { writable: true, enumerable: true,  configurable: true },
+        parent_id: { writable: true, enumerable: true,  configurable: true },
+        items: { writable: true, enumerable: true,  configurable: true }
+      });
+  
+    
+
+      this.id = options?.context?.id || options?.id || this.id;
+      this.parent_id = options?.context?.parent_id || options?.parent_id || this.parent_id;
+
+
+      if ((typeof options?.response !== "undefined") && (typeof options?.response !== "null")){
+        this.entity = Object.keys(options?.response)[0];
+        let myList = options?.response[this.entity]?.items ?? [];
+
+        myList.forEach((item) => {
+            this.items.push(new ChoreToDoItem(item));
+        });
+        //this.items = list.map((item) => new ChoreToDoItem(item));
+        //this.hass.formatEntityAttributeValue(this.hass.states[this.entity], 'friendly_name')
+        
+        //this.parent_id = options?.response?.parent_id || options?.parent_id || this.parent_id;
+      }else{
+        this.entity = options?.entity || this.entity;
+        //this.items = options?.items.map((item) => new ChoreToDoItem(item)) || this.items;
+      }
+      this.name = options?.name || null;
+      //this.id = options && options.id || String();
+      //this.parent_id = options && options.parent_id || String();
+      //this.items = options && options.items || [];
+    }
+} */
+
+/* export class ToDo_Helper {
+    static hass = null;
+    //static entityArray2 = [];
+    static entityArray = [];
+
+     static setChoreToDo(hass) {
+        ToDo_Helper.hass = hass;
+        return new Promise((resolve, reject) => {
+
+            if(ToDo_Helper.entityArray.length > 0) {
+                resolve(ToDo_Helper.entityArray);
+            }else{
+                if (!ToDo_Helper.hass) {
+                    reject();
+                }else{
+                    ToDo_Helper.hass.callApi(
+                        'get',
+                        'states'
+                    ).then(response => {
+                        
+                        const newArray = response.filter((el) => {
+                            return el.entity_id.startsWith("todo.");
+                        });
+                        newArray.forEach((element) => {
+                                if(ToDo_Helper.entityArray.indexOf(element.entity_id) == -1) {
+                                    //ToDo_Helper.entityArray2.push(element.entity_id);
+
+                                    const obj = new ChoreToDo2(ToDo_Helper.hass, element);
+                                    //obj.update();
+                                    ToDo_Helper.entityArray.push(obj);
+                                }
+                            }
+                        );
+
+
+                        
+
+
+                        resolve(ToDo_Helper.entityArray);
+                    }).catch(error => {
+                        console.error(error)
+                        reject(error);
+                    });
+                }
+            }
+        });
+    } 
+
+   static getEntityArray(hass) {
+        ToDo_Helper.hass = hass;
+        return new Promise((resolve, reject) => {
+
+            if(ToDo_Helper.entityArray.length > 0) {
+                resolve(ToDo_Helper.entityArray);
+            }else{
+                if (!ToDo_Helper.hass) {
+                    reject();
+                }else{
+                    ToDo_Helper.hass.callApi(
+                        'get',
+                        'states'
+                    ).then(response => {
+                        
+                        const newArray = response.filter((el) => {
+                            return el.entity_id.startsWith("todo.");
+                        });
+                        newArray.forEach((element) => {
+                                if(ToDo_Helper.entityArray.indexOf(element.entity_id) == -1) {
+                                    ToDo_Helper.entityArray.push(element.entity_id)
+                                }
+                            }
+                        );
+                        resolve(ToDo_Helper.entityArray);
+                    }).catch(error => {
+                        console.error(error)
+                        reject(error);
+                    });
+                }
+            }
+        });
+    }
+    static getChoresToDo(hass,entityId) {
+        ToDo_Helper.hass = hass;
+        return new Promise((resolve, reject) => {
+            if (!ToDo_Helper.hass) {
+                reject();
+            }else{
+                ToDo_Helper.hass.callWS({
+                    "type": "call_service",
+                    "domain": "todo",
+                    "service": "get_items",
+                    "target": { "entity_id": entityId },
+                    "return_response": new Boolean(true)
+                }).then(response => {
+
+                    resolve(new ChoreToDo(response))
+                    //resolve(response);
+                }).catch(error => {
+                    console.error(error)
+                    reject(error);
+                });
+            }
+        });
+    }
+    static getEntityArray_olg(hass) {
+        if (!hass) {
+            return null;
+        }
+        hass.callWS({
+            "type": "call_service",
+            "domain": "todo",
+            "service": "get_items",
+            "target": { "entity_id": "todo.thomas" },
+            "return_response": new Boolean(true)
+        })
+        .then(response =>
+            console.log("ssss", response))
+        .catch(error =>
+            console.log("aaaa", error)
+        );
+        
+        hass.callApi(
+            'get',
+            'services'
+        ).then(response => {
+            console.log(response)
+        }).catch(error => {
+        
+            console.log(error)
+        }); 
+        
+        
+        hass.callApi(
+            'get',
+            'states'
+        ).then(response => {
+        
+            const newArray = response.filter((el) => {
+                return el.entity_id.startsWith("todo.");
+            });
+            console.log(newArray)
+        }).catch(error => {
+        
+            console.log(error)
+        });
+    } 
+} */
  
 
 export class Helper{
    
+    static updateCalendarEvent(hass, entityId, event){
+
+        return new Promise((resolve, reject) => {
+            let obj = Object.assign({}, event);
+            if (!obj.hasOwnProperty('dtstart') ){
+                const dt_start = DateTime.fromISO(event.start.dateTime);
+                obj['dtstart'] = dt_start.toFormat('yyyy-LL-dd\'T\'HH:mm:ss') ?? '';
+            }
+            if (!obj.hasOwnProperty('dtend') ){
+                const dt_end = DateTime.fromISO(event.end.dateTime);
+                obj['dtend'] = dt_end.toFormat('yyyy-LL-dd\'T\'HH:mm:ss') ?? '';
+            }
+            let _event = {
+                uid: obj.uid ?? '',
+                summary: obj.summary ?? '',
+                location: obj.location ?? undefined,
+                description: obj.description ?? '',
+                recurrence_id: obj.recurrence_id ?? undefined,
+                rrule: obj.rrule ?? undefined,
+                dtstart: obj.dtstart ?? '',
+                dtend: obj.dtend ?? ''
+            };
+
+            Helper.createCalendarEvent(hass, entityId, _event)
+            .then((response) => {
+                Helper.deleteCalendarEvent(hass, entityId, _event)
+                .then((response) => {
+                    resolve(response);
+                })
+                .catch(error =>{
+                    reject(error);
+                });
+            })
+            .catch(error =>{
+                reject(error);
+            });
+            
+        });
+    }
+    static deleteCalendarEvent(hass,entityId, event){
+        return new Promise((resolve, reject) => {
+
+
+            let _event = {
+                uid: event.uid ?? '',
+                summary: event.summary ?? '',
+                description: event.description ?? '',
+                recurrence_id: event.recurrence_id ?? undefined,
+                rrule: event.rrule ?? undefined,
+                dtstart: event.dtstart ?? '',
+                dtend: event.dtend ?? ''
+            };
+
+            hass.callWS({
+                type: "calendar/event/delete",
+                entity_id: entityId,
+                uid: _event.uid,
+                recurrence_id: _event.recurrence_id,
+                recurrence_range: _event.rrule
+            })
+            .then(response => {
+                resolve(response);
+            })
+            .catch(error =>{
+                reject(error);
+            });
+        });
+
+       
+    }
+    static createCalendarEvent(hass,entityId, event){
+        return new Promise((resolve, reject) => {
+            let obj = Object.assign({}, event);
+            if (!obj.hasOwnProperty('dtstart') ){
+                const dt_start = DateTime.fromISO(event.start.dateTime);
+                obj['dtstart'] = dt_start.toFormat('yyyy-LL-dd\'T\'HH:mm:ss') ?? '';
+            }
+            if (!obj.hasOwnProperty('dtend') ){
+                const dt_end = DateTime.fromISO(event.end.dateTime);
+                obj['dtend'] = dt_end.toFormat('yyyy-LL-dd\'T\'HH:mm:ss') ?? '';
+            }
+            let _event = {
+                summary: obj.summary ?? '',
+                description: obj.description ?? '',
+                location: obj.location ?? undefined,
+                dtstart: obj.dtstart ?? '',
+                rrule: obj.rrule ?? undefined,
+                dtend: obj.dtend ?? ''
+            };
+
+
+            /* if (obj.hasOwnProperty('rrule') ){
+                if ((typeof _config.name !== "undefined") && (typeof _config.name !== "null") && ( _config.name !== "") ) ) {
+                    _event['rrule'] = obj.rrule;
+                }
+            } */
+
+            hass.callWS({
+                type: "calendar/event/create",
+                entity_id: entityId,
+                event: _event
+            })
+            .then(response => {
+                resolve(response);
+            })
+            .catch(error =>{
+                reject(error);
+            });
+        });
+    }
+/* 
+    static persistent_notification(hass) {
+        hass.callWS({
+            "type": "call_service",
+            "domain": "persistent_notification",
+            "service": "create",
+            "message": "BBBB",
+            "title": "AAAA"
+        })
+        .then(response =>
+            console.log("ssss", response))
+        .catch(error =>
+            console.log("aaaa", error)
+        );
+    } */
+
+
     /* static isDarkMode = false;
 
     static {
@@ -111,9 +576,9 @@ export class Helper{
     static getColorByIndex(index) {
         return Helper.Colors[index % Helper.Colors.length];
     }
-    static getFreeColorIndex (index,calendars){
+    static getFreeColorIndex (index,calendars=[]){
         let color = Helper.getColorByIndex(index);
-        let updatedCalendar = calendars.find(c => (c?.color ?? 'A') == (color ?? 'B') );
+        let updatedCalendar = calendars?.find(c => (c?.color ?? 'A') == (color ?? 'B') );
         if ((typeof updatedCalendar !== "undefined") && (typeof updatedCalendar !== "null")) {
             return Helper.getFreeColorIndex(index+1, calendars);
         }else{

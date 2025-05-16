@@ -7,8 +7,13 @@ import { CalendarObj, CalendarEditorObj } from './helpers/types.js';
 import { HaFormSwitch, HaFormLabel } from './helpers/ha-form-switch.js';
 
 
-customElements.define("ha-form-label", HaFormLabel);
-customElements.define("ha-form-switch", HaFormSwitch);
+if(!customElements.get("ha-form-label")){
+    customElements.define("ha-form-label", HaFormLabel);
+}
+if(!customElements.get("ha-form-switch")){
+    customElements.define("ha-form-switch", HaFormSwitch);
+}
+
 // Finally we create and register the editor itself
 
 
@@ -76,7 +81,9 @@ class MyCustomCardEditor extends LitElement {
                     }
                 }
             }
-            _calendars.push(object);
+            if (Object.keys(object).length > 0){
+                _calendars.push(object);
+            }
         }
         if(i>0){
             this._config = Helper.fixReadOnlyOnObject(this._config,'calendars');
@@ -153,7 +160,10 @@ class MyCustomCardEditor extends LitElement {
 
             let i = 0;
             for (let object of this._calendars) {
-                let updatedCalendar = this._config['calendars'].find(c => c.entity == object.entity);
+
+                
+
+                let updatedCalendar = this._config['calendars']?.find(c => c.entity == object.entity);
                 if (Helper.isNullOrUndefined(updatedCalendar)) {
                     i = Helper.getFreeColorIndex(i,this._config['calendars']);
                     object.color = Helper.getColorByIndex(i);
@@ -691,6 +701,12 @@ class MyCustomCardEditor extends LitElement {
     
 
         return html`
+
+
+
+
+        
+
 
         <ha-expansion-panel outlined>
             <h3 slot="header">

@@ -1,4 +1,4 @@
-import { html, LitElement, css } from 'lit';
+import { html, LitElement, css, TemplateResult } from 'lit';
 import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';
 import { DateTime, Settings as LuxonSettings, Info as LuxonInfo } from 'luxon';
 import { styles } from './card.styles';
@@ -18,7 +18,110 @@ import sunny from 'data-url:./icons/sunny.png';
 import windy from 'data-url:./icons/windy.svg';
 import { v4 as uuidv4 } from 'uuid';
 import { MyCustomCardEditor } from './card-editor.js';
-import { Helper} from './helpers/helper.js';
+import { Helper, ToDo_Helper } from './helpers/helper.js';
+/* 
+import { DialogBox } from './helpers/ha-form-switch.js';
+//const BaseDialogBoxParams = { confirmText: (this.confirmText ? String() : null) , color: String(), entity: null, friendly_name: String(), name: String()};
+
+const BaseDialogBoxParams = { confirmText: String() , text: String(), title: String(), warning: Boolean()};
+//let _config = Object.assign({}, this._texts);
+
+const ConfirmationDialogParams = Object.assign({}, { dismissText: String(), confirm: ()=>{}, cancel: ()=>{}, destructive: Boolean()}, BaseDialogBoxParams);
+const PromptDialogParams = Object.assign({}, { inputLabel: String(), inputType: String(), defaultValue: String(), placeholder: String(), confirm: ()=>{}, cancel: ()=>{}, inputMin: Number(), inputMax: Number()}, BaseDialogBoxParams);
+
+const DialogBoxParams = Object.assign({}, {confirm: ()=>{}, confirmation: Boolean(), prompt: Boolean()}, ConfirmationDialogParams,PromptDialogParams);
+
+
+const _extra = { confirmation: DialogBoxParams["confirmation"] , prompt: DialogBoxParams["prompt"]};
+const showDialogHelper = (
+    element,
+    dialogParams=DialogBoxParams,
+    extra= {
+        confirmation: dialogParams?.confirmation,
+        prompt: dialogParams?.prompt
+      }
+  ) =>
+    new Promise((resolve) => {
+        const origCancel = dialogParams?.cancel;
+        const origConfirm = dialogParams?.confirm;
+  
+
+        const event = new Event("show-dialog", {
+            detail: {
+                dialogTag: "dialog-box",
+                dialogImport: loadGenericDialog,
+                dialogParams: {
+                  ...dialogParams,
+                  ...extra,
+                  cancel: () => {
+                    resolve(extra?.prompt ? null : false);
+                    if (origCancel) {
+                      origCancel();
+                    }
+                  },
+                  confirm: (out) => {
+                    resolve(extra?.prompt ? out : true);
+                    if (origConfirm) {
+                      origConfirm(out);
+                    }
+                  },
+                },
+              },
+            bubbles: true,
+            composed: true,
+        });
+        element.dispatchEvent(event);
+
+    });
+
+export const showConfirmationDialog = (
+    element,
+    dialogParams=ConfirmationDialogParams
+    ) =>
+    showDialogHelper(element, dialogParams, {
+        confirmation: true,
+    }); */
+class CurrentConfirmDialog {
+    title= (this.title ? String() : null);
+    message= (this.message ? String() : null);
+    
+    confirm= (this.confirm ? Function() : null);
+    cancel= (this.cancel ? Function() : null);
+    data= (this.data ? Object() : null);
+
+
+    /* *
+     * Get properties
+     *
+     * @return {Object}
+     */
+   /*  static get properties() {
+        return {
+            _days: { type: Array },
+            _calendars: { type: Array },
+            _hours: { type: Array },
+            _config: { type: Object },
+            _event_icons: { type: Object },
+            _isLoading: { type: Boolean },
+            _error: { type: String },
+            _currentEventDetails: { type: Object },
+            _currentConfirmDialog: { type: Object },
+            _viewType: { type: VIEW_TYPE }
+        }
+    } */
+    constructor(title=(this.title ? String() : null), message=(this.message ? String() : null), confirm=(this.confirm ? Function() : null), data=(this.data ? Object() : null), cancel=(this.cancel ? Function() : null)) {
+        this.title = title || null;
+        this.message = message || null;
+        this.confirm = confirm || null;
+        this.cancel = cancel || null;
+        this.data = data || null;
+    }
+}
+
+const RecurrenceRange = {
+    THISEVENT: '',
+    THISANDFUTURE: 'THISANDFUTURE',
+}
 
 const ICONS = {
   'clear-day': sunny,
@@ -73,6 +176,12 @@ const CALENDAR_EDITOR = {
   };
 
 
+
+
+
+
+
+
 export class WeekPlannerCard extends LitElement {
 
     static styles = [styles];
@@ -117,12 +226,14 @@ export class WeekPlannerCard extends LitElement {
     _startDate;
     _hideWeekend;
     _weatherForecast = null;
+    _chores = null;
+    _choresToDo = null;
     _showLocation;
     _showCalendarProfil = true;
     _hidePastEvents;
     _hideDaysWithoutEvents;
     _hideNoEvent;
-    
+    _editCurrentEventDetails = false;
     /**
      * Get properties
      *
@@ -138,12 +249,19 @@ export class WeekPlannerCard extends LitElement {
             _isLoading: { type: Boolean },
             _error: { type: String },
             _currentEventDetails: { type: Object },
+            _currentConfirmDialog: { type: CurrentConfirmDialog },
             _viewType: { type: VIEW_TYPE }
         }
     }
 
     firstUpdated(){
- 
+
+
+       
+
+
+
+
     }
     _updateCalendarColors(){
         
@@ -159,7 +277,7 @@ export class WeekPlannerCard extends LitElement {
             throw new Error('No calendars are configured');
         }
 
-        
+        this._editCurrentEventDetails = false;
 
         this._calendars = [];
 
@@ -284,7 +402,78 @@ export class WeekPlannerCard extends LitElement {
         if (this._compact) {
             cardClasses.push('compact');
         }
+
         
+       
+        
+/* 
+        showConfirmationDialog(this, {
+            text: 'AAAA'
+        })
+        .then(response => {
+            console.log(response)
+        })
+        .catch(error =>{
+            console.error(error)
+        }); */
+  
+    /*     this.hass.callApi(
+            'get',
+            'services'
+        ).then(response => {
+            console.log(response)
+        }).catch(error => {
+        
+            console.error(error)
+        });
+
+
+        Helper.persistent_notification(this.hass); */
+
+        /* 
+        this.hass.callApi(
+            'get',
+            'states'
+        ).then(response => {
+        
+            const newArray = response.filter((el) => {
+                return el.entity_id.startsWith("calendar.");
+            });
+            console.log(newArray)
+        }).catch(error => {
+        
+            console.log(error)
+        }); */
+
+/* 
+        this.hass.callApi(
+            'get',
+            'services'
+        ).then(response => {
+            console.log(response)
+        }).catch(error => {
+
+            console.log(error)
+        }); */
+
+        /* ToDo_Helper.getEntityArray(this.hass).then(response => {
+            this._chores = response;
+            console.log(response)
+
+        }).catch(error => {
+            console.error(error)
+        }); */
+
+/* 
+        this.hass.callService('todo', 'get_items', {
+            entity_id: 'todo.thomas'
+        }).then(response => {
+            console.log(response)
+      }).catch(error => {
+        console.log(error)
+      });
+ */
+
         return html`
             <ha-card class="${cardClasses.join(' ')}" style="--event-background-color: ${this._eventBackground}">
                 <div class="card-content">
@@ -301,6 +490,7 @@ export class WeekPlannerCard extends LitElement {
                         ${this._renderDays()}
                     </div>
                     ${this._renderEventDetailsDialog()}
+                    ${this._renderConfirmDialog()}
                     ${this._isLoading ?
                         html`<div class="loader"></div>` :
                         ''
@@ -602,10 +792,16 @@ export class WeekPlannerCard extends LitElement {
 
         console.log(newValue)
     }
-    valueChanged(ev) {
+    currentEventDetailsChanged(ev) {
         const newValue = ev.currentTarget.value;
 
+
+        this._currentEventDetails.summary = newValue;
+        this._currentEventDetails.event.summary = newValue;
         console.log(newValue)
+
+
+        Helper.updateCalendarEvent(this.hass,this._currentEventDetails.calendar,this._currentEventDetails.event);
         //const attributeName = ev.currentTarget.getAttribute("data-attributeName");
         //const ff = this._currentEventDetails[attributeName] = newValue;
 
@@ -619,11 +815,137 @@ export class WeekPlannerCard extends LitElement {
         //};
         //this._hass.callService('input_text', 'set_value', param);
       }
+
+    _closeConfirmDialog() {
+        this._currentConfirmDialog = null;
+    }
+
+    
+    _handleConfirmClick(title='', message, data, confirm=()=>{}, cancel=null) {
+        if (!this._currentConfirmDialog) {
+            this._currentConfirmDialog = new CurrentConfirmDialog(title, message, confirm, data);
+        }
+    }
+   
+    _renderConfirmDialogHeading() {
+        if (!this._currentConfirmDialog) {
+            return html``;
+        }
+        return html`
+            <div class="header_title textselect">
+
+            <span>${this._currentConfirmDialog?.title}</span>
+            
+                <ha-icon-button
+                    .label="${this.hass?.localize('ui.dialogs.generic.close') ?? 'Close'}"
+                    dialogAction="close"
+                    class="header_button"
+                ><ha-icon icon="mdi:close"></ha-icon></ha-icon-button>
+            </div>
+        `;
+    }
+    _renderConfirmDialogFooter() {
+        if (!this._currentConfirmDialog) {
+            return html``;
+        }
+        return html`
+            ${(this._currentConfirmDialog?.cancel ?? false) ?
+                html` 
+                <ha-button slot="secondaryAction" dialogAction="close" @click=${this._currentConfirmDialog?.cancel} >
+                    ${this.hass.localize("ui.dialogs.generic.cancel")}
+                </ha-button>
+                ` :
+                html``
+            }
+            ${(this._currentConfirmDialog?.confirm ?? false) ?
+                html`
+                <ha-button slot="secondaryAction" dialogAction="close" @click="${() => { this._currentConfirmDialog?.confirm(this._currentConfirmDialog.data)}}" >
+                    ${this.hass.localize("ui.dialogs.generic.ok")}
+                </ha-button>
+                ` :
+                html``
+            }
+        `;
+    }
+    _renderConfirmDialog() {
+        if (!this._currentConfirmDialog) {
+            return html``;
+        }
+
+        
+        return html`
+
+        <ha-dialog
+                open
+                @closed="${this._closeConfirmDialog}"
+                .heading="${this._renderConfirmDialogHeading()}"
+            >
+            <div class="content">
+                <!--
+                <div class="calendar">
+                    <ha-icon icon="mdi:calendar-account"></ha-icon>
+                    <div class="info">
+                    -->
+                     ${(this._currentConfirmDialog?.message ?? false) ?
+                            html`
+                                ${this._currentConfirmDialog?.message}
+                            ` :
+                            html``
+                        }
+              <!--      </div>
+                </div> -->
+            </div>
+            ${this._renderConfirmDialogFooter()}
+        </ha-dialog>
+        `;
+    }
+    _renderEventDetailsDialogContent() {
+        if (!this._currentEventDetails) {
+            return html``;
+        }
+
+        return html`
+        ${(this._currentEventDetails?.canEdit ?? false) ?
+            html`
+                <ha-textfield
+                    label="dddddd"
+                    style="width: 100%"
+                    value="${this._currentEventDetails.summary}"
+                    @change="${this.currentEventDetailsChanged}"
+                    id="textinput_summary"
+                    placeholder=""
+                    ></ha-textfield>
+            ` :
+            html``
+        }
+        `;
+    }
     _renderEventDetailsDialog() {
         if (!this._currentEventDetails) {
             return html``;
         }
 
+
+/* 
+        if(this._currentEventDetails.event.uid == 'bud5ndqustsrs5ufe358s7kums@google.com'){
+            let dd = this._currentEventDetails.event;
+            
+            const dt = DateTime.local();
+            const timess = dt.toFormat('HH:mm:ss')
+
+            dd.summary = dd.summary + "("+timess+")";
+            //let _config = Object.assign({}, configuration, _updatedCalendar ?? {}, updatedCalendar ?? {});
+
+
+            //startDate.toFormat('yyyy-LL-dd\'T\'HH:mm:ss\'Z\'') 
+
+            Helper.updateCalendarEvent(this.hass,this._currentEventDetails.calendar,dd);
+            //Helper.createCalendarEvent(this.hass,this._currentEventDetails.calendar,dd);
+            //Helper.deleteCalendarEvent(this.hass,this._currentEventDetails.calendar,dd);
+            //Helper.updateCalendarEvent(this.hass,this._currentEventDetails.calendar, this._currentEventDetails.event.uid, _event, this._currentEventDetails.event.recurrence_id,this._currentEventDetails.event.rrule)
+    
+        } */
+       
         return html`
             <ha-dialog
                 open
@@ -631,6 +953,10 @@ export class WeekPlannerCard extends LitElement {
                 .heading="${this._renderEventDetailsDialogHeading()}"
             >
                 <div class="content">
+
+
+                
+                    ${this._renderEventDetailsDialogContent()}
                     <div class="calendar">
                         <ha-icon icon="mdi:calendar-account"></ha-icon>
                         <div class="info">
@@ -662,42 +988,51 @@ export class WeekPlannerCard extends LitElement {
                         ` :
                         ''
                     }
-                    ${this._renderEventDetailsDialogFooter()}
+                   
                 </div>
+                ${this._renderEventDetailsDialogFooter()}
             </ha-dialog>
         `;
     }
 
     _renderEventDetailsDialogFooter() {
         return html`
-            <div class="footer">
-                
-            <!--
-            <button
-                    class="footer_button"
-                    @click="${() => { this._deleteEvent()}}"
-                ><ha-icon icon="mdi:close"></ha-icon></button>
-                -->
-            </div>
+        <!--
+
+
+        ${this.hass.localize("ui.components.calendar.event.add")}
+        ${this.hass.localize("ui.components.calendar.event.save")}
+        ${this.hass.localize("ui.components.calendar.event.edit")}
+        ${this.hass.localize("ui.components.calendar.event.delete")}
+        ${this.hass.localize("ui.components.calendar.event.summary")}
+        ${this.hass.localize("ui.components.calendar.event.description")}
+        ${this.hass.localize("ui.components.calendar.event.all_day")}
+        ${this.hass.localize("ui.components.calendar.event.start")}
+        ${this.hass.localize("ui.components.calendar.event.end")}
+        ${this.hass.localize("ui.components.calendar.event.summary")}
+        ${this.hass.localize("ui.components.calendar.event.summary")}
+        -->
+
+
+        ${(this._currentEventDetails?.canEdit ?? false) ?
+            html`
+            <ha-button slot="primaryAction" @click=${this._deleteEvent}>
+                ${this.hass.localize("ui.components.calendar.event.delete")}
+            </ha-button>
+            ` : 
+            html``
+        }
+        <ha-button slot="primaryAction" @click=${this._editEvent}>
+            ${this.hass.localize("ui.components.calendar.event.edit")}
+        </ha-button>
         `;
     }
     _renderEventDetailsDialogHeading() {
         return html`
             <div class="header_title textselect">
 
-            ${this._currentEventDetails.summary.length === 0 ?
-                html`
-                    <ha-textfield
-                        label="dddddd"
-                        style="width: 100%"
-                        value="${this._currentEventDetails.summary}"
-                        @change="${this.valueChanged}"
-                        id="textinput_summary"
-                        placeholder=""
-                        ></ha-textfield>
-                ` :
-                html`<span>${this._currentEventDetails.summary}</span>`
-            }
+            <span>${this._currentEventDetails.summary}</span>
+            
                 <ha-icon-button
                     .label="${this.hass?.localize('ui.dialogs.generic.close') ?? 'Close'}"
                     dialogAction="close"
@@ -820,7 +1155,14 @@ export class WeekPlannerCard extends LitElement {
             return;
         }
 
-        
+        let _dark = this.hass?.selectedTheme?.dark ?? false;
+        const event = new CustomEvent("settheme", {
+            detail: { dark: _dark },
+            bubbles: true,
+            composed: true,
+        });
+        this.dispatchEvent(event);
+
         //for (let obj of this._calendars) {
         //    obj = Helper.fixReadOnlyOnObject(obj,'color');
 
@@ -845,6 +1187,7 @@ export class WeekPlannerCard extends LitElement {
     _subscribeToWeatherForecast() {
         this._loading++;
         let loadingWeather = true;
+        
         this.hass.connection.subscribeMessage((event) => {
             this._weatherForecast = event.forecast ?? [];
             if (loadingWeather) {
@@ -860,153 +1203,47 @@ export class WeekPlannerCard extends LitElement {
        
     }
 
-
-    _deleteEvent(){
-
+    _editEvent(){
         if (!this._currentEventDetails) {
             return html``;
         }
-        const uid = this._currentEventDetails.id;
-        const entity_id = this._currentEventDetails.calendar;
-        //this.hass.callWS({
-        //    type: "calendar/event/delete",
-        //    entity_id: entity_id,
-        //    uid: uid
-        //})
-        //.then(response =>
-        //    console.log("ssss", response))
-        //.catch(error =>
-        //    console.log("aaaa", error));
 
-
-
-            
-        this.hass.callService('calendar', 'delete_event', {
-            "entity_id": entity_id,
-            "uid": uid
-        }).then(response => {
-            console.log(response)
-        }).catch(error => {
-            console.log(error)
-        });
-
-
-    }
-    _createEvent(summary, startDate,endDate,fullDay, calendar) {
-
-
-        //static local(
-        //    year: number,
-        //    month: number,
-        //    day: number,
-        //    hour: number,
-        //    minute: number,
-        //    second: number,
-        //    millisecond: number,
-    
-        //const currentTime = DateTime.local(2024,7,14,14,20,25);
-        //const updatedTIme = currentTime.startOf('hour').plus({ hours: 3 });
-
-
-
-        const currentTime = DateTime.fromISO("2024-07-08T10:00:00.000+02:00");
-        const updatedTIme = currentTime.startOf('hour').plus({ hours: 3 });
-        const sssw = DateTime.now().toISOTime();
-        console.log(sssw);
-        const sss = DateTime.now().toISODate();
-        console.log(sss);
-        const fff = currentTime.toString();
-        console.log(fff);
-        
-
-
-        const currentTime3 = DateTime.now();
-        const updatedTIme3 = DateTime.now().startOf('hour').plus({ hours: 3 });
-        const fff3 = currentTime3.toJSDate();
-
-
-        const currentTime2 = DateTime.local();
-        const updatedTIme2 = DateTime.local().startOf('hour').plus({ hours: 3 });
-        const fff2 = currentTime2.toJSDate();
-
-
-        //const updatedTIme = DateTime.local();
-
-        //console.log(dt);
-        //console.log(dt.toJSDate());
-        
-        //let currentTime = new Date("2024-07-08T10:00:00.000+02:00");
-        
-        //let updatedTIme = new Date("2024-07-08T15:00:00.000+02:00");
-        //const event = new Date(startDate);
-        calendar = {
-            "entity": this._calendars[0].entity,
-            "image": this._calendars[0].image,
-            "color": this._calendars[0].color
+        if (this._currentEventDetails?.canEdit ?? false) {
+            this._currentEventDetails['canEdit'] = false;
+        }else{
+            this._currentEventDetails['canEdit'] = true;
         }
-        let ff = {
-            summary: '',
-            description:  null,
-            location: null,
-            start: currentTime,
-            originalStart: this._convertApiDate({dateTime:currentTime}),
-            end: updatedTIme,
-            originalEnd: this._convertApiDate({dateTime:updatedTIme}),
-            fullDay: fullDay ?? false,
-            color: calendar.color ?? 'inherit',
-            calendar: calendar.entity,
-            class: this._getEventClass(currentTime, updatedTIme, fullDay)
-        };
-
-        this._currentEventDetails = ff;
-        this._renderEventDetailsDialog()
+        this._renderEventDetailsDialog();
+        this._updateEvents();
 
         
-        //this.hass.callService('calendar', 'create_event', {
-        //        "entity_id": calendar,
-        //        "summary": summary,
-        //        "start_date_time": start_date_time,
-        //        "end_date_time": end_date_time
-        //    }).then(response => {
-        //        console.log(response)
-        //        this._updateEvents()
-        //  }).catch(error => {
-        //    console.log(error)
-        //  });
     }
-    _createEvent22(summary, start_date_time,end_date_time, calendar) {
+    _deleteEvent(){
+        if (!this._currentEventDetails) {
+            return html``;
+        }
+        this._handleConfirmClick(this.hass.localize("ui.components.calendar.event.delete"),null,Object.assign({}, this._currentEventDetails),(data)=>{
+            if (!data) {
+            }else{  
+                Helper.deleteCalendarEvent(this.hass,data.calendar,data.event)
+                .then((response) => {
+                    this._closeConfirmDialog();
+                    this._updateEvents();
+                })
+                .catch(error =>{
+                    this._closeConfirmDialog();
+                    this._updateEvents();
+                    console.error(error);
+                });
+            }
 
-        let ff = {
-            summary: event.summary ?? null,
-            description: event.description ?? null,
-            location: event.location ?? null,
-            start: startDate,
-            originalStart: this._convertApiDate(event.start),
-            end: endDate,
-            originalEnd: this._convertApiDate(event.end),
-            fullDay: fullDay,
-            color: calendar.color ?? 'inherit',
-            calendar: calendar.entity,
-            class: this._getEventClass(startDate, endDate, fullDay)
-        };
+        });
+        this._closeDialog();
+        this._updateEvents();
 
-        this._renderEventDetailsDialog()
 
         
-        this.hass.callService('calendar', 'create_event', {
-                "entity_id": calendar,
-                "summary": summary,
-                "start_date_time": start_date_time,
-                "end_date_time": end_date_time
-            }).then(response => {
-                console.log(response)
-                this._updateEvents()
-          }).catch(error => {
-            console.log(error)
-          });
     }
-
-    
     _updateEvents() {
         if (this._loading > 0) {
             return;
@@ -1028,8 +1265,10 @@ export class WeekPlannerCard extends LitElement {
         if (this._weather && this._weatherForecast === null) {
             this._subscribeToWeatherForecast();
         }
-
-
+        
+        
+        
+       
 
         
 
@@ -1098,9 +1337,9 @@ export class WeekPlannerCard extends LitElement {
         if (!this._events.hasOwnProperty(dateKey)) {
             this._events[dateKey] = [];
         }
-
         this._events[dateKey].push({
-            id: event.uid ?? uuidv4(),
+            event: event,
+            id: event.uid,
             summary: event.summary ?? null,
             description: event.description ?? null,
             location: event.location ?? null,
@@ -1240,10 +1479,12 @@ export class WeekPlannerCard extends LitElement {
    
    
     _handleEventClick(event) {
+        //this._editCurrentEventDetails = false;
         this._currentEventDetails = event;
     }
 
     _closeDialog() {
+        this._editCurrentEventDetails = false;
         this._currentEventDetails = null;
     }
 

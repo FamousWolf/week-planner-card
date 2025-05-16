@@ -1,6 +1,14 @@
 import { css } from 'lit';
 
 export const styles = css`
+    :host .events .event { 
+        --secondary-text-color: var(--text-primary-color, inherit);
+        --primary-text-color:var(--text-primary-color, inherit);
+    }
+    :host .calendar-profil-cell, 
+    :host .events {
+      color: var(--text-primary-color, inherit) !important
+    }
     :host ha-dialog { 
         user-select: text !important;
     }
