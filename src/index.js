@@ -16,7 +16,7 @@ window.customCards.push({
 });
 
 console.info(
-    `%c Family-WEEK-PLANNER-CARD %c v${version} `,
+    `%c FAMILY-WEEK-PLANNER-CARD %c v${version} `,
     'color: white; background: black; font-weight: 700;',
     'color: black; background: white; font-weight: 700;',
 );
