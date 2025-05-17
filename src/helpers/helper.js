@@ -870,9 +870,10 @@ export class Helper{
         //_config['eventBackground'] = config.eventBackground ?? 'var(--card-background-color, inherit)';
 
 
-
+        LuxonSettings.defaultLocale = 'en';
         const lang = (localStorage.getItem('selectedLanguage') || 'en').replace(/['"]+/g, '').replace('-', '_');
         _config['locale'] = config.locale ?? lang;
+        _config['locale'] = _config['locale'] ?? 'en';
         if (_config['locale']) {
             LuxonSettings.defaultLocale = _config['locale'];
         }

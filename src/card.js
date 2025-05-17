@@ -200,6 +200,7 @@ export class WeekPlannerCard extends LitElement {
         return {
             type: 'custom:family-week-planner-card',
             calendars: [],
+            locale: 'en',
         };
         //return { calendars: { type: Object }};
     }

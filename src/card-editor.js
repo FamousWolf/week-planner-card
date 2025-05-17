@@ -28,7 +28,7 @@ class MyCustomCardEditor extends LitElement {
     _initialized = false;
     _sortCalendar = false;
     _weather;
-    _calendars;
+    _calendars = [];
     _texts;
     /**
      * Get properties
@@ -55,6 +55,10 @@ class MyCustomCardEditor extends LitElement {
 
     // setConfig works the same way as for the card itself
     setConfig(config) {
+        this.config = config;
+
+        this.config['locale'] = this.config.locale ?? 'en';
+
         this._config = Helper.getDefaultConfig(config, this.hass);
         this._updateCalendarEntities();
         if((this._config.calendars ?? []).length == 0){
@@ -65,8 +69,17 @@ class MyCustomCardEditor extends LitElement {
         this._config.texts = this._texts;
     }
   
-   
-
+    _getHass() {
+        let checkLoading = window.setInterval(() => {
+            if (!this.hass) {
+                clearInterval(checkLoading);
+                return this._getHass();
+            }else{
+                clearInterval(checkLoading);
+                return this.hass;
+            }
+        }, 50);
+    }
     
     _updateCalendarColors(){
         let i = 0;
@@ -425,7 +438,9 @@ class MyCustomCardEditor extends LitElement {
         if (!this._config.hasOwnProperty('type')){
             this._config['type'] = "custom:family-week-planner-card";
         }
-
+        if (!this._config.hasOwnProperty('locale')){
+            this._config['locale'] = "en";
+        }
         
 
         /* let configuration = {
@@ -679,7 +694,7 @@ class MyCustomCardEditor extends LitElement {
         `;
     }
     _waitForHassAndConfig() {
-        if (!this.hass || !this._calendars) {
+        if (!this.hass || !this._calendars || this._calendars.length == 0) {
             window.setTimeout(() => {
                 this._waitForHassAndConfig();
             }, 50)
