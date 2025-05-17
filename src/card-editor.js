@@ -28,7 +28,7 @@ class MyCustomCardEditor extends LitElement {
     _initialized = false;
     _sortCalendar = false;
     _weather;
-    _calendars = [];
+    _calendars;
     _texts;
     /**
      * Get properties
@@ -56,9 +56,7 @@ class MyCustomCardEditor extends LitElement {
     // setConfig works the same way as for the card itself
     setConfig(config) {
         this.config = config;
-
         this.config['locale'] = this.config.locale ?? 'en';
-
         this._config = Helper.getDefaultConfig(config, this.hass);
         this._updateCalendarEntities();
         if((this._config.calendars ?? []).length == 0){
@@ -694,7 +692,7 @@ class MyCustomCardEditor extends LitElement {
         `;
     }
     _waitForHassAndConfig() {
-        if (!this.hass || !this._calendars || this._calendars.length == 0) {
+        if (!this.hass || !this._calendars) {
             window.setTimeout(() => {
                 this._waitForHassAndConfig();
             }, 50)
