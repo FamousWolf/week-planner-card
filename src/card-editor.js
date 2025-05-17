@@ -71,7 +71,7 @@ class MyCustomCardEditor extends LitElement {
     _updateCalendarColors(){
         let i = 0;
         let _calendars = [];
-        for (let object of this._config.calendars) {
+        for (let object of (this._config?.calendars ?? [])) {
             if (!(object.hasOwnProperty('color') && !Helper.isNullOrUndefinedOrEmpty(object['color']))) {
                 let updatedCalendar = this._calendars.find(c => c.entity == object.entity);
                 if (!Helper.isNullOrUndefined(updatedCalendar)) {
@@ -587,9 +587,9 @@ class MyCustomCardEditor extends LitElement {
                                         .data=${calendar}
                                         .schema=${[
                                             {name: "entity"},
-                                            {name: "enabled", type: 'switch'},
+                                            {name: "enabled", type: 'boolean'},
                                             {name: "color", disabled: !(calendar.enabled), selector: { select: { mode: "dropdown", options: _optionsCalendarColors}}},
-                                            {name: "showProfil", disabled: !(calendar.enabled), type: 'switch'},
+                                            {name: "showProfil", disabled: !(calendar.enabled), type: 'boolean'},
                                             {disabled: !(calendar.enabled), title: Helper.localize('settings.calendar.image'), type: 'expandable', schema:[
                                                 {name: "image", value: calendar.image, selector: { image: { original: true, crop: {round: true } }}}
                                             ]},
@@ -607,7 +607,7 @@ class MyCustomCardEditor extends LitElement {
                                         .data=${calendar}
                                         .schema=${[
                                             {name: "entity"},
-                                            {name: "enabled", type: 'switch'}
+                                            {name: "enabled", type: 'boolean'}
                                         ]}
                                         .computeLabel=${this._computeCalendarLabel}
                                         @value-changed=${this._calendarValueChanged} 
@@ -634,7 +634,7 @@ class MyCustomCardEditor extends LitElement {
                             .hass=${this.hass}
                             .data=${calendar}
                             .schema=${[
-                                {name: "enabled", type: 'switch'}
+                                {name: "enabled", type: 'boolean'}
                             ]}
                             .computeLabel=${this._computeCalendarLabel}
                             @value-changed=${this._calendarValueChanged} 
@@ -650,7 +650,7 @@ class MyCustomCardEditor extends LitElement {
                                         .schema=${[
                                             {name: "entity"},
                                             {label: this.hass.formatEntityAttributeValue(this.hass.states[calendar.entity], 'friendly_name'),  disabled: !(calendar.enabled), type: 'label'},
-                                            {name: "showProfil",  disabled: !(calendar.enabled), type: 'switch'},
+                                            {name: "showProfil",  disabled: !(calendar.enabled), type: 'boolean'},
                                             {name: "color", disabled: !(calendar.enabled), selector: { select: { mode: "dropdown", options: _optionsCalendarColors}}},
                                             {title: Helper.localize('settings.calendar.image'), type: 'expandable', schema:[
                                                 {name: "image", value: calendar.image, disabled: !(calendar.enabled), selector: { image: { original: true, crop: {round: true } }}}
@@ -728,11 +728,11 @@ class MyCustomCardEditor extends LitElement {
                     .schema=${[
                         {name: "days", type: 'integer'},
                         {name: "startingDay", selector: { select: { mode: "dropdown", options: optionsStartingDay}}},
-                        {name: "hideWeekend", type: 'switch', label: 'ddd'},
-                        {name: "noCardBackground",  type: 'switch'},
-                        {name: "hideNoEvent",  type: 'switch'},
-                        {name: "showCalendarProfil",  type: 'switch'},
-                        {name: "compact",  type: 'switch'},
+                        {name: "hideWeekend", type: 'boolean'},
+                        {name: "noCardBackground",  type: 'boolean'},
+                        {name: "hideNoEvent",  type: 'boolean'},
+                        {name: "showCalendarProfil",  type: 'boolean'},
+                        {name: "compact",  type: 'boolean'},
                         {name: "updateInterval", type: 'integer'}
                     ]}
                     .computeLabel=${this._computeLabel}
@@ -768,9 +768,9 @@ class MyCustomCardEditor extends LitElement {
                     .data=${this._weather}
                     .schema=${[
                             {name: "entity", selector: { entity: { domain: "weather" } }},
-                            {name: "showCondition", type: 'switch'},
-                            {name: "showLowTemperature", type: 'switch'},
-                            {name: "showTemperature",  type: 'switch'}
+                            {name: "showCondition", type: 'boolean'},
+                            {name: "showLowTemperature", type: 'boolean'},
+                            {name: "showTemperature",  type: 'boolean'}
                     ]}
                 .computeLabel=${this._computeWeatherLabel}
                 @value-changed=${this._weatherValueChanged} 
