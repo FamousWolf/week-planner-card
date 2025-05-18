@@ -56,29 +56,31 @@ class MyCustomCardEditor extends LitElement {
     // setConfig works the same way as for the card itself
     setConfig(config) {
         this.config = config;
+
+        this._config = Helper.getDefaultConfig(config, this.hass);
         let _texts = Object.keys(this._config.texts ?? {}).map((key) => ({ [key]: { 'value': this._config.texts[key], 'enabled': true} }));
 
         this._texts = Object.assign(
             {},
             {
                 fullDay: {
-                    value: Helper.localize('texts.fullDay',_config['locale']),
+                    value: Helper.localize('texts.fullDay'),
                     enabled: false
                 },
                 noEvents: {
-                    value: Helper.localize('texts.noEvents',_config['locale']),
+                    value: Helper.localize('texts.noEvents'),
                     enabled: false
                 },
                 today: {
-                    value: Helper.localize('texts.today',_config['locale']),
+                    value: Helper.localize('texts.today'),
                     enabled: false
                 },
                 tomorrow: {
-                    value: Helper.localize('texts.tomorrow',_config['locale']),
+                    value: Helper.localize('texts.tomorrow'),
                     enabled: false
                 },
                 yesterday: {
-                    value: Helper.localize('texts.yesterday',_config['locale']),
+                    value: Helper.localize('texts.yesterday'),
                     enabled: false
                 },
                 monday: {
@@ -115,7 +117,7 @@ class MyCustomCardEditor extends LitElement {
         this._config.texts = Object.keys(this._texts).filter((key) =>  this._texts[key].enabled ?? false ).map((key) => ({ [key]: this._texts[key].value}));
 
 
-        this._config = Helper.getDefaultConfig(config, this.hass);
+        
         this._updateCalendarEntities();
         if((this._config.calendars ?? []).length == 0){
             this._config['hideNoEvent'] = true
