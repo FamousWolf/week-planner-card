@@ -58,63 +58,36 @@ class MyCustomCardEditor extends LitElement {
         this.config = config;
 
         this._config = Helper.getDefaultConfig(config, this.hass);
-        let _texts = Object.keys(this._config.texts ?? {}).map((key) => ({ [key]: { 'value': this._config.texts[key], 'enabled': true} }));
 
+        let _texts = this._config.texts ?? {};
+        //let _texts = Object.keys(this._config.texts ?? {}).map((key) => ({ [key]: { 'value': this._config.texts[key], 'enabled': true} }));
+
+        //this._config['texts'] = Object.keys(texts).filter((key) =>  { const k = (key.startsWith('show_') ? key : 'show_'+key) ; return ( key.startsWith('show_') ? false : texts[k].value ) });
         this._texts = Object.assign(
             {},
             {
-                fullDay: {
-                    value: Helper.localize('texts.fullDay'),
-                    enabled: false
-                },
-                noEvents: {
-                    value: Helper.localize('texts.noEvents'),
-                    enabled: false
-                },
-                today: {
-                    value: Helper.localize('texts.today'),
-                    enabled: false
-                },
-                tomorrow: {
-                    value: Helper.localize('texts.tomorrow'),
-                    enabled: false
-                },
-                yesterday: {
-                    value: Helper.localize('texts.yesterday'),
-                    enabled: false
-                },
-                monday: {
-                    value: LuxonInfo.weekdays('long')[0],
-                    enabled: false
-                },
-                tuesday: {
-                    value: LuxonInfo.weekdays('long')[1],
-                    enabled: false
-                },
-                wednesday: {
-                    value: LuxonInfo.weekdays('long')[2],
-                    enabled: false
-                },
-                thursday: {
-                    value: LuxonInfo.weekdays('long')[3],
-                    enabled: false
-                },
-                friday: {
-                    value: LuxonInfo.weekdays('long')[4],
-                    enabled: false
-                },
-                saturday: {
-                    value: LuxonInfo.weekdays('long')[5],
-                    enabled: false
-                },
-                sunday: {
-                    value: LuxonInfo.weekdays('long')[6],
-                    enabled: false
-                }
+                show_fullDay: false,
+                fullDay: Helper.localize('texts.fullDay'),
+                show_noEvents: false,
+                noEvents: Helper.localize('texts.noEvents'),
+                show_today: false,
+                today: Helper.localize('texts.today'),
+                show_tomorrow: false,
+                tomorrow: Helper.localize('texts.tomorrow'),
+                show_yesterday: false,
+                yesterday: Helper.localize('texts.yesterday'),
+                monday: LuxonInfo.weekdays('long')[0],
+                tuesday: LuxonInfo.weekdays('long')[1],
+                wednesday: LuxonInfo.weekdays('long')[2],
+                thursday: LuxonInfo.weekdays('long')[3],
+                friday: LuxonInfo.weekdays('long')[4],
+                saturday: LuxonInfo.weekdays('long')[5],
+                sunday: LuxonInfo.weekdays('long')[6]
             },
             _texts ?? {}
         );
-        this._config.texts = Object.keys(this._texts).filter((key) =>  this._texts[key].enabled ?? false ).map((key) => ({ [key]: this._texts[key].value}));
+        this._config['texts'] = Object.keys(this._texts).filter((key) =>  { const k = (key.startsWith('show_') ? key : 'show_'+key) ; return ( key.startsWith('show_') ? false : this._texts[k] ) }).map((key) => ({ [key]: this._texts[key] }));
+        //this._config.texts = Object.keys(this._texts).filter((key) =>  this._texts[key].enabled ?? false ).map((key) => ({ [key]: this._texts[key].value}));
 
 
         
@@ -382,8 +355,8 @@ class MyCustomCardEditor extends LitElement {
             this._config['type'] = "custom:family-week-planner-card";
         }
 
-
-        let texts = Object.assign({}, this._texts, Object.keys(this._config.texts ?? {}).map((key) => ({ [key]: { 'value': this._config.texts[key], 'enabled': true} }) ));
+        let texts = Object.assign({}, this._texts);
+        //let texts = Object.assign({}, this._texts, Object.keys(this._config.texts ?? {}).map((key) => ({ [key]: { 'value': this._config.texts[key], 'enabled': true} }) ));
 
         //let texts = Object.assign({}, Object.keys(this._texts).map((key) => ({ [key]: this._texts[key].value})), this._config.texts ?? {} );
 
@@ -397,19 +370,24 @@ class MyCustomCardEditor extends LitElement {
 
         Object.keys(ev.detail.value).forEach(key => {
             if (!texts.hasOwnProperty(key) || ((typeof ev.detail.value[key] !== "undefined") && (typeof ev.detail.value[key] !== "null"))) {
-                if(key.startsWith('show_')){
-                    let k = key.replace('show_', '')
-                    texts[k]['enabled'] = ev.detail.value[key];
-                }else{
-                    texts[key]['value'] = ev.detail.value[key];
-                }
+                //if(key.startsWith('show_')){
+                //    let k = key.replace('show_', '')
+                //    texts[k]['enabled'] = ev.detail.value[key];
+                //}else{
+                    texts[key] = ev.detail.value[key];
+                //}
             }
         });
+        this._texts = texts;
+        this._config['texts'] = Object.keys(texts).filter((key) =>  { const k = (key.startsWith('show_') ? key : 'show_'+key) ; return ( key.startsWith('show_') ? false : texts[k] ) }).map((key) => ({ [key]: texts[key] }));
+
         //this._texts = texts;
         //this._config['texts'] = texts;
         
-        this._config['texts'] = Object.keys(texts).filter((key) =>  texts[key].enabled ?? false ).map((key) => ({ [key]: texts[key].value}));
+        //this._config['texts'] = Object.keys(texts).filter((key) =>  texts[key].enabled ?? false ).map((key) => ({ [key]: texts[key].value}));
 
+
+        //${Object.assign({}, Object.keys(this._texts).map((key) => ({ [key]: this._texts[key].value})), Object.keys(this._texts).map((key) => { const k = 'show_'+key; return ({ [k]: this._texts[key].enabled}) }) )};
 
         const event = new CustomEvent("config-changed", {
             detail: { config: this._config },
@@ -850,22 +828,19 @@ class MyCustomCardEditor extends LitElement {
                     >
                 </ha-form></br>
 
-               ((entity) => {
-                const { stateObj } = entity;
-                return (
-                    (stateObj.state && stateObj.attributes && stateObj.attributes.device_class === 'calendar') ||
-                    stateObj.entity_id.includes('calendar')
-                )
-            })
                 <ha-form
                     .hass=${this.hass}
-                    .data=${Object.assign({}, Object.keys(this._texts).map((key) => ({ [key]: this._texts[key].value})), Object.keys(this._texts).map((key) => { const k = 'show_'+key; return ({ [k]: this._texts[key].enabled}) }) )};
+                    .data=${this._texts};
                     .schema=${[
                         {name: "show_noEvents", type: 'boolean'},
                         {name: "noEvents", type: 'string'},
+                        {name: "show_fullDay", type: 'boolean'},
                         {name: "fullDay", type: 'string'},
+                        {name: "show_today", type: 'boolean'},
                         {name: "today", type: 'string'},
+                        {name: "show_tomorrow", type: 'boolean'},
                         {name: "tomorrow", type: 'string'},
+                        {name: "show_yesterday", type: 'boolean'},
                         {name: "yesterday", type: 'string'}
                     ]}
                     .computeLabel=${this._computeTextsLabel}
