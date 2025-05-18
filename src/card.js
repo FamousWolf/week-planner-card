@@ -225,6 +225,7 @@ export class WeekPlannerCard extends LitElement {
     _timeFormat;
     _locationLink;
     _startDate;
+    _startingDayOffset;
     _hideWeekend;
     _weatherForecast = null;
     _chores = null;
@@ -320,6 +321,7 @@ export class WeekPlannerCard extends LitElement {
         this._numberOfDays = this._getNumberOfDays(config.days ?? 7);
         this._hideWeekend = config.hideWeekend ?? false;
         this._startDate = this._getStartDate(config.startingDay ?? 'today');
+        this._startingDayOffset = config.startingDayOffset ?? 0;
         this._updateInterval = config.updateInterval ?? 60;
         this._noCardBackground = config.noCardBackground ?? false;
         this._showCalendarProfil = config.showCalendarProfil ?? true;
@@ -1156,13 +1158,13 @@ export class WeekPlannerCard extends LitElement {
             return;
         }
 
-        let _dark = this.hass?.selectedTheme?.dark ?? false;
-        const event = new CustomEvent("settheme", {
-            detail: { dark: _dark },
-            bubbles: true,
-            composed: true,
-        });
-        this.dispatchEvent(event);
+        //let _dark = this.hass?.selectedTheme?.dark ?? false;
+        //const event = new CustomEvent("settheme", {
+        //    detail: { dark: _dark },
+        //    bubbles: true,
+        //    composed: true,
+        //});
+        //this.dispatchEvent(event);
 
         //for (let obj of this._calendars) {
         //    obj = Helper.fixReadOnlyOnObject(obj,'color');
@@ -1546,6 +1548,10 @@ export class WeekPlannerCard extends LitElement {
             case 'month':
                 startDate = startDate.startOf('month');
                 break;
+        }
+        
+        if (this._startingDayOffset !== 0) {
+            startDate = startDate.plus({ days: this._startingDayOffset });
         }
 
         if (this._hideWeekend && startDate.weekday >= 6) {

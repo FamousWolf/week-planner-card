@@ -56,28 +56,114 @@ class MyCustomCardEditor extends LitElement {
     // setConfig works the same way as for the card itself
     setConfig(config) {
         this.config = config;
-        this.config['locale'] = this.config.locale ?? 'en';
         this._config = Helper.getDefaultConfig(config, this.hass);
         this._updateCalendarEntities();
         if((this._config.calendars ?? []).length == 0){
             this._config['hideNoEvent'] = true
         }
         this._weather = this._config.weather ?? {};
-        this._texts = this._config.texts ?? {};
-        this._config.texts = this._texts;
+
+
+
+
+         /*
+        const dvdvd = Object.keys(this.hass.states)
+            .filter((entityId) =>  entityId.startsWith('calendar.') )
+            .map((entityId) => ({
+                entity_id: entityId,
+                stateObj: this.hass.states[entityId]
+            })).filter((entity) => {
+                const { stateObj } = entity;
+                return (
+                    (stateObj.state && stateObj.attributes && stateObj.attributes.device_class === 'calendar') ||
+                    stateObj.entity_id.includes('calendar')
+                )
+            })
+        */
+
+        
+        //let _texts = this._config.texts ?? {};
+
+
+        
+        //_texts = _texts.map((key) => ({ key: this._texts[key]}
+
+                
+          //      entity_id: entityId,
+           //     stateObj: this.hass.states[entityId]
+           // ));
+
+
+        //.filter((entityId) =>  entityId.startsWith('calendar.') )
+
+        let _texts = Object.keys(this._config.texts).map((key) => ({ key: { 'value': this._config.texts[key], 'enabled': true} }));
+
+        this._texts = Object.assign(
+            {},
+            {
+                fullDay: {
+                    value: Helper.localize('texts.fullDay',_config['locale']),
+                    enabled: false
+                },
+                noEvents: {
+                    value: Helper.localize('texts.noEvents',_config['locale']),
+                    enabled: false
+                },
+                today: {
+                    value: Helper.localize('texts.today',_config['locale']),
+                    enabled: false
+                },
+                tomorrow: {
+                    value: Helper.localize('texts.tomorrow',_config['locale']),
+                    enabled: false
+                },
+                yesterday: {
+                    value: Helper.localize('texts.yesterday',_config['locale']),
+                    enabled: false
+                },
+                monday: {
+                    value: LuxonInfo.weekdays('long')[0],
+                    enabled: false
+                },
+                tuesday: {
+                    value: LuxonInfo.weekdays('long')[1],
+                    enabled: false
+                },
+                wednesday: {
+                    value: LuxonInfo.weekdays('long')[2],
+                    enabled: false
+                },
+                thursday: {
+                    value: LuxonInfo.weekdays('long')[3],
+                    enabled: false
+                },
+                friday: {
+                    value: LuxonInfo.weekdays('long')[4],
+                    enabled: false
+                },
+                saturday: {
+                    value: LuxonInfo.weekdays('long')[5],
+                    enabled: false
+                },
+                sunday: {
+                    value: LuxonInfo.weekdays('long')[6],
+                    enabled: false
+                }
+            },
+            _texts
+        );
+        debugger
+        this._config.texts = Object.keys(this._texts).filter((key) =>  this._texts[key].enabled ?? false ).map((key) => ({ key: this._texts[key].value}));
+        debugger
+        //const optionsCalendarColors = Object.keys(this._calendarColors).map((key) => ({ 'label': this._renderCalendarColorOption(key, (this._calendarColors[key])[colorMode]), 'value':key}));
+
+        
+        
+        //this._texts = this._config.texts ?? {};
+        //this._config.texts = this._texts;
     }
   
-    _getHass() {
-        let checkLoading = window.setInterval(() => {
-            if (!this.hass) {
-                clearInterval(checkLoading);
-                return this._getHass();
-            }else{
-                clearInterval(checkLoading);
-                return this.hass;
-            }
-        }, 50);
-    }
+    
     
     _updateCalendarColors(){
         let i = 0;
@@ -112,9 +198,6 @@ class MyCustomCardEditor extends LitElement {
    
     
     _updateCalendarEntities() {
-
-       
-
         let checkLoading = window.setInterval(() => {
             if (!this.hass) {
                 clearInterval(checkLoading);
@@ -124,8 +207,6 @@ class MyCustomCardEditor extends LitElement {
                 clearInterval(checkLoading);
             }
         }, 50);
-
-
 
         if (!this._calendars) {
             const calendarEntities = Object.keys(this.hass.states)
@@ -297,19 +378,16 @@ class MyCustomCardEditor extends LitElement {
         if (!this._config.hasOwnProperty('type')){
             this._config['type'] = "custom:family-week-planner-card";
         }
-
-
-        let _config = Object.assign({}, this._texts);
-
+        let texts = Object.assign({}, this._texts);
 
         Object.keys(ev.detail.value).forEach(key => {
-            if (!_config.hasOwnProperty(key) || ((typeof ev.detail.value[key] !== "undefined") && (typeof ev.detail.value[key] !== "null"))) {
-                _config[key] = ev.detail.value[key];
+            if (!texts.hasOwnProperty(key) || ((typeof ev.detail.value[key] !== "undefined") && (typeof ev.detail.value[key] !== "null"))) {
+                texts[key] = ev.detail.value[key];
             }
         });
 
-        this._texts = _config;
-        this._config['texts'] = _config;
+        this._texts = texts;
+        this._config['texts'] = texts;
 
 
 

@@ -6,8 +6,9 @@ class i18nextHelper{
     static {
         
     }
-    static i18next_options() {
-        const lang = (localStorage.getItem('selectedLanguage') || 'en').replace(/['"]+/g, '').replace('-', '_');
+    static i18next_options(lng) {
+        const _lang = (localStorage.getItem('selectedLanguage') || 'en').replace(/['"]+/g, '').replace('-', '_');
+        const lang = lng ?? _lang;
         const _options = {
             lng: lang,
             debug: false,
@@ -750,14 +751,16 @@ export class Helper{
         }
         return i18next.getResource(i18nextHelper.i18next_options().lng , 'config', string, i18nextHelper.i18next_options());
     }
-    static localize(string, search = '', replace = '') {
+    static localize(string, lng) {
         if (!i18next.isInitialized) {
             
-            const localize_options = i18nextHelper.i18next_options();
+            const localize_options = i18nextHelper.i18next_options(lng);
             i18next.use(backend);
             i18next.init(localize_options);
         }
-        return translate('app:'+string);
+        let res = translate('app:'+string);
+
+        return res;
     }
     static localize_dddfdfdf(string, search = '', replace = '') {
         if (!i18next.isInitialized) {
@@ -817,7 +820,9 @@ export class Helper{
         if (!_config.hasOwnProperty('type')){
             _config['type'] = "custom:family-week-planner-card";
         }
-
+        if (!_config.hasOwnProperty('locale')){
+            _config['locale'] = "en";
+        }
         _config['days'] = config.days ?? 7;
         if (_config['days'] === 'month') {
             _config['days'] = DateTime.now().daysInMonth;
@@ -868,23 +873,25 @@ export class Helper{
         }
 
         //_config['eventBackground'] = config.eventBackground ?? 'var(--card-background-color, inherit)';
+       
 
-
-        LuxonSettings.defaultLocale = 'en';
+        
         const lang = (localStorage.getItem('selectedLanguage') || 'en').replace(/['"]+/g, '').replace('-', '_');
         _config['locale'] = config.locale ?? lang;
         _config['locale'] = _config['locale'] ?? 'en';
         if (_config['locale']) {
             LuxonSettings.defaultLocale = _config['locale'];
         }
+
+        /*
         _config['texts'] = Object.assign(
             {},
             {
-                fullDay: Helper.localize('texts.fullDay'),
-                noEvents: Helper.localize('texts.noEvents'),
-                today: Helper.localize('texts.today'),
-                tomorrow: Helper.localize('texts.tomorrow'),
-                yesterday: Helper.localize('texts.yesterday'),
+                fullDay: Helper.localize('texts.fullDay',_config['locale']),
+                noEvents: Helper.localize('texts.noEvents',_config['locale']),
+                today: Helper.localize('texts.today',_config['locale']),
+                tomorrow: Helper.localize('texts.tomorrow',_config['locale']),
+                yesterday: Helper.localize('texts.yesterday',_config['locale']),
                 monday: LuxonInfo.weekdays('long')[0],
                 tuesday: LuxonInfo.weekdays('long')[1],
                 wednesday: LuxonInfo.weekdays('long')[2],
@@ -895,6 +902,11 @@ export class Helper{
             },
             config.texts ?? {}
         );
+        */
+
+        
+
+        
         return _config;
     }
     static lightModeCalendarColors = {
@@ -964,7 +976,7 @@ export class Helper{
         friday: LuxonInfo.weekdays('long')[4],
         saturday: LuxonInfo.weekdays('long')[5],
         sunday: LuxonInfo.weekdays('long')[6],
-        month: Helper.localize('month')
+        month: Helper.localize('settings.month')
     };
 
 
