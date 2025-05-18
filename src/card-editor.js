@@ -82,27 +82,32 @@ class MyCustomCardEditor extends LitElement {
             this._config['texts'] ?? {}
         );
 
-
-        Object.keys(this._texts.filter((key) => !key.startsWith('show_'))).forEach(key => {
-            const _key = 'show_'+key;
-            if (!(this._texts ?? {}).hasOwnProperty(_key) ){
-                this._texts[_key] = false;
-            }
-        });
         
-        Object.keys(this._texts.filter((key) => !key.startsWith('show_'))).forEach(key => {
-            if ((typeof (this._texts ?? {})[key] == "undefined") || (typeof (this._texts ?? {})[key] == "null") && ((this._texts ?? {})[key].trim() == "")) {
+        Object.keys(this._texts)
+            .filter((key) => !key.startsWith('show_'))
+            .forEach(key => {
                 const _key = 'show_'+key;
-                this._texts[_key] = false;
-            }
-        });
+                if (!(this._texts ?? {}).hasOwnProperty(_key) ){
+                    this._texts[_key] = false;
+                }
+            });
+        
+        Object.keys(this._texts)
+            .filter((key) => !key.startsWith('show_'))
+            .forEach(key => {
+                if ((typeof (this._texts ?? {})[key] == "undefined") || (typeof (this._texts ?? {})[key] == "null") && ((this._texts ?? {})[key].trim() == "")) {
+                    const _key = 'show_'+key;
+                    this._texts[_key] = false;
+                }
+            });
 
-        this._config['texts'] = Object.keys(this._texts.filter((key) => key.startsWith('show_')))
+        this._config['texts'] = Object.keys(this._texts)
+            .filter((key) => key.startsWith('show_'))
             .filter((key) =>  this._texts[key] )
             .reduce((obj, key) => {
-                    const _key = key.replace('show_','');
-                    return this._texts[_key];
-                }, {});
+                const _key = key.replace('show_','');
+                return this._texts[_key];
+            }, {});
 
 
         //this._config['texts'] = Object.keys(this._texts).filter((key) =>  { const k = (key.startsWith('show_') ? key : 'show_'+key) ; return ( key.startsWith('show_') ? false : this._texts[k] ) });
@@ -407,14 +412,15 @@ class MyCustomCardEditor extends LitElement {
 
 
 
-        Object.keys(texts.filter((key) => !key.startsWith('show_'))).forEach(key => {
+        Object.keys(texts).filter((key) => !key.startsWith('show_')).forEach(key => {
             if ((typeof (texts ?? {})[key] == "undefined") || (typeof (texts ?? {})[key] == "null") && ((texts ?? {})[key].trim() == "")) {
                 const _key = 'show_'+key;
                 texts[_key] = false;
             }
         });
 
-        this._config['texts'] = Object.keys(texts.filter((key) => key.startsWith('show_')))
+        this._config['texts'] = Object.keys(texts)
+            .filter((key) => key.startsWith('show_'))
             .filter((key) =>  texts[key] )
             .reduce((obj, key) => {
                     const _key = key.replace('show_','');
