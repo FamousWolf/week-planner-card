@@ -56,47 +56,7 @@ class MyCustomCardEditor extends LitElement {
     // setConfig works the same way as for the card itself
     setConfig(config) {
         this.config = config;
-        this._config = Helper.getDefaultConfig(config, this.hass);
-        this._updateCalendarEntities();
-        if((this._config.calendars ?? []).length == 0){
-            this._config['hideNoEvent'] = true
-        }
-        this._weather = this._config.weather ?? {};
-
-
-
-
-         /*
-        const dvdvd = Object.keys(this.hass.states)
-            .filter((entityId) =>  entityId.startsWith('calendar.') )
-            .map((entityId) => ({
-                entity_id: entityId,
-                stateObj: this.hass.states[entityId]
-            })).filter((entity) => {
-                const { stateObj } = entity;
-                return (
-                    (stateObj.state && stateObj.attributes && stateObj.attributes.device_class === 'calendar') ||
-                    stateObj.entity_id.includes('calendar')
-                )
-            })
-        */
-
-        
-        //let _texts = this._config.texts ?? {};
-
-
-        
-        //_texts = _texts.map((key) => ({ key: this._texts[key]}
-
-                
-          //      entity_id: entityId,
-           //     stateObj: this.hass.states[entityId]
-           // ));
-
-
-        //.filter((entityId) =>  entityId.startsWith('calendar.') )
-
-        let _texts = Object.keys(this._config.texts).map((key) => ({ key: { 'value': this._config.texts[key], 'enabled': true} }));
+        let _texts = Object.keys(this._config.texts ?? {}).map((key) => ({ [key]: { 'value': this._config.texts[key], 'enabled': true} }));
 
         this._texts = Object.assign(
             {},
@@ -150,11 +110,52 @@ class MyCustomCardEditor extends LitElement {
                     enabled: false
                 }
             },
-            _texts
+            _texts ?? {}
         );
-        debugger
-        this._config.texts = Object.keys(this._texts).filter((key) =>  this._texts[key].enabled ?? false ).map((key) => ({ key: this._texts[key].value}));
-        debugger
+        this._config.texts = Object.keys(this._texts).filter((key) =>  this._texts[key].enabled ?? false ).map((key) => ({ [key]: this._texts[key].value}));
+
+
+        this._config = Helper.getDefaultConfig(config, this.hass);
+        this._updateCalendarEntities();
+        if((this._config.calendars ?? []).length == 0){
+            this._config['hideNoEvent'] = true
+        }
+        this._weather = this._config.weather ?? {};
+
+
+
+
+         /*
+        const dvdvd = Object.keys(this.hass.states)
+            .filter((entityId) =>  entityId.startsWith('calendar.') )
+            .map((entityId) => ({
+                entity_id: entityId,
+                stateObj: this.hass.states[entityId]
+            })).filter((entity) => {
+                const { stateObj } = entity;
+                return (
+                    (stateObj.state && stateObj.attributes && stateObj.attributes.device_class === 'calendar') ||
+                    stateObj.entity_id.includes('calendar')
+                )
+            })
+        */
+
+        
+        //let _texts = this._config.texts ?? {};
+
+
+        
+        //_texts = _texts.map((key) => ({ key: this._texts[key]}
+
+                
+          //      entity_id: entityId,
+           //     stateObj: this.hass.states[entityId]
+           // ));
+
+
+        //.filter((entityId) =>  entityId.startsWith('calendar.') )
+
+        
         //const optionsCalendarColors = Object.keys(this._calendarColors).map((key) => ({ 'label': this._renderCalendarColorOption(key, (this._calendarColors[key])[colorMode]), 'value':key}));
 
         
@@ -790,7 +791,6 @@ class MyCustomCardEditor extends LitElement {
         let optionsStartingDay = Object.keys(Helper.StartingDayEnum).map((key) => ({ 'label': `${Helper.StartingDayEnum[key].startsWith('texts.') ?  Helper.localize(Helper.StartingDayEnum[key]) :  Helper.StartingDayEnum[key]}`, 'value': key}));
      
     
-
         return html`
 
 
