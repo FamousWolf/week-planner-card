@@ -78,12 +78,11 @@ class MyCustomCardEditor extends LitElement {
                 saturday: LuxonInfo.weekdays('long')[5],
                 sunday: LuxonInfo.weekdays('long')[6]
             },
-            config.texts ?? {}
+            this._texts ?? {}
         );
 
         this._texts = Object.assign(
             {},
-            this._texts,
             texts
         );
         
@@ -92,10 +91,23 @@ class MyCustomCardEditor extends LitElement {
             .forEach(key => {
                 const _key = 'show_'+key;
                 if (!(this._texts ?? {}).hasOwnProperty(_key) ){
-                    this._texts[_key] = false;
+                    let v = (this._texts[key] !== (config.texts ?? {})[key]);
+                    this._texts[_key] = v;
                 }
             });
         
+        this._texts = Object.assign(
+            {},
+            this._texts,
+            config.texts ?? {}
+        );
+
+        this._config['texts'] = Object.fromEntries(
+            Object.entries(this._texts).filter(
+                ([key, val])=> (!key.startsWith('show_') ? this._texts['show_'+key] : false )
+            )
+        );
+        /*
         Object.keys(this._texts)
             .filter((key) => !key.startsWith('show_'))
             .forEach(key => {
@@ -109,6 +121,7 @@ class MyCustomCardEditor extends LitElement {
                 ([key, val])=> (!key.startsWith('show_') ? this._texts['show_'+key] : false )
             )
         );
+        */
 
         if (Object.keys(this._config['texts'] ?? {}).length == 0){
             if (this._config.hasOwnProperty('texts') ){
@@ -394,7 +407,7 @@ class MyCustomCardEditor extends LitElement {
             this._config['type'] = "custom:family-week-planner-card";
         }
 
-        let texts = Object.assign({}, this._texts);
+        let texts = Object.assign({}, this._texts ?? {});
         //let texts = Object.assign({}, this._texts, Object.keys(this._config.texts ?? {}).map((key) => ({ [key]: { 'value': this._config.texts[key], 'enabled': true} }) ));
 
         //let texts = Object.assign({}, Object.keys(this._texts).map((key) => ({ [key]: this._texts[key].value})), this._config.texts ?? {} );
