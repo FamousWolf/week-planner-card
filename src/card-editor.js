@@ -85,7 +85,12 @@ class MyCustomCardEditor extends LitElement {
             {},
             texts
         );
-        
+        Object.keys(this._texts).forEach(key => {
+            if (!isNaN(this._texts[key])){
+                delete this._texts[key];
+            }
+        });
+
         Object.keys(this._texts)
             .filter((key) => !key.startsWith('show_'))
             .forEach(key => {
