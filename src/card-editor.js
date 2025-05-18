@@ -59,22 +59,16 @@ class MyCustomCardEditor extends LitElement {
 
         this._config = Helper.getDefaultConfig(config, this.hass);
 
-        let _texts = this._config.texts ?? {};
         //let _texts = Object.keys(this._config.texts ?? {}).map((key) => ({ [key]: { 'value': this._config.texts[key], 'enabled': true} }));
 
         //this._config['texts'] = Object.keys(texts).filter((key) =>  { const k = (key.startsWith('show_') ? key : 'show_'+key) ; return ( key.startsWith('show_') ? false : texts[k].value ) });
         this._texts = Object.assign(
             {},
             {
-                show_fullDay: false,
                 fullDay: Helper.localize('texts.fullDay'),
-                show_noEvents: false,
                 noEvents: Helper.localize('texts.noEvents'),
-                show_today: false,
                 today: Helper.localize('texts.today'),
-                show_tomorrow: false,
                 tomorrow: Helper.localize('texts.tomorrow'),
-                show_yesterday: false,
                 yesterday: Helper.localize('texts.yesterday'),
                 monday: LuxonInfo.weekdays('long')[0],
                 tuesday: LuxonInfo.weekdays('long')[1],
@@ -84,13 +78,48 @@ class MyCustomCardEditor extends LitElement {
                 saturday: LuxonInfo.weekdays('long')[5],
                 sunday: LuxonInfo.weekdays('long')[6]
             },
-            _texts ?? {}
+            this._texts ?? {},
+            this._config['texts'] ?? {}
         );
-        this._config['texts'] = Object.keys(this._texts).filter((key) =>  { const k = (key.startsWith('show_') ? key : 'show_'+key) ; return ( key.startsWith('show_') ? false : this._texts[k] ) }).map((key) => ({ [key]: this._texts[key] }));
+
+
+        Object.keys(this._texts.filter((key) => !key.startsWith('show_'))).forEach(key => {
+            const _key = 'show_'+key;
+            if (!(this._texts ?? {}).hasOwnProperty(_key) ){
+                this._texts[_key] = false;
+            }
+        });
+        
+        Object.keys(this._texts.filter((key) => !key.startsWith('show_'))).forEach(key => {
+            if ((typeof (this._texts ?? {})[key] == "undefined") || (typeof (this._texts ?? {})[key] == "null") && ((this._texts ?? {})[key].trim() == "")) {
+                const _key = 'show_'+key;
+                this._texts[_key] = false;
+            }
+        });
+
+        this._config['texts'] = Object.keys(this._texts.filter((key) => key.startsWith('show_')))
+            .filter((key) =>  this._texts[key] )
+            .reduce((obj, key) => {
+                    const _key = key.replace('show_','');
+                    return this._texts[_key];
+                }, {});
+
+
+        //this._config['texts'] = Object.keys(this._texts).filter((key) =>  { const k = (key.startsWith('show_') ? key : 'show_'+key) ; return ( key.startsWith('show_') ? false : this._texts[k] ) });
         //this._config.texts = Object.keys(this._texts).filter((key) =>  this._texts[key].enabled ?? false ).map((key) => ({ [key]: this._texts[key].value}));
 
 
         
+        //let _texts = Object.keys(texts)
+        //    .filter((key) =>  { const k = (key.startsWith('show_') ? key : 'show_'+key) ; return ( key.startsWith('show_') ? false : texts[k] ) })
+        //    .reduce((obj, key) => {
+        //            obj[key] = texts[key];
+        //            return obj;
+        //        }, {});
+        //this._config['texts'] =  Object.assign({}, this._config['texts'] ?? {}, _texts );
+
+
+
         this._updateCalendarEntities();
         if((this._config.calendars ?? []).length == 0){
             this._config['hideNoEvent'] = true
@@ -370,16 +399,42 @@ class MyCustomCardEditor extends LitElement {
 
         Object.keys(ev.detail.value).forEach(key => {
             if (!texts.hasOwnProperty(key) || ((typeof ev.detail.value[key] !== "undefined") && (typeof ev.detail.value[key] !== "null"))) {
-                //if(key.startsWith('show_')){
-                //    let k = key.replace('show_', '')
-                //    texts[k]['enabled'] = ev.detail.value[key];
-                //}else{
-                    texts[key] = ev.detail.value[key];
-                //}
+                texts[key] = ev.detail.value[key];
             }
         });
+
+
+
+
+
+        Object.keys(texts.filter((key) => !key.startsWith('show_'))).forEach(key => {
+            if ((typeof (texts ?? {})[key] == "undefined") || (typeof (texts ?? {})[key] == "null") && ((texts ?? {})[key].trim() == "")) {
+                const _key = 'show_'+key;
+                texts[_key] = false;
+            }
+        });
+
+        this._config['texts'] = Object.keys(texts.filter((key) => key.startsWith('show_')))
+            .filter((key) =>  texts[key] )
+            .reduce((obj, key) => {
+                    const _key = key.replace('show_','');
+                    return texts[_key];
+                }, {});
+
         this._texts = texts;
-        this._config['texts'] = Object.keys(texts).filter((key) =>  { const k = (key.startsWith('show_') ? key : 'show_'+key) ; return ( key.startsWith('show_') ? false : texts[k] ) }).map((key) => ({ [key]: texts[key] }));
+      
+
+        //this._config['texts'] = Object.entries(obj).filter((key) =>  { const k = (key.startsWith('show_') ? key : 'show_'+key) ; return ( key.startsWith('show_') ? false : texts[k] ) });
+        //this._config['texts'] = Object.entries(obj).reduce((acc, [key, value]) => {
+            
+        //    if ((value !== null && value !== undefined) && value !== '') {
+        //        acc[key] = value;
+        //    }
+        //    return acc;
+        //}, {});
+
+
+        //this._config['texts'] = Object.keys(texts).filter((key) =>  { const k = (key.startsWith('show_') ? key : 'show_'+key) ; return ( key.startsWith('show_') ? false : texts[k] ) });
 
         //this._texts = texts;
         //this._config['texts'] = texts;
