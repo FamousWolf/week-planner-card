@@ -100,16 +100,17 @@ class MyCustomCardEditor extends LitElement {
                     this._texts[_key] = false;
                 }
             });
+        this._config['texts'] = Object.fromEntries(
+            Object.entries(this._texts).filter(
+                ([key, val])=> (!key.startsWith('show_') ? this._texts['show_'+key] : false )
+            )
+        );
 
-        this._config['texts'] = Object.keys(this._texts)
-            .filter((key) => key.startsWith('show_'))
-            .filter((key) =>  this._texts[key] )
-            .reduce((obj, key) => {
-                const _key = key.replace('show_','');
-                return this._texts[_key];
-            }, {});
-
-
+        if (Object.keys(this._config['texts'] ?? {}).length == 0){
+            if (this._config.hasOwnProperty('texts') ){
+                delete this._config.texts;
+            }
+        }
         //this._config['texts'] = Object.keys(this._texts).filter((key) =>  { const k = (key.startsWith('show_') ? key : 'show_'+key) ; return ( key.startsWith('show_') ? false : this._texts[k] ) });
         //this._config.texts = Object.keys(this._texts).filter((key) =>  this._texts[key].enabled ?? false ).map((key) => ({ [key]: this._texts[key].value}));
 
@@ -419,14 +420,12 @@ class MyCustomCardEditor extends LitElement {
         //    }
         //});
 
-        this._config['texts'] = Object.keys(texts)
-            .filter((key) => key.startsWith('show_'))
-            .filter((key) =>  texts[key] )
-            .reduce((obj, key) => {
-                    const _key = key.replace('show_','');
-                    return texts[_key];
-                }, {});
 
+        this._config['texts'] = Object.fromEntries(
+            Object.entries(texts).filter(
+                ([key, val])=> (!key.startsWith('show_') ? texts['show_'+key] : false )
+            )
+        );
         this._texts = texts;
       
 
