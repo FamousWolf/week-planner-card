@@ -381,17 +381,34 @@ class MyCustomCardEditor extends LitElement {
         if (!this._config.hasOwnProperty('type')){
             this._config['type'] = "custom:family-week-planner-card";
         }
-        let texts = Object.assign({}, this._texts);
+
+
+        let texts = Object.assign({}, this._texts, Object.keys(this._config.texts ?? {}).map((key) => ({ [key]: { 'value': this._config.texts[key], 'enabled': true} }) ));
+
+        //let texts = Object.assign({}, Object.keys(this._texts).map((key) => ({ [key]: this._texts[key].value})), this._config.texts ?? {} );
+
+
+
+
+        //let texts = Object.assign({}, Object.keys(this._config.texts ?? {}).map((key) => ({ [key]: { 'value': this._config.texts[key], 'enabled': true} })));
+        //let texts = Object.keys(this._texts).map((key) => ({ [key]: this._texts[key].value}));
+        //this._config.texts = Object.keys(this._texts).filter((key) =>  this._texts[key].enabled ?? false ).map((key) => ({ [key]: this._texts[key].value}));
+        //let texts = Object.assign({}, this._texts);
 
         Object.keys(ev.detail.value).forEach(key => {
             if (!texts.hasOwnProperty(key) || ((typeof ev.detail.value[key] !== "undefined") && (typeof ev.detail.value[key] !== "null"))) {
-                texts[key] = ev.detail.value[key];
+                if(key.startsWith('show_')){
+                    let k = key.replace('show_', '')
+                    texts[k]['enabled'] = ev.detail.value[key];
+                }else{
+                    texts[key]['value'] = ev.detail.value[key];
+                }
             }
         });
-
-        this._texts = texts;
-        this._config['texts'] = texts;
-
+        //this._texts = texts;
+        //this._config['texts'] = texts;
+        
+        this._config['texts'] = Object.keys(texts).filter((key) =>  texts[key].enabled ?? false ).map((key) => ({ [key]: texts[key].value}));
 
 
         const event = new CustomEvent("config-changed", {
@@ -832,10 +849,19 @@ class MyCustomCardEditor extends LitElement {
                     @value-changed=${this._valueChanged} 
                     >
                 </ha-form></br>
+
+               ((entity) => {
+                const { stateObj } = entity;
+                return (
+                    (stateObj.state && stateObj.attributes && stateObj.attributes.device_class === 'calendar') ||
+                    stateObj.entity_id.includes('calendar')
+                )
+            })
                 <ha-form
                     .hass=${this.hass}
-                    .data=${this._texts}
+                    .data=${Object.assign({}, Object.keys(this._texts).map((key) => ({ [key]: this._texts[key].value})), Object.keys(this._texts).map((key) => { const k = 'show_'+key; return ({ [k]: this._texts[key].enabled}) }) )};
                     .schema=${[
+                        {name: "show_noEvents", type: 'boolean'},
                         {name: "noEvents", type: 'string'},
                         {name: "fullDay", type: 'string'},
                         {name: "today", type: 'string'},
