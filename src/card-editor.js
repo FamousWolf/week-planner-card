@@ -62,7 +62,7 @@ class MyCustomCardEditor extends LitElement {
         //let _texts = Object.keys(this._config.texts ?? {}).map((key) => ({ [key]: { 'value': this._config.texts[key], 'enabled': true} }));
 
         //this._config['texts'] = Object.keys(texts).filter((key) =>  { const k = (key.startsWith('show_') ? key : 'show_'+key) ; return ( key.startsWith('show_') ? false : texts[k].value ) });
-        this._texts = Object.assign(
+        let texts = Object.assign(
             {},
             {
                 fullDay: Helper.localize('texts.fullDay'),
@@ -78,10 +78,14 @@ class MyCustomCardEditor extends LitElement {
                 saturday: LuxonInfo.weekdays('long')[5],
                 sunday: LuxonInfo.weekdays('long')[6]
             },
-            this._texts ?? {},
-            this._config['texts'] ?? {}
+            config.texts ?? {}
         );
 
+        this._texts = Object.assign(
+            {},
+            this._texts,
+            texts
+        );
         
         Object.keys(this._texts)
             .filter((key) => !key.startsWith('show_'))
@@ -408,7 +412,7 @@ class MyCustomCardEditor extends LitElement {
                 texts[key] = ev.detail.value[key];
             }
         });
-
+        this._texts = texts;
 
 
 
@@ -426,7 +430,7 @@ class MyCustomCardEditor extends LitElement {
                 ([key, val])=> (!key.startsWith('show_') ? texts['show_'+key] : false )
             )
         );
-        this._texts = texts;
+        
       
 
         //this._config['texts'] = Object.entries(obj).filter((key) =>  { const k = (key.startsWith('show_') ? key : 'show_'+key) ; return ( key.startsWith('show_') ? false : texts[k] ) });

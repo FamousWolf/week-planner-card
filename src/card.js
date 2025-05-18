@@ -345,11 +345,11 @@ export class WeekPlannerCard extends LitElement {
         this._language = Object.assign(
             {},
             {
-                fullDay: 'Entire day',
-                noEvents: 'No events',
-                today: 'Today',
-                tomorrow: 'Tomorrow',
-                yesterday: 'Yesterday',
+                fullDay: Helper.localize('texts.fullDay'),
+                noEvents: Helper.localize('texts.noEvents'),
+                today: Helper.localize('texts.today'),
+                tomorrow: Helper.localize('texts.tomorrow'),
+                yesterday: Helper.localize('texts.yesterday'),
                 sunday: LuxonInfo.weekdays('long')[6],
                 monday: LuxonInfo.weekdays('long')[0],
                 tuesday: LuxonInfo.weekdays('long')[1],
