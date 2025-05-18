@@ -412,12 +412,12 @@ class MyCustomCardEditor extends LitElement {
 
 
 
-        Object.keys(texts).filter((key) => !key.startsWith('show_')).forEach(key => {
-            if ((typeof (texts ?? {})[key] == "undefined") || (typeof (texts ?? {})[key] == "null") && ((texts ?? {})[key].trim() == "")) {
-                const _key = 'show_'+key;
-                texts[_key] = false;
-            }
-        });
+        //Object.keys(texts).filter((key) => !key.startsWith('show_')).forEach(key => {
+        //    if ((typeof (texts ?? {})[key] == "undefined") || (typeof (texts ?? {})[key] == "null") && ((texts ?? {})[key].trim() == "")) {
+        //        const _key = 'show_'+key;
+        //        texts[_key] = false;
+        //    }
+        //});
 
         this._config['texts'] = Object.keys(texts)
             .filter((key) => key.startsWith('show_'))
