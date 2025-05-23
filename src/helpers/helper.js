@@ -382,6 +382,35 @@ class i18nextHelper{
 
 export class Helper{
    
+
+
+    static getFirstDayOfMonth(d=new Date()){
+        let curr = new Date(d.getTime());
+        curr.setHours(12);
+        curr.setMinutes(0);
+        curr.setSeconds(0);
+        curr.setDate(1);
+        return curr;
+    }
+    static getLastDayOfMonth(d=new Date()){
+        let curr = new Date(d.getTime());
+        curr.setHours(12);
+        curr.setMinutes(0);
+        curr.setSeconds(0);
+        curr.setDate(new Date(d.getFullYear(),d.getMonth(), 0).getDate()+1);
+        return curr;
+    }
+
+    static getMonday(d=new Date()) {
+        var day = d.getDay(),
+            diff = d.getDate() - day + (day == 0 ? -6 : 1); // adjust when day is sunday
+        return new Date(d.setDate(diff));
+    }
+    static getSunday(d=new Date()) {
+        var day = d.getDay(),
+            diff = d.getDate() - day + 7;
+        return new Date(d.setDate(diff));
+    }
     static updateCalendarEvent(hass, entityId, event){
 
         return new Promise((resolve, reject) => {

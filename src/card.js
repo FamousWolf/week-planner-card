@@ -961,7 +961,13 @@ export class WeekPlannerCard extends LitElement {
                 
                     ${this._renderEventDetailsDialogContent()}
                     <div class="calendar">
-                        <ha-icon icon="mdi:calendar-account"></ha-icon>
+                        ${this._currentEventDetails.image ?
+                            html`
+                                <state-badge class="has-image" style="background-image: url(${this._currentEventDetails.image});">
+                                </state-badge>
+                            ` :
+                            html`<ha-icon icon="mdi:calendar-account"></ha-icon>`
+                        }
                         <div class="info">
                         ${this._currentEventDetails.calendar ? html`${this.hass.formatEntityAttributeValue(this.hass.states[this._currentEventDetails.calendar], 'friendly_name')}` :''}
                         </div>
