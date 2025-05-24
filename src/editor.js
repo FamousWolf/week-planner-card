@@ -225,7 +225,7 @@ export class WeekPlannerCardEditor extends LitElement {
                 label="${label ?? name}"
                 value="${this.getConfigValue(name, defaultValue)}"
                 .includeDomains="${includeDomains}"
-                @change="${this._valueChanged}"
+                @value-changed="${this._valueChanged}"
             />
         `;
     }
@@ -237,7 +237,7 @@ export class WeekPlannerCardEditor extends LitElement {
                 name="${name}"
                 label="${label ?? name}"
                 value="${this.getConfigValue(name, defaultValue)}"
-                @change="${this._valueChanged}"
+                @value-changed="${this._valueChanged}"
             />
         `;
     }
@@ -305,7 +305,7 @@ export class WeekPlannerCardEditor extends LitElement {
 
     _valueChanged(event) {
         const target = event.target;
-        let value = target.value;
+        let value = target.value ?? event.detail.value;
 
         if (target.tagName === 'HA-SWITCH') {
             value = target.checked;
