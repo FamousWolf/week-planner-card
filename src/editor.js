@@ -106,6 +106,9 @@ export class WeekPlannerCardEditor extends LitElement {
                             }, {
                                 value: 'saturday',
                                 label: 'Saturday',
+                            }, {
+                                value: 'month',
+                                label: 'Month',
                             }
                         ], true)}
                         ${this.addTextField('startingDayOffset', 'Starting day offset', 'number')}
@@ -225,7 +228,7 @@ export class WeekPlannerCardEditor extends LitElement {
                 label="${label ?? name}"
                 value="${this.getConfigValue(name, defaultValue)}"
                 .includeDomains="${includeDomains}"
-                @change="${this._valueChanged}"
+                @value-changed="${this._valueChanged}"
             />
         `;
     }
@@ -237,7 +240,7 @@ export class WeekPlannerCardEditor extends LitElement {
                 name="${name}"
                 label="${label ?? name}"
                 value="${this.getConfigValue(name, defaultValue)}"
-                @change="${this._valueChanged}"
+                @value-changed="${this._valueChanged}"
             />
         `;
     }
@@ -305,7 +308,7 @@ export class WeekPlannerCardEditor extends LitElement {
 
     _valueChanged(event) {
         const target = event.target;
-        let value = target.value;
+        let value = event.detail ? event.detail.value ?? target.value ?? '' : target.value ?? '';
 
         if (target.tagName === 'HA-SWITCH') {
             value = target.checked;
