@@ -754,7 +754,12 @@ export class WeekPlannerCard extends LitElement {
                     name: this.hass.formatEntityAttributeValue(this.hass.states[calendar.entity], 'friendly_name')
                 }
             }
-            let calendarSorting = calendarNumber;
+            if (!calendar.sorting) {
+                calendar = {
+                    ...calendar,
+                    sorting: calendarNumber
+                }
+            }
             this._loading++;
             this.hass.callApi(
                 'get',
@@ -778,9 +783,9 @@ export class WeekPlannerCard extends LitElement {
                     let fullDay = this._isFullDay(startDate, endDate);
 
                     if (!fullDay && !this._isSameDay(startDate, endDate)) {
-                        this._handleMultiDayEvent(event, startDate, endDate, calendar, calendarSorting);
+                        this._handleMultiDayEvent(event, startDate, endDate, calendar);
                     } else {
-                        this._addEvent(event, startDate, endDate, fullDay, calendar, calendarSorting);
+                        this._addEvent(event, startDate, endDate, fullDay, calendar);
                     }
                 });
 
@@ -826,7 +831,7 @@ export class WeekPlannerCard extends LitElement {
             || calendarFilter && event.summary.match(calendarFilter);
     }
 
-    _addEvent(event, startDate, endDate, fullDay, calendar, calendarSorting) {
+    _addEvent(event, startDate, endDate, fullDay, calendar) {
         if (this._hideWeekend && startDate.weekday >= 6) {
             return;
         }
@@ -849,8 +854,8 @@ export class WeekPlannerCard extends LitElement {
             if (calendar.name && this._calendarEvents[eventKey].calendarNames.indexOf(calendar.name) === -1) {
                 this._calendarEvents[eventKey].calendarNames.push(calendar.name);
             }
-            if (calendarSorting < this._calendarEvents[eventKey].calendarSorting) {
-                this._calendarEvents[eventKey].calendarSorting = calendarSorting;
+            if (calendar.sorting < this._calendarEvents[eventKey].calendarSorting) {
+                this._calendarEvents[eventKey].calendarSorting = calendar.sorting;
             }
         } else {
             this._calendarEvents[eventKey] = {
@@ -865,7 +870,7 @@ export class WeekPlannerCard extends LitElement {
                 colors: [calendar.color ?? 'inherit'],
                 icon: calendar.icon ?? null,
                 calendars: [calendar.entity],
-                calendarSorting: calendarSorting,
+                calendarSorting: calendar.sorting,
                 calendarNames: [calendar.name],
                 class: this._getEventClass(startDate, endDate, fullDay)
             }
@@ -952,13 +957,13 @@ export class WeekPlannerCard extends LitElement {
         return classes.join(' ');
     }
 
-    _handleMultiDayEvent(event, startDate, endDate, calendar, calendarSorting) {
+    _handleMultiDayEvent(event, startDate, endDate, calendar) {
         while (startDate < endDate) {
             let eventStartDate = startDate;
             startDate = startDate.plus({ days: 1 }).startOf('day');
             let eventEndDate = startDate < endDate ? startDate : endDate;
 
-            this._addEvent(event, eventStartDate, eventEndDate, this._isFullDay(eventStartDate, eventEndDate), calendar, calendarSorting);
+            this._addEvent(event, eventStartDate, eventEndDate, this._isFullDay(eventStartDate, eventEndDate), calendar);
         }
     }
 
