@@ -191,7 +191,12 @@ export class WeekPlannerCard extends LitElement {
         this._columns = config.columns ?? {};
         this._maxEvents = config.maxEvents ?? false;
         this._maxDayEvents = config.maxDayEvents ?? false;
-        this._hideCalendars = [];
+        this._hideCalendars = (config.calendars || []).reduce((acc, calendar) => {
+            if (calendar.initiallyHidden && calendar.entity) {
+                acc.push(calendar.entity);
+            }
+            return acc;
+        }, []);
         if (config.locale) {
             LuxonSettings.defaultLocale = config.locale;
         }
