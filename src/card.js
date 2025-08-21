@@ -199,7 +199,7 @@ export class WeekPlannerCard extends LitElement {
             {},
             {
                 fullDay: 'Entire day',
-                noEvents: 'No events111',
+                noEvents: 'No events1112',
                 moreEvents: 'More events',
                 today: 'Today',
                 tomorrow: 'Tomorrow',
