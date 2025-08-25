@@ -993,11 +993,12 @@ export class WeekPlannerCard extends LitElement {
                 const dateKey = startDate.toISODate();
                 if (this._events.hasOwnProperty(dateKey)) {
                     events = this._events[dateKey].sort((event1, event2) => {
-                        if (this._calendarEvents[event1].start === this._calendarEvents[event2].start) {
-                            return this._calendarEvents[event1].calendarSorting < this._calendarEvents[event2].calendarSorting ? 1 : (this._calendarEvents[event1].calendarSorting > this._calendarEvents[event2].calendarSorting) ? -1 : 0;
+                        const date1 = new Date(this._calendarEvents[event1].start);
+                        const date2 = new Date(this._calendarEvents[event2].start);
+                        if (date1.getTime() === date2.getTime()) {
+                            return this._calendarEvents[event1].calendarSorting < this._calendarEvents[event2].calendarSorting ? -1 : (this._calendarEvents[event1].calendarSorting > this._calendarEvents[event2].calendarSorting) ? 1 : 0;
                         }
-
-                        return this._calendarEvents[event1].start > this._calendarEvents[event2].start ? 1 : -1;
+                        return date1.getTime() > date2.getTime() ? -1 : 1;
                     });
 
                     const previousNumberOfEvents = numberOfEvents;
