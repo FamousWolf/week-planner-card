@@ -496,7 +496,6 @@ export class WeekPlannerCard extends LitElement {
             ${dayEvents.map((event) => {
                 const doneColors = [event.colors[0]];
                 const durationMinutes = event.fullDay ? 24 * 60 : this._getEventDurationMinutes(event.start, event.end);
-                const durationType = this._getDurationType(durationMinutes);
                 return html`
                     <div
                         class="event ${event.class}"
@@ -509,7 +508,6 @@ export class WeekPlannerCard extends LitElement {
                         data-end-hour="${event.end.toFormat('H')}"
                         data-end-minute="${event.end.toFormat('mm')}"
                         data-duration="${durationMinutes}"
-                        data-duration-type="${durationType}"
                         style="--border-color: ${event.colors[0]}"
                         @click="${() => {
                             this._handleEventClick(event)
@@ -938,6 +936,10 @@ export class WeekPlannerCard extends LitElement {
         } else {
             classes.push('future');
         }
+        // Add duration class
+        const durationMinutes = fullDay ? 24 * 60 : this._getEventDurationMinutes(startDate, endDate);
+        const durationType = this._getDurationType(durationMinutes);
+        classes.push(`duration-${durationType}`);
         return classes.join(' ');
     }
 
