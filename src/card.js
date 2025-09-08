@@ -98,12 +98,12 @@ export class WeekPlannerCard extends LitElement {
 
     // Categorize duration type
     _getDurationType(minutes) {
-        if (minutes < 30) return 'XS';
-        if (minutes < 60) return 'Small';
-        if (minutes < 120) return 'Medium';
-        if (minutes < 240) return 'Large';
-        if (minutes < 360) return 'XL';
-        return 'XXL';
+        if (minutes < 30) return 'xs';
+        if (minutes < 60) return 'small';
+        if (minutes < 120) return 'medium';
+        if (minutes < 240) return 'large';
+        if (minutes < 360) return 'xl';
+        return 'xxl';
     }
 
     /**
@@ -508,8 +508,8 @@ export class WeekPlannerCard extends LitElement {
                         data-start-minute="${event.start.toFormat('mm')}"
                         data-end-hour="${event.end.toFormat('H')}"
                         data-end-minute="${event.end.toFormat('mm')}"
-                data-duration="${durationMinutes}"
-                data-duration-type="${durationType}"
+                        data-duration="${durationMinutes}"
+                        data-duration-type="${durationType}"
                         style="--border-color: ${event.colors[0]}"
                         @click="${() => {
                             this._handleEventClick(event)
