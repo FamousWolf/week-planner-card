@@ -93,7 +93,7 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 | `columns`                | object           | optional                                           | See [Columns](#columns)                                                                                                                     | Configuration to override the number of columns                                        | 1.11.0  |
 | `showNavigation`         | boolean          | false                                              | `false` \| `true`                                                                                                                           | Show navigational arrows to traverse additional dates on calendar.                     | 1.12.0  |
 | `showNavigationLabel`     | boolean          | true                                               | `false` \| `true`                                                                                                                           | Show or hide the navigation label                                                      | 1.14.0  |
-| `navigationLabelFormat`  | string           | `MMMM`                                             | See [Luxon format](https://moment.github.io/luxon/#/formatting?id=table-of-tokens)                                                          | Format of the navigation label                                                        | 1.14.0  |
+| `navigationLabelFormat`  | string           | `MMMM`                                             | See [Luxon format](https://moment.github.io/luxon/#/formatting?id=table-of-tokens)                                                          | Format of the navigation label. Supports range templates using `{start: ...}` and `{end: ...}`. When these tokens are present, the left token formats the start date and the right token formats the inclusive end date. If omitted, the value is applied to the start date only. Example: `{start: MMM, dd} - {end: MMM, dd yyyy}` → `OCT, 27 - NOV, 09 2025`. | 1.14.0  |
 
 ### Calendars
 
@@ -318,4 +318,26 @@ type: custom:week-planner-card
 calendars:
   - calendar.my_calendar_1
 dayFormat: '''<span class="number">''d''</span> <span class="month">''MMMM''</span>'''
+```
+
+### Navigation label single-date formatting
+
+```yaml
+type: custom:week-planner-card
+calendars:
+  - entity: calendar.my_calendar_1
+showNavigation: true
+showNavigationLabel: true
+navigationLabelFormat: 'MMM, dd yyyy'
+```
+
+### Navigation label range formatting
+
+```yaml
+type: custom:week-planner-card
+calendars:
+  - entity: calendar.my_calendar_1
+showNavigation: true
+showNavigationLabel: true
+navigationLabelFormat: '{start: MMM, dd} - {end: MMM, dd yyyy}'
 ```

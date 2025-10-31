@@ -378,7 +378,15 @@ export class WeekPlannerCard extends LitElement {
 
     _getNavigationLabel() {
         if (this._showNavigationLabel) {
-            return this._startDate.toFormat(this._navigationLabelFormat);
+            const template = this._navigationLabelFormat;
+
+            // Support explicit start/end templates like "{start: MMM} - {end: MMM yyyy}"
+            if (template?.includes('{')) {
+                return this._formatNavigationLabel(template);
+            }
+
+            // Default: single-date formatting
+            return this._startDate.toFormat(template);
         }
         return '';
     }
