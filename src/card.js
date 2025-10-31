@@ -89,6 +89,7 @@ export class WeekPlannerCard extends LitElement {
     _showNavigation;
     _navigationOffset = 0;
     _updateEventsTimeouts = [];
+    _showNavigationLabel;
 
     /**
      * Get config element
@@ -174,6 +175,8 @@ export class WeekPlannerCard extends LitElement {
         this._dayFormat = config.dayFormat ?? null;
         this._dateFormat = config.dateFormat ?? 'cccc d LLLL yyyy';
         this._timeFormat = config.timeFormat ?? 'HH:mm';
+        this._showNavigationLabel = config.showNavigationLabel ?? true;
+        this._navigationLabelFormat = config.navigationLabelFormat ?? 'MMMM';
         this._locationLink = config.locationLink ?? 'https://www.google.com/maps/search/?api=1&query=';
         this._showTitle = config.showTitle ?? true;
         this._showDescription = config.showDescription ?? false;
@@ -365,9 +368,49 @@ export class WeekPlannerCard extends LitElement {
                     <li @click="${this._handleNavigationOriginalClick}"><ha-icon icon="mdi:circle-medium"></ha-icon></li>
                     <li @click="${this._handleNavigationNextClick}"><ha-icon icon="mdi:arrow-right"></ha-icon></li>
                 </ul>
-                <div class="month">${this._startDate.toFormat('MMMM')}</div>
+                ${this._showNavigationLabel ? 
+                    html`<div class="month">${this._getNavigationLabel()}</div>` : 
+                    ''
+                }
             </div>
         `;
+    }
+
+    _getNavigationLabel() {
+        if (this._showNavigationLabel) {
+            const template = this._navigationLabelFormat;
+
+            // Support explicit start/end templates like "{start: MMM} - {end: MMM yyyy}"
+            if (template?.includes('{')) {
+                return this._formatNavigationLabel(template);
+            }
+
+            // Default: single-date formatting
+            return this._startDate.toFormat(template);
+        }
+        return '';
+    }
+
+    _formatNavigationLabel(template) {
+        const startInclusive = this._startDate;
+        let endInclusive;
+
+        if (this._numberOfDaysIsMonth) {
+            // Show the visual end of the month
+            endInclusive = startInclusive.endOf('month');
+        } else {
+            // End is exclusive in calculations; make inclusive for display
+            endInclusive = startInclusive.plus({ days: this._numberOfDays }).minus({ days: 1 });
+        }
+
+        return template.replace(/\{(start|end):([^}]+)\}/g, (match, which, fmt) => {
+            const date = which === 'start' ? startInclusive : endInclusive;
+            try {
+                return date.toFormat(fmt.trim());
+            } catch (e) {
+                return match;
+            }
+        });
     }
 
     _renderDays() {
