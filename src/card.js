@@ -376,6 +376,9 @@ export class WeekPlannerCard extends LitElement {
         }
 
         return html`
+            ${this._startingDay === 'month' && Array.from({ length: (this._startDate.weekday - this._startingDayOffset - 1) % 7 }, (_, i) => html`
+                <div class="day"></div>`)
+            }
             ${this._days.map((day) => {
                 if (this._hideDaysWithoutEvents && day.events.length === 0 && (this._hideTodayWithoutEvents || !this._isToday(day.date))) {
                     return html``;
@@ -734,7 +737,7 @@ export class WeekPlannerCard extends LitElement {
 
         this._startDate = this._getStartDate();
         let startDate = this._startDate;
-        let endDate = this._startDate.plus({ days: this._numberOfDays });
+        let endDate = this._startDate.plus({ days: this._numberOfDaysIsMonth ? this._startDate.daysInMonth : this._numberOfDays });
         let now = DateTime.now();
         let runStartdate = this._startDate.toISO();
 
@@ -983,7 +986,7 @@ export class WeekPlannerCard extends LitElement {
         });
 
         let startDate = this._startDate;
-        let endDate = this._startDate.plus({ days: this._numberOfDays });
+        let endDate = this._startDate.plus({ days: this._numberOfDaysIsMonth ? this._startDate.daysInMonth : this._numberOfDays });
 
         let numberOfEvents = 0;
         while (startDate < endDate) {
@@ -1177,7 +1180,7 @@ export class WeekPlannerCard extends LitElement {
                 break;
         }
 
-        if (this._startingDayOffset !== 0) {
+        if (this._startingDayOffset !== 0 && ! this._numberOfDaysIsMonth) {
             startDate = startDate.plus({ days: this._startingDayOffset });
         }
 
