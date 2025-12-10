@@ -17,6 +17,14 @@ jobs:
           npm install
           npm run build
 
+      - name: Transpile dist
+        run: |
+          npm run transpile-dist
+
+      - name: Verify ES2019 compatibility
+        run: |
+          npm run verify:es2019
+
       # Upload build file to the release as an asset.
       - name: Upload js to release
         uses: svenstaro/upload-release-action@2.0.0

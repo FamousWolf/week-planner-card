@@ -12,7 +12,9 @@
   },
   "scripts": {
     "watch": "parcel watch",
-    "build": "parcel build"
+    "build": "parcel build",
+    "transpile-dist": "./node_modules/.bin/babel dist --extensions \".js\" --out-dir dist --presets @babel/preset-env --no-babelrc && node scripts/replace-bigint.cjs",
+    "verify:es2019": "npx es-check --module es2019 \"dist/**/*.js\" \"dist/*.js\""
   },
   "repository": {
     "type": "git",
@@ -28,8 +30,12 @@
   },
   "homepage": "https://github.com/FamousWolf/week-planner-card",
   "devDependencies": {
+    "@babel/cli": "^7.28.3",
+    "@babel/core": "^7.28.5",
+    "@babel/preset-env": "^7.28.5",
     "@parcel/optimizer-data-url": "^2.12.0",
     "@parcel/transformer-inline-string": "^2.11.0",
+    "es-check": "^7.0.0",
     "parcel": "^2.11.0",
     "svgo": "^3.3.2"
   },
