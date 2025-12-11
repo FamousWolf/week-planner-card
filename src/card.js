@@ -617,6 +617,30 @@ export class WeekPlannerCard extends LitElement {
                         ''
                     }
                 </div>
+                ${this._params.canDelete
+                    ? html`
+                        <ha-button
+                            slot="secondaryAction"
+                            variant="danger"
+                            appearance="plain"
+                            @click=${this._deleteEvent}
+                            .disabled=${this._submitting}
+                        >
+                            ${this.hass.localize("ui.components.calendar.event.delete")}
+                        </ha-button>
+                    `
+                : ""}
+                ${this._params.canEdit
+                    ? html`
+                        <ha-button
+                            slot="primaryAction"
+                            @click=${this._editEvent}
+                            .disabled=${this._submitting}
+                        >
+                            ${this.hass.localize("ui.components.calendar.event.edit")}
+                        </ha-button>
+                    `
+                : ""}
             </ha-dialog>
         `;
     }
