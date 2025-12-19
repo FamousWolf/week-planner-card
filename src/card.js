@@ -866,6 +866,7 @@ export class WeekPlannerCard extends LitElement {
                 icon: calendar.icon ?? null,
                 calendars: [calendar.entity],
                 calendarSorting: calendarSorting,
+                priority: calendar.priority ?? 0,
                 calendarNames: [calendar.name],
                 class: this._getEventClass(startDate, endDate, fullDay)
             }
@@ -993,11 +994,29 @@ export class WeekPlannerCard extends LitElement {
                 const dateKey = startDate.toISODate();
                 if (this._events.hasOwnProperty(dateKey)) {
                     events = this._events[dateKey].sort((event1, event2) => {
-                        if (this._calendarEvents[event1].start === this._calendarEvents[event2].start) {
-                            return this._calendarEvents[event1].calendarSorting < this._calendarEvents[event2].calendarSorting ? 1 : (this._calendarEvents[event1].calendarSorting > this._calendarEvents[event2].calendarSorting) ? -1 : 0;
+                        const e1 = this._calendarEvents[event1];
+                        const e2 = this._calendarEvents[event2];
+
+                        // Both events are all-day
+                        if (e1.fullDay && e2.fullDay) {
+                            const p1 = e1.priority ?? e1.calendarSorting ?? 0;
+                            const p2 = e2.priority ?? e2.calendarSorting ?? 0;
+                            // Sort descending by priority
+                            if (p1 !== p2) return p2 - p1;
+                            return e1.calendarSorting - e2.calendarSorting;
                         }
 
-                        return this._calendarEvents[event1].start > this._calendarEvents[event2].start ? 1 : -1;
+                        // One all-day, one timed: keep all-day first
+                        if (e1.fullDay && !e2.fullDay) return -1;
+                        if (!e1.fullDay && e2.fullDay) return 1;
+
+                        // Both timed events: sort by start time
+                        const date1 = new Date(e1.start);
+                        const date2 = new Date(e2.start);
+                        if (date1.getTime() === date2.getTime()) {
+                            return e1.calendarSorting - e2.calendarSorting;
+                        }
+                        return date1.getTime() - date2.getTime();
                     });
 
                     const previousNumberOfEvents = numberOfEvents;
