@@ -28,7 +28,7 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 ### HACS (Recommended)
 
 1. Make sure [HACS](https://hacs.xyz) is installed and working.
-2. Add this repository (https://github.com/FamousWolf/week-planner-card) via [HACS Custom repositories](https://hacs.xyz/docs/faq/custom_repositories). Type should be `Dashboard`.
+2. Search for `week-planner-card`.
 3. Download and install using HACS.
 
 ### Manual
@@ -39,7 +39,7 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
     Add:
     ```yaml
     resources:
-      - url: /local/week-planner-card.js?version=1.11.1
+      - url: /local/week-planner-card.js?version=1.12.1
     type: module
     ```
   - **Using the graphical editor**
@@ -86,23 +86,30 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 | `hideTodayWithoutEvents` | boolean          | false                                              | `false` \| `true`                                                                                                                           | Also do not show today without events if `hideDaysWithoutEvents` is set                | 1.8.0   |
 | `filter`                 | string           | optional                                           | Any regular expression                                                                                                                      | Remove events that match the regular expression                                        | 1.7.0   |
 | `filterText`             | string           | optional                                           | Any regular expression                                                                                                                      | Remove text from events                                                                | 1.10.0  |
+| `replaceTitleText`       | object           | optional                                           | See [Replace title text](#replace-title-text)                                                                                               | Replace title text                                                                     | 1.12.0  |
 | `combineSimilarEvents`   | boolean          | false                                              | `false` \| `true`                                                                                                                           | Combine events with the same start date/time, end date/time and title                  | 1.9.0   |
 | `showLegend`             | boolean          | false                                              | `false` \| `true`                                                                                                                           | Show calendar legend                                                                   | 1.7.0   |
 | `legendToggle`           | boolean          | false                                              | `false` \| `true`                                                                                                                           | Toggle calendars by clicking on the legend                                             | 1.11.0  |
 | `columns`                | object           | optional                                           | See [Columns](#columns)                                                                                                                     | Configuration to override the number of columns                                        | 1.11.0  |
+| `showNavigation`         | boolean          | false                                              | `false` \| `true`                                                                                                                           | Show navigational arrows to traverse additional dates on calendar.                     | 1.12.0  |
+| `showWeekDayText`        | boolean          | false                                              | `false` \| `true`                                                                                                                           | Display the weekday in a header instead of individual days when days >=7               | Local   |
+
+**Note regarding Month View:**
+When `days` is set to `month` and `startingDay` is configured as a specific weekday (e.g., `monday` to `sunday`), the calendar will align the display with the specified starting day of the week. In this mode, days falling outside the current month will be excluded from the view.
 
 ### Calendars
 
-| Name              | Type    | Default      | Supported options      | Description                                            | Version |
-|-------------------|---------|--------------|------------------------|--------------------------------------------------------|---------|
-| `entity`          | string  | **Required** | `calendar.my_calendar` | Entity ID                                              | 1.0.0   |
-| `name`            | string  | optional     | Any text               | Name of the calendar                                   | 1.7.0   |
-| `color`           | string  | optional     | Any CSS color          | Color used for events from the calendar                | 1.0.0   |
-| `icon`            | string  | optional     | Any icon               | Icon used for events from the calendar                 | 1.10.0  |
-| `eventTitleField` | string  | optional     | Any text               | Name of the title field for events (usually `summary`) | 1.11.0  |
-| `filter`          | string  | optional     | Any regular expression | Remove events that match the regular expression        | 1.8.0   |
-| `filterText`      | string  | optional     | Any regular expression | Remove text from events                                | 1.10.0  |
-| `hideInLegend`    | boolean | false        | `false` \| `true`      | Do not show the calendar in the legend                 | 1.8.0   |
+| Name               | Type    | Default      | Supported options                             | Description                                            | Version |
+|--------------------|---------|--------------|-----------------------------------------------|--------------------------------------------------------|---------|
+| `entity`           | string  | **Required** | `calendar.my_calendar`                        | Entity ID                                              | 1.0.0   |
+| `name`             | string  | optional     | Any text                                      | Name of the calendar                                   | 1.7.0   |
+| `color`            | string  | optional     | Any CSS color                                 | Color used for events from the calendar                | 1.0.0   |
+| `icon`             | string  | optional     | Any icon                                      | Icon used for events from the calendar                 | 1.10.0  |
+| `eventTitleField`  | string  | optional     | Any text                                      | Name of the title field for events (usually `summary`) | 1.11.0  |
+| `filter`           | string  | optional     | Any regular expression                        | Remove events that match the regular expression        | 1.8.0   |
+| `filterText`       | string  | optional     | Any regular expression                        | Remove text from events                                | 1.10.0  |
+| `replaceTitleText` | object  | optional     | See [Replace title text](#replace-title-text) | Replace title text                                     | 1.12.0  |
+| `hideInLegend`     | boolean | false        | `false` \| `true`                             | Do not show the calendar in the legend                 | 1.8.0   |
 
 ### Texts
 
@@ -145,6 +152,18 @@ By default, the columns are based on the width of the card. You can use these se
 | `medium`     | number  | optional | Any positive number | Number of columns when the card width is >= 1024 pixels | 1.11.0  |
 | `small`      | number  | optional | Any positive number | Number of columns when the card width is >= 640 pixels  | 1.11.0  |
 | `extraSmall` | number  | optional | Any positive number | Number of columns when the card width is < 640 pixels   | 1.11.0  |
+
+### Replace title text
+
+You can replace text in the title. For example:
+
+```yaml
+replaceTitleText:
+  "Search text": "Replace text"
+  "Foo": "Bar"
+```
+
+This will replace the text "Search text" with "Replace text" and "Foo" with "Bar". This option is not available in the visual editor.
 
 ## Custom styling using cardmod
 

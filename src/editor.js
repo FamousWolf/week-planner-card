@@ -106,13 +106,18 @@ export class WeekPlannerCardEditor extends LitElement {
                             }, {
                                 value: 'saturday',
                                 label: 'Saturday',
+                            }, {
+                                value: 'month',
+                                label: 'Month',
                             }
                         ], true)}
                         ${this.addTextField('startingDayOffset', 'Starting day offset', 'number')}
+                        ${this.addBooleanField('showWeekDayText', 'Show week day text', true)}
                         ${this.addBooleanField('hideWeekend', 'Hide weekend')}
                         ${this.addBooleanField('hideDaysWithoutEvents', 'Hide days without events except for today')}
                         ${this.addBooleanField('hideTodayWithoutEvents', 'Also hide today without events')}
                         ${this.addTextField('maxDayEvents', 'Maximum number of events per day (0 is no maximum)', 'number', 0)}
+                        ${this.addBooleanField('showNavigation', 'Show navigation')}
                     `
                 )}
                 ${this.addExpansionPanel(
@@ -224,7 +229,7 @@ export class WeekPlannerCardEditor extends LitElement {
                 label="${label ?? name}"
                 value="${this.getConfigValue(name, defaultValue)}"
                 .includeDomains="${includeDomains}"
-                @change="${this._valueChanged}"
+                @value-changed="${this._valueChanged}"
             />
         `;
     }
@@ -236,7 +241,7 @@ export class WeekPlannerCardEditor extends LitElement {
                 name="${name}"
                 label="${label ?? name}"
                 value="${this.getConfigValue(name, defaultValue)}"
-                @change="${this._valueChanged}"
+                @value-changed="${this._valueChanged}"
             />
         `;
     }
@@ -304,7 +309,7 @@ export class WeekPlannerCardEditor extends LitElement {
 
     _valueChanged(event) {
         const target = event.target;
-        let value = target.value;
+        let value = event.detail ? event.detail.value ?? target.value ?? '' : target.value ?? '';
 
         if (target.tagName === 'HA-SWITCH') {
             value = target.checked;

@@ -9,7 +9,10 @@ jobs:
     name: Prepare release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
       # Build
       - name: Build the file
@@ -20,7 +23,6 @@ jobs:
       # Upload build file to the release as an asset.
       - name: Upload js to release
         uses: svenstaro/upload-release-action@2.0.0
-
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: dist/week-planner-card.js
