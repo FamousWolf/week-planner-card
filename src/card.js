@@ -18,35 +18,35 @@ import sunny from 'data-url:./icons/sunny.png';
 import windy from 'data-url:./icons/windy.svg';
 
 const ICONS = {
-  'clear-day': sunny,
-  'clear-night': clear_night,
-  cloudy,
-  overcast: cloudy,
-  fog,
-  hail: mixed_rain,
-  lightning,
-  'lightning-rainy': storm,
-  'partly-cloudy-day': mostly_cloudy,
-  'partly-cloudy-night': mostly_cloudy_night,
-  partlycloudy: mostly_cloudy,
-  pouring: heavy_rain,
-  rain: rainy,
-  rainy,
-  sleet: mixed_rain,
-  snow: snowy,
-  snowy,
-  'snowy-rainy': mixed_rain,
-  sunny,
-  wind: windy,
-  windy,
-  'windy-variant': windy
+    'clear-day': sunny,
+    'clear-night': clear_night,
+    cloudy,
+    overcast: cloudy,
+    fog,
+    hail: mixed_rain,
+    lightning,
+    'lightning-rainy': storm,
+    'partly-cloudy-day': mostly_cloudy,
+    'partly-cloudy-night': mostly_cloudy_night,
+    partlycloudy: mostly_cloudy,
+    pouring: heavy_rain,
+    rain: rainy,
+    rainy,
+    sleet: mixed_rain,
+    snow: snowy,
+    snowy,
+    'snowy-rainy': mixed_rain,
+    sunny,
+    wind: windy,
+    windy,
+    'windy-variant': windy
 };
 
 const ICONS_NIGHT = {
-  ...ICONS,
-  sunny: clear_night,
-  partlycloudy: mostly_cloudy_night,
-  'lightning-rainy': storm_night
+    ...ICONS,
+    sunny: clear_night,
+    partlycloudy: mostly_cloudy_night,
+    'lightning-rainy': storm_night
 };
 
 export class WeekPlannerCard extends LitElement {
@@ -294,13 +294,13 @@ export class WeekPlannerCard extends LitElement {
             <ha-card class="${cardClasses.join(' ')}" style="${cardStyles.join(' ')}">
                 <div class="card-content">
                     ${this._error ?
-                        html`<ha-alert alert-type="error">${this._error}</ha-alert>` :
-                        ''
-                    }
+                html`<ha-alert alert-type="error">${this._error}</ha-alert>` :
+                ''
+            }
                     ${this._title ?
-                        html`<h1 class="card-title">${this._title}</h1>` :
-                        ''
-                    }
+                html`<h1 class="card-title">${this._title}</h1>` :
+                ''
+            }
                     <div class="container${this._actions ? ' hasActions' : ''}" @click="${this._handleContainerClick}">
                         ${this._renderHeader()}
                         ${this._renderDays()}
@@ -334,20 +334,20 @@ export class WeekPlannerCard extends LitElement {
             <div class="legend">
                 <ul>
                     ${this._calendars.map((calendar) => {
-                        if (!calendar.hideInLegend) {
-                            return html`
+            if (!calendar.hideInLegend) {
+                return html`
                                 <li class="${calendar.icon ? 'icon' : 'noIcon'}${this._legendToggle ? ' hasToggle' : ''}${this._hideCalendars.indexOf(calendar.entity) === -1 ? '' : ' hidden'}" style="--legend-calendar-color: ${calendar.color ?? 'inherit'}" @click="${() => {
-                                    this._handleLegendClick(calendar)
-                                }}">
+                        this._handleLegendClick(calendar)
+                    }}">
                                     ${calendar.icon ?
-                                        html`<ha-icon icon="${calendar.icon}"></ha-icon>` :
-                                        ''
-                                    }
+                        html`<ha-icon icon="${calendar.icon}"></ha-icon>` :
+                        ''
+                    }
                                     ${calendar.name ?? calendar.entity}
                                 </li>
                             `;
-                        }
-                    })}
+            }
+        })}
                 </ul>
             </div>
         `;
@@ -377,60 +377,60 @@ export class WeekPlannerCard extends LitElement {
 
         return html`
             ${this._days.map((day) => {
-                if (this._hideDaysWithoutEvents && day.events.length === 0 && (this._hideTodayWithoutEvents || !this._isToday(day.date))) {
-                    return html``;
-                }
-                return html`
+            if (this._hideDaysWithoutEvents && day.events.length === 0 && (this._hideTodayWithoutEvents || !this._isToday(day.date))) {
+                return html``;
+            }
+            return html`
                     <div class="day ${day.class}" data-date="${day.date.day}" data-weekday="${day.date.weekday}" data-month="${day.date.month}" data-year="${day.date.year}" data-week="${day.date.weekNumber}">
                         <div class="date">
                             ${this._dayFormat ?
-                                unsafeHTML(day.date.toFormat(this._dayFormat)) :
-                                html`
+                    unsafeHTML(day.date.toFormat(this._dayFormat)) :
+                    html`
                                     <span class="number">${day.date.day}</span>
                                     <span class="text">${this._getWeekDayText(day.date)}</span>
                                 `
-                            }
+                }
                         </div>
                         ${day.weather ?
-                            html`
+                    html`
                                 <div class="weather" @click="${this._handleWeatherClick}">
                                     ${this._weather?.showTemperature || this._weather?.showLowTemperature ?
-                                        html`
+                            html`
                                             <div class="temperature">
                                                 ${this._weather?.showTemperature ?
-                                                    html`
+                                    html`
                                                         <span class="high">${day.weather.temperature}</span>
                                                     ` :
-                                                    ''
-                                                }
+                                    ''
+                                }
                                                 ${this._weather?.showLowTemperature ?
-                                                    html`
+                                    html`
                                                             <span class="low">${day.weather.templow}</span>
                                                     ` :
-                                                    ''
-                                                }
+                                    ''
+                                }
                                             </div>
                                         ` :
-                                        ''
-                                    }
+                            ''
+                        }
                                     ${this._weather?.showCondition ?
-                                        html`
+                            html`
                                             <div class="icon">
                                                 <img src="${day.weather.icon}" alt="${day.weather.condition}">
                                             </div>
                                         ` :
-                                        ''
-                                    }
-                                </div>
-                            ` :
                             ''
                         }
+                                </div>
+                            ` :
+                    ''
+                }
                         <div class="events">
                             ${this._renderEvents(day)}
                         </div>
                     </div>
                 `
-            })}
+        })}
         `;
     }
 
@@ -478,8 +478,8 @@ export class WeekPlannerCard extends LitElement {
 
         return html`
             ${dayEvents.map((event) => {
-                const doneColors = [event.colors[0]];
-                return html`
+            const doneColors = [event.colors[0]];
+            return html`
                     <div
                         class="event ${event.class}"
                         data-entity="${event.calendars[0]}"
@@ -492,68 +492,68 @@ export class WeekPlannerCard extends LitElement {
                         data-end-minute="${event.end.toFormat('mm')}"
                         style="--border-color: ${event.colors[0]}"
                         @click="${() => {
-                            this._handleEventClick(event)
-                        }}"
+                    this._handleEventClick(event)
+                }}"
                     >
                         ${event.colors.map((color) => {
-                            if (doneColors.indexOf(color) > -1) {
-                                return '';
-                            }
-                            doneColors.push(color);
-                            return html`
+                    if (doneColors.indexOf(color) > -1) {
+                        return '';
+                    }
+                    doneColors.push(color);
+                    return html`
                                 <div
                                     class="additionalColor"
                                     style="--event-additional-color: ${color}"
                                 ></div>
                             `
-                        })}
+                })}
                         <div class="inner">
                             <div class="time">
                                 ${event.fullDay ?
-                                    html`${this._language.fullDay}` :
-                                    html`
+                    html`${this._language.fullDay}` :
+                    html`
                                         ${event.start.toFormat(this._timeFormat)}
                                         ${event.end ? ' - ' + event.end.toFormat(this._timeFormat) : ''}
                                     `
-                                }
+                }
                             </div>
                             ${this._showTitle ?
-                                    html`
+                    html`
                                         <div class="title">
                                             ${event.summary}
                                         </div>
                                     ` :
-                                    ''
-                            }
+                    ''
+                }
                             ${this._showDescription ?
-                                html`
+                    html`
                                     <div class="description">
                                         ${unsafeHTML(event.description)}
                                     </div>
                                 ` :
-                                ''
-                            }
+                    ''
+                }
                             ${this._showLocation && event.location ?
-                                html`
+                    html`
                                     <div class="location">
                                         <ha-icon icon="mdi:map-marker"></ha-icon>
                                         ${event.location}
                                     </div>
                                 ` :
-                                ''
-                            }
+                    ''
+                }
                         </div>
                         ${event.icon ?
-                            html`
+                    html`
                                 <div class="icon">
                                     <ha-icon icon="${event.icon}"></ha-icon>
                                 </div>
                             ` :
-                            ''
-                        }
+                    ''
+                }
                     </div>
                 `
-            })}
+        })}
             ${moreEvents ?
                 html`
                     <div class="more">
@@ -598,7 +598,7 @@ export class WeekPlannerCard extends LitElement {
                         </div>
                     </div>
                     ${this._currentEventDetails.location ?
-                        html`
+                html`
                             <div class="location">
                                 <ha-icon icon="mdi:map-marker"></ha-icon>
                                 <div class="info">
@@ -606,16 +606,16 @@ export class WeekPlannerCard extends LitElement {
                                 </div>
                             </div>
                         ` :
-                        ''
-                    }
+                ''
+            }
                     ${this._currentEventDetails.description ?
-                        html`
+                html`
                             <div class="description">
                                 ${unsafeHTML(this._currentEventDetails.description)}
                             </div>
                         ` :
-                        ''
-                    }
+                ''
+            }
                 </div>
             </ha-dialog>
         `;
@@ -843,9 +843,11 @@ export class WeekPlannerCard extends LitElement {
             eventKey = startDate.toISO() + '-' + endDate.toISO() + '-' + title + '-' + calendar.entity;
         }
 
+        const color = this._getEventColor(event, calendar);
+
         if (this._calendarEvents.hasOwnProperty(eventKey)) {
             this._calendarEvents[eventKey].calendars.push(calendar.entity);
-            this._calendarEvents[eventKey].colors.push(calendar.color ?? 'inherit')
+            this._calendarEvents[eventKey].colors.push(color)
             if (calendar.name && this._calendarEvents[eventKey].calendarNames.indexOf(calendar.name) === -1) {
                 this._calendarEvents[eventKey].calendarNames.push(calendar.name);
             }
@@ -862,7 +864,7 @@ export class WeekPlannerCard extends LitElement {
                 end: endDate,
                 originalEnd: this._convertApiDate(event.end),
                 fullDay: fullDay,
-                colors: [calendar.color ?? 'inherit'],
+                colors: [color],
                 icon: calendar.icon ?? null,
                 calendars: [calendar.entity],
                 calendarSorting: calendarSorting,
@@ -871,6 +873,22 @@ export class WeekPlannerCard extends LitElement {
             }
             this._events[dateKey].push(eventKey);
         }
+    }
+
+    _getEventColor(event, calendar) {
+        if (event.color) {
+            return event.color;
+        }
+
+        if (calendar.colorRules) {
+            for (const rule of calendar.colorRules) {
+                if (rule.match && event.summary && event.summary.match(new RegExp(rule.match, 'i'))) {
+                    return rule.color;
+                }
+            }
+        }
+
+        return calendar.color ?? 'inherit';
     }
 
     _filterEventSummary(event, calendar) {
@@ -1056,9 +1074,9 @@ export class WeekPlannerCard extends LitElement {
 
         const event = new Event(
             'hass-action', {
-                bubbles: true,
-                composed: true,
-            }
+            bubbles: true,
+            composed: true,
+        }
         );
         event.detail = {
             config: this._actions,
@@ -1113,9 +1131,9 @@ export class WeekPlannerCard extends LitElement {
     _handleWeatherClick(e) {
         const event = new Event(
             'hass-more-info', {
-                bubbles: true,
-                composed: true,
-            }
+            bubbles: true,
+            composed: true,
+        }
         );
         event.detail = {
             entityId: this._weather.entity

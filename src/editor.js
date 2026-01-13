@@ -35,82 +35,114 @@ export class WeekPlannerCardEditor extends LitElement {
             <div style="display: flex; flex-direction: column">
                 ${this.addTextField('title', 'Title')}
                 ${this.addExpansionPanel(
-                    'Calendars',
-                    html`
+            'Calendars',
+            html`
                         ${this.getConfigValue('calendars').map((calendar, index) => {
-                            return html`
+                return html`
                                 ${this.addExpansionPanel(
-                                    `Calendar: ${calendar.name ?? calendar.entity}`,
-                                    html`
+                    `Calendar: ${calendar.name ?? calendar.entity}`,
+                    html`
                                         ${this.addEntityPickerField('calendars.' + index + '.entity', 'Entity', ['calendar'])}
                                         ${this.addTextField('calendars.' + index + '.name', 'Name')}
                                         ${this.addTextField('calendars.' + index + '.color', 'Color')}
+                                        ${this.addExpansionPanel(
+                        'Color rules',
+                        html`
+                                                ${(calendar.colorRules ?? []).map((rule, ruleIndex) => {
+                            return html`
+                                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                                            <div style="flex-grow: 1;">
+                                                                ${this.addTextField('calendars.' + index + '.colorRules.' + ruleIndex + '.match', 'Match (regex)')}
+                                                            </div>
+                                                            <div style="flex-grow: 1;">
+                                                                ${this.addTextField('calendars.' + index + '.colorRules.' + ruleIndex + '.color', 'Color')}
+                                                            </div>
+                                                            ${this.addButton('', 'mdi:trash-can', () => {
+                                const config = JSON.parse(JSON.stringify(this._config));
+                                config.calendars[index].colorRules.splice(ruleIndex, 1);
+                                this._config = config;
+                                this.dispatchConfigChangedEvent();
+                            })}
+                                                        </div>
+                                                    `;
+                        })}
+                                                ${this.addButton('Add color rule', 'mdi:plus', () => {
+                            const config = JSON.parse(JSON.stringify(this._config));
+                            if (!config.calendars[index].colorRules) {
+                                config.calendars[index].colorRules = [];
+                            }
+                            config.calendars[index].colorRules.push({});
+                            this._config = config;
+                            this.dispatchConfigChangedEvent();
+                        })}
+                                            `
+                    )}
                                         ${this.addIconPickerField('calendars.' + index + '.icon', 'Icon')}
                                         ${this.addTextField('calendars.' + index + '.eventTitleField', 'Event title field', 'text', 'summary')}
                                         ${this.addTextField('calendars.' + index + '.filter', 'Filter events (regex)')}
                                         ${this.addTextField('calendars.' + index + '.filterText', 'Filter event text (regex)')}
                                         ${this.addBooleanField('calendars.' + index + '.hideInLegend', 'Hide in legend')}
                                         ${this.addButton('Remove calendar', 'mdi:trash-can', () => {
-                                            const config = JSON.parse(JSON.stringify(this._config));
-                                            if (config.calendars.length === 1) {
-                                                config.calendars = [];
-                                            } else {
-                                                delete config.calendars[index];
-                                                config.calendars = config.calendars.filter(Boolean);
-                                            }
-                                            this._config = config;
-                                            this.dispatchConfigChangedEvent();
-                                        })}
+                        const config = JSON.parse(JSON.stringify(this._config));
+                        if (config.calendars.length === 1) {
+                            config.calendars = [];
+                        } else {
+                            delete config.calendars[index];
+                            config.calendars = config.calendars.filter(Boolean);
+                        }
+                        this._config = config;
+                        this.dispatchConfigChangedEvent();
+                    })}
                                     `
-                                )}
-                            `
-                        })}
-                        ${this.addButton('Add calendar', 'mdi:plus', () => {
-                            const index = this.getConfigValue('calendars').length;
-                            this.setConfigValue('calendars.' + index, {});
-                        })}
-                    `
                 )}
+                            `
+            })}
+                        ${this.addButton('Add calendar', 'mdi:plus', () => {
+                const index = this.getConfigValue('calendars').length;
+                this.setConfigValue('calendars.' + index, {});
+            })}
+                    `
+        )}
                 ${this.addExpansionPanel(
-                    'Days',
-                    html`
+            'Days',
+            html`
                         ${this.addTextField('days', 'Days')}
                         ${this.addSelectField('startingDay', 'Starting day', [
-                            {
-                                value: 'today',
-                                label: 'Today',
-                            }, {
-                                value: 'tomorrow',
-                                label: 'Tomorrow',
-                            }, {
-                                value: 'yesterday',
-                                label: 'Yesterday',
-                            }, {
-                                value: 'sunday',
-                                label: 'Sunday',
-                            }, {
-                                value: 'monday',
-                                label: 'Monday',
-                            }, {
-                                value: 'tuesday',
-                                label: 'Tuesday',
-                            }, {
-                                value: 'wednesday',
-                                label: 'Wednesday',
-                            }, {
-                                value: 'thursday',
-                                label: 'Thursday',
-                            }, {
-                                value: 'friday',
-                                label: 'Friday',
-                            }, {
-                                value: 'saturday',
-                                label: 'Saturday',
-                            }, {
-                                value: 'month',
-                                label: 'Month',
-                            }
-                        ], true)}
+                {
+                    value: 'today',
+                    label: 'Today',
+                }, {
+                    value: 'tomorrow',
+                    label: 'Tomorrow',
+                }, {
+                    value: 'yesterday',
+                    label: 'Yesterday',
+                }, {
+                    value: 'sunday',
+                    label: 'Sunday',
+                }, {
+                    value: 'monday',
+                    label: 'Monday',
+                }, {
+                    value: 'tuesday',
+                    label: 'Tuesday',
+                }, {
+                    value: 'wednesday',
+                    label: 'Wednesday',
+                }, {
+                    value: 'thursday',
+                    label: 'Thursday',
+                }, {
+                    value: 'friday',
+                    label: 'Friday',
+                }, {
+                    value: 'saturday',
+                    label: 'Saturday',
+                }, {
+                    value: 'month',
+                    label: 'Month',
+                }
+            ], true)}
                         ${this.addTextField('startingDayOffset', 'Starting day offset', 'number')}
                         ${this.addBooleanField('hideWeekend', 'Hide weekend')}
                         ${this.addBooleanField('hideDaysWithoutEvents', 'Hide days without events except for today')}
@@ -118,10 +150,10 @@ export class WeekPlannerCardEditor extends LitElement {
                         ${this.addTextField('maxDayEvents', 'Maximum number of events per day (0 is no maximum)', 'number', 0)}
                         ${this.addBooleanField('showNavigation', 'Show navigation')}
                     `
-                )}
+        )}
                 ${this.addExpansionPanel(
-                    'Events',
-                    html`
+            'Events',
+            html`
                         ${this.addTextField('maxEvents', 'Maximum number of events (0 is no maximum)', 'number', 0)}
                         ${this.addBooleanField('hidePastEvents', 'Hide past events')}
                         ${this.addTextField('filter', 'Filter events (regex)')}
@@ -132,30 +164,30 @@ export class WeekPlannerCardEditor extends LitElement {
                         ${this.addBooleanField('showLocation', 'Show location in overview')}
                         ${this.addTextField('locationLink', 'Override location link base URL')}
                     `
-                )}
+        )}
                 ${this.addExpansionPanel(
-                    'Date/time formats',
-                    html`
+            'Date/time formats',
+            html`
                         <p>These formats use <a href="https://moment.github.io/luxon/#/formatting?id=table-of-tokens" target="_blank">Luxon format tokens</a></p>
                         ${this.addTextField('locale', 'Locale')}
                         ${this.addTextField('dateFormat', 'Date format')}
                         ${this.addTextField('timeFormat', 'Time format')}
                         ${this.addTextField('dayFormat', 'Override day number')}
                     `
-                )}
+        )}
                 ${this.addExpansionPanel(
-                    'Weather',
-                    html`
+            'Weather',
+            html`
                         ${this.addEntityPickerField('weather.entity', 'Weather entity', ['weather'])}
                         ${this.addBooleanField('weather.showCondition', 'Show condition icon')}
                         ${this.addBooleanField('weather.showTemperature', 'Show temperature')}
                         ${this.addBooleanField('weather.showLowTemperature', 'Show low temperature')}
                         ${this.addBooleanField('weather.useTwiceDaily', 'Use twice daily if entity does not support daily')}
                     `
-                )}
+        )}
                 ${this.addExpansionPanel(
-                    'Override columns',
-                    html`
+            'Override columns',
+            html`
                         <p>The number of columns is based on the size of the card.</p>
                         ${this.addTextField('columns.extraLarge', 'Extra large (>= 1920px)', 'number')}
                         ${this.addTextField('columns.large', 'Large (>= 1280px)', 'number')}
@@ -163,25 +195,25 @@ export class WeekPlannerCardEditor extends LitElement {
                         ${this.addTextField('columns.small', 'Small (>= 640px)', 'number')}
                         ${this.addTextField('columns.extraSmall', 'Extra small (< 640px)', 'number')}
                     `
-                )}
+        )}
                 ${this.addExpansionPanel(
-                    'Appearance',
-                    html`
+            'Appearance',
+            html`
                         ${this.addBooleanField('noCardBackground', 'No card background')}
                         ${this.addTextField('eventBackground', 'Override events background color')}
                         ${this.addBooleanField('compact', 'Compact mode')}
                     `
-                )}
+        )}
                 ${this.addExpansionPanel(
-                    'Legend',
-                    html`
+            'Legend',
+            html`
                         ${this.addBooleanField('showLegend', 'Show legend')}
                         ${this.addBooleanField('legendToggle', 'Toggle calendars by clicking on the legend')}
                     `
-                )}
+        )}
                 ${this.addExpansionPanel(
-                    'Texts',
-                    html`
+            'Texts',
+            html`
                         ${this.addTextField('texts.fullDay', 'Entire day')}
                         ${this.addTextField('texts.noEvents', 'No events')}
                         ${this.addTextField('texts.moreEvents', 'More events')}
@@ -196,13 +228,13 @@ export class WeekPlannerCardEditor extends LitElement {
                         ${this.addTextField('texts.friday', 'Friday')}
                         ${this.addTextField('texts.saturday', 'Saturday')}
                     `
-                )}
+        )}
                 ${this.addExpansionPanel(
-                    'Miscellaneous',
-                    html`
+            'Miscellaneous',
+            html`
                         ${this.addTextField('updateInterval', 'Override update interval', 'number')}
                     `
-                )}
+        )}
             </div>
         `;
     }
@@ -256,12 +288,12 @@ export class WeekPlannerCardEditor extends LitElement {
                 @closed="${(event) => { event.stopPropagation(); } /* Prevent a bug where the editor dialog also closes. See https://github.com/material-components/material-web/issues/1150 */}"
             >
                 ${options.map((option) => {
-                    return html`
+            return html`
                         <mwc-list-item
                             value="${option.value}"
                         >${option.label ?? option.value}</mwc-list-item>
                     `;
-                })}
+        })}
             </ha-select>
         `;
     }

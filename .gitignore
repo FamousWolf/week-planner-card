@@ -4,3 +4,4 @@ node_modules/
 dist/week-planner-card.js
 dist/week-planner-card.js.map
 
+.DS_Store
