@@ -151,6 +151,7 @@ export class WeekPlannerCardEditor extends LitElement {
                         ${this.addBooleanField('weather.showCondition', 'Show condition icon')}
                         ${this.addBooleanField('weather.showTemperature', 'Show temperature')}
                         ${this.addBooleanField('weather.showLowTemperature', 'Show low temperature')}
+                        ${this.addBooleanField('weather.roundTemperature', 'Round temperatures to nearest integer')}
                         ${this.addBooleanField('weather.useTwiceDaily', 'Use twice daily if entity does not support daily')}
                     `
                 )}

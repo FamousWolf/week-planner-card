@@ -119,6 +119,7 @@ export class WeekPlannerCard extends LitElement {
                 showCondition: true,
                 showTemperature: false,
                 showLowTemperature: false,
+                roundTemperature: false,
                 useTwiceDaily: false,
             },
             locale: 'en',
@@ -235,7 +236,8 @@ export class WeekPlannerCard extends LitElement {
             entity: null,
             showCondition: true,
             showTemperature: false,
-            showLowTemperature: false
+            showLowTemperature: false,
+            roundTemperature: false,
         };
         if (typeof weatherConfiguration === 'string') {
             configuration.entity = weatherConfiguration;
@@ -1026,11 +1028,13 @@ export class WeekPlannerCard extends LitElement {
             }
 
             const dateKey = DateTime.fromISO(forecast.datetime).toISODate();
+            const temperature = this._weather.roundTemperature ? Math.round(forecast.temperature) : forecast.temperature;
+            const templow = this._weather.roundTemperature ? Math.round(forecast.templow) : forecast.templow;
             weatherForecast[dateKey] = {
                 icon: this._getWeatherIcon(forecast),
                 condition: this.hass.formatEntityState(weatherState, forecast.condition),
-                temperature: this.hass.formatEntityAttributeValue(weatherState, 'temperature', forecast.temperature),
-                templow: this.hass.formatEntityAttributeValue(weatherState, 'templow', forecast.templow)
+                temperature: this.hass.formatEntityAttributeValue(weatherState, 'temperature', temperature),
+                templow: this.hass.formatEntityAttributeValue(weatherState, 'templow', templow)
             };
         });
 
