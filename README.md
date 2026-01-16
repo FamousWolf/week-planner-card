@@ -92,6 +92,10 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 | `legendToggle`           | boolean          | false                                              | `false` \| `true`                                                                                                                           | Toggle calendars by clicking on the legend                                             | 1.11.0  |
 | `columns`                | object           | optional                                           | See [Columns](#columns)                                                                                                                     | Configuration to override the number of columns                                        | 1.11.0  |
 | `showNavigation`         | boolean          | false                                              | `false` \| `true`                                                                                                                           | Show navigational arrows to traverse additional dates on calendar.                     | 1.12.0  |
+| `showWeekDayText`        | boolean          | false                                              | `false` \| `true`                                                                                                                           | Display the weekday in a header instead of individual days when days >=7               | Local   |
+
+**Note regarding Month View:**
+When `days` is set to `month` and `startingDay` is configured as a specific weekday (e.g., `monday` to `sunday`), the calendar will align the display with the specified starting day of the week. In this mode, days falling outside the current month will be excluded from the view.
 
 ### Calendars
 

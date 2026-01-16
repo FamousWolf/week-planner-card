@@ -112,6 +112,7 @@ export class WeekPlannerCardEditor extends LitElement {
                             }
                         ], true)}
                         ${this.addTextField('startingDayOffset', 'Starting day offset', 'number')}
+                        ${this.addBooleanField('showWeekDayText', 'Show week day text', true)}
                         ${this.addBooleanField('hideWeekend', 'Hide weekend')}
                         ${this.addBooleanField('hideDaysWithoutEvents', 'Hide days without events except for today')}
                         ${this.addBooleanField('hideTodayWithoutEvents', 'Also hide today without events')}
