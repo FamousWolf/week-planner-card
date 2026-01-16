@@ -50,6 +50,7 @@ export class WeekPlannerCardEditor extends LitElement {
                                         ${this.addTextField('calendars.' + index + '.filter', 'Filter events (regex)')}
                                         ${this.addTextField('calendars.' + index + '.filterText', 'Filter event text (regex)')}
                                         ${this.addBooleanField('calendars.' + index + '.hideInLegend', 'Hide in legend')}
+                                        ${this.addBooleanField('calendars.' + index + '.initiallyHidden', 'Initially hide calendar events')}
                                         ${this.addButton('Remove calendar', 'mdi:trash-can', () => {
                                             const config = JSON.parse(JSON.stringify(this._config));
                                             if (config.calendars.length === 1) {

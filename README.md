@@ -110,6 +110,7 @@ When `days` is set to `month` and `startingDay` is configured as a specific week
 | `filterText`       | string  | optional     | Any regular expression                        | Remove text from events                                | 1.10.0  |
 | `replaceTitleText` | object  | optional     | See [Replace title text](#replace-title-text) | Replace title text                                     | 1.12.0  |
 | `hideInLegend`     | boolean | false        | `false` \| `true`                             | Do not show the calendar in the legend                 | 1.8.0   |
+| `initiallyHidden`  | boolean | false        | `false` \| `true`                             | Initially hide the calendar                            | 1.13.0  |
 
 ### Texts
 
