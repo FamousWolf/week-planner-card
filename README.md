@@ -130,7 +130,7 @@ When `days` is set to `month` and `startingDay` is configured as a specific week
 | `saturday`   | string | Name of Saturday based on locale  | Any text          | Text used to override Saturdays                                                 | 1.1.0   |
 
 ### Actions
-See [Actions documentation](https://www.home-assistant.io/dashboards/actions/). Currently only the tab action is supported.
+See [Actions documentation](https://www.home-assistant.io/dashboards/actions/). Currently only the tap action is supported.
 
 ### Weather
 
@@ -283,6 +283,26 @@ card_mod:
   style: |
     .event.past {
       opacity: .3;
+    }
+```
+
+### Highlight Today with card_mod
+
+```yaml
+type: custom:week-planner-card
+calendars:
+  - entity: calendar.my_calendar_1
+    color: '#e6c229'
+  - entity: calendar.my_calendar_2
+    color: '#1a8fe3'
+card_mod:
+  style: |
+    .day.today {
+      box-sizing: border-box;
+      border: 2px solid #00ffff;
+      border-radius: 6px;
+      box-shadow: inset 0 0 5px #00ffff;
+      margin: 2px;
     }
 ```
 
