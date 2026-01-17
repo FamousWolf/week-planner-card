@@ -44,6 +44,10 @@ export default css`
         --weather-icon-size: 20px;
         --weather-temperature-font-size: 0.8em;
     }
+  
+    .errors {
+        white-space: pre-line;
+    }
 
     .container {
         container-name: weekplanner;
@@ -62,6 +66,11 @@ export default css`
         display: flex;
         flex-wrap: wrap;
         gap: var(--header-spacing);
+    }
+    
+    .container .legend {
+        display: flex;
+        align-items: center;
     }
 
     .container .legend ul {
@@ -112,6 +121,7 @@ export default css`
     .container .navigation {
         display: flex;
         gap: var(--navigation-spacing);
+        align-items: center;
     }
 
     .container .navigation .month {

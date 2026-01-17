@@ -50,6 +50,7 @@ export class WeekPlannerCardEditor extends LitElement {
                                         ${this.addTextField('calendars.' + index + '.filter', 'Filter events (regex)')}
                                         ${this.addTextField('calendars.' + index + '.filterText', 'Filter event text (regex)')}
                                         ${this.addBooleanField('calendars.' + index + '.hideInLegend', 'Hide in legend')}
+                                        ${this.addBooleanField('calendars.' + index + '.initiallyHidden', 'Initially hide calendar events')}
                                         ${this.addButton('Remove calendar', 'mdi:trash-can', () => {
                                             const config = JSON.parse(JSON.stringify(this._config));
                                             if (config.calendars.length === 1) {
@@ -112,6 +113,7 @@ export class WeekPlannerCardEditor extends LitElement {
                             }
                         ], true)}
                         ${this.addTextField('startingDayOffset', 'Starting day offset', 'number')}
+                        ${this.addBooleanField('showWeekDayText', 'Show week day text', true)}
                         ${this.addBooleanField('hideWeekend', 'Hide weekend')}
                         ${this.addBooleanField('hideDaysWithoutEvents', 'Hide days without events except for today')}
                         ${this.addBooleanField('hideTodayWithoutEvents', 'Also hide today without events')}
@@ -150,6 +152,7 @@ export class WeekPlannerCardEditor extends LitElement {
                         ${this.addBooleanField('weather.showCondition', 'Show condition icon')}
                         ${this.addBooleanField('weather.showTemperature', 'Show temperature')}
                         ${this.addBooleanField('weather.showLowTemperature', 'Show low temperature')}
+                        ${this.addBooleanField('weather.roundTemperature', 'Round temperatures to nearest integer')}
                         ${this.addBooleanField('weather.useTwiceDaily', 'Use twice daily if entity does not support daily')}
                     `
                 )}

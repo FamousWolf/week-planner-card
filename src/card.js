@@ -111,6 +111,7 @@ export class WeekPlannerCard extends LitElement {
             days: 7,
             startingDay: 'today',
             startingDayOffset: 0,
+            showWeekDayText: true,
             hideWeekend: false,
             noCardBackground: false,
             compact: false,
@@ -118,6 +119,7 @@ export class WeekPlannerCard extends LitElement {
                 showCondition: true,
                 showTemperature: false,
                 showLowTemperature: false,
+                roundTemperature: false,
                 useTwiceDaily: false,
             },
             locale: 'en',
@@ -166,6 +168,7 @@ export class WeekPlannerCard extends LitElement {
         this._showNavigation = config.showNavigation ?? false;
         this._startingDay = config.startingDay ?? 'today';
         this._startingDayOffset = config.startingDayOffset ?? 0;
+        this._showWeekDayText = config.showWeekDayText ?? true;
         this._startDate = this._getStartDate();
         this._updateInterval = config.updateInterval ?? 60;
         this._noCardBackground = config.noCardBackground ?? false;
@@ -191,7 +194,12 @@ export class WeekPlannerCard extends LitElement {
         this._columns = config.columns ?? {};
         this._maxEvents = config.maxEvents ?? false;
         this._maxDayEvents = config.maxDayEvents ?? false;
-        this._hideCalendars = [];
+        this._hideCalendars = (config.calendars || []).reduce((acc, calendar) => {
+            if (calendar.initiallyHidden && calendar.entity) {
+                acc.push(calendar.entity);
+            }
+            return acc;
+        }, []);
         if (config.locale) {
             LuxonSettings.defaultLocale = config.locale;
         }
@@ -214,10 +222,11 @@ export class WeekPlannerCard extends LitElement {
             },
             config.texts ?? {}
         );
+        this._calendarErrors = [];
     }
 
     _isNumberOfDaysMonth(numberOfDays) {
-        return numberOfDays === 'month';
+        return String(numberOfDays).toLowerCase().trim() === 'month';
     }
 
     _getWeatherConfig(weatherConfiguration) {
@@ -233,7 +242,8 @@ export class WeekPlannerCard extends LitElement {
             entity: null,
             showCondition: true,
             showTemperature: false,
-            showLowTemperature: false
+            showLowTemperature: false,
+            roundTemperature: false,
         };
         if (typeof weatherConfiguration === 'string') {
             configuration.entity = weatherConfiguration;
@@ -294,7 +304,7 @@ export class WeekPlannerCard extends LitElement {
             <ha-card class="${cardClasses.join(' ')}" style="${cardStyles.join(' ')}">
                 <div class="card-content">
                     ${this._error ?
-                        html`<ha-alert alert-type="error">${this._error}</ha-alert>` :
+                        html`<div class="errors"><ha-alert alert-type="error">${this._error}</ha-alert></div>` :
                         ''
                     }
                     ${this._title ?
@@ -303,6 +313,7 @@ export class WeekPlannerCard extends LitElement {
                     }
                     <div class="container${this._actions ? ' hasActions' : ''}" @click="${this._handleContainerClick}">
                         ${this._renderHeader()}
+                        ${this._renderWeekDays()}
                         ${this._renderDays()}
                     </div>
                     ${this._renderEventDetailsDialog()}
@@ -370,6 +381,40 @@ export class WeekPlannerCard extends LitElement {
         `;
     }
 
+    _renderWeekDays() {
+        if (this._showWeekDayText || !this._days) {
+            return html``;
+        }
+
+        if (!this._numberOfDaysIsMonth && this._numberOfDays < 7) {
+            return html``;
+        }
+
+        const days = this._days.slice(0, 7);
+        const weekDays = [
+            this._language.sunday,
+            this._language.monday,
+            this._language.tuesday,
+            this._language.wednesday,
+            this._language.thursday,
+            this._language.friday,
+            this._language.saturday,
+            this._language.sunday,
+        ];
+
+        return html`
+            ${days.map((day) => {
+                return html`
+                    <div class="day header">
+                        <div class="date">
+                            <span class="text">${weekDays[day.date.weekday]}</span>
+                        </div>
+                    </div>
+                `
+            })}
+        `;
+    }
+
     _renderDays() {
         if (!this._days) {
             return html``;
@@ -377,6 +422,10 @@ export class WeekPlannerCard extends LitElement {
 
         return html`
             ${this._days.map((day) => {
+                if (day.isOutsideMonth) {
+                    return html`<div class="day ${day.class}"></div>`;
+                }
+
                 if (this._hideDaysWithoutEvents && day.events.length === 0 && (this._hideTodayWithoutEvents || !this._isToday(day.date))) {
                     return html``;
                 }
@@ -387,7 +436,10 @@ export class WeekPlannerCard extends LitElement {
                                 unsafeHTML(day.date.toFormat(this._dayFormat)) :
                                 html`
                                     <span class="number">${day.date.day}</span>
-                                    <span class="text">${this._getWeekDayText(day.date)}</span>
+                                    ${this._showWeekDayText || (!this._numberOfDaysIsMonth && this._numberOfDays < 7) ?
+                                        html`<span class="text">${this._getWeekDayText(day.date)}</span>` :
+                                        ''
+                                    }
                                 `
                             }
                         </div>
@@ -728,11 +780,13 @@ export class WeekPlannerCard extends LitElement {
 
         this._clearUpdateEventsTimeouts();
 
-        this._error = '';
         this._events = {};
         this._calendarEvents = {};
 
         this._startDate = this._getStartDate();
+        if (this._numberOfDaysIsMonth) {
+            this._numberOfDays = this._startDate.daysInMonth;
+        }
         let startDate = this._startDate;
         let endDate = this._startDate.plus({ days: this._numberOfDays });
         let now = DateTime.now();
@@ -754,7 +808,13 @@ export class WeekPlannerCard extends LitElement {
                     name: this.hass.formatEntityAttributeValue(this.hass.states[calendar.entity], 'friendly_name')
                 }
             }
-            let calendarSorting = calendarNumber;
+            if (!calendar.sorting) {
+                calendar = {
+                    ...calendar,
+                    sorting: calendarNumber
+                }
+            }
+            let currentCalendarNumber = calendarNumber;
             this._loading++;
             this.hass.callApi(
                 'get',
@@ -764,6 +824,8 @@ export class WeekPlannerCard extends LitElement {
                     this._loading--;
                     return;
                 }
+
+                this._calendarErrors[currentCalendarNumber] = '';
 
                 response.forEach(event => {
                     if (this._isFilterEvent(event, calendar.filter ?? '')) {
@@ -778,20 +840,16 @@ export class WeekPlannerCard extends LitElement {
                     let fullDay = this._isFullDay(startDate, endDate);
 
                     if (!fullDay && !this._isSameDay(startDate, endDate)) {
-                        this._handleMultiDayEvent(event, startDate, endDate, calendar, calendarSorting);
+                        this._handleMultiDayEvent(event, startDate, endDate, calendar);
                     } else {
-                        this._addEvent(event, startDate, endDate, fullDay, calendar, calendarSorting);
+                        this._addEvent(event, startDate, endDate, fullDay, calendar);
                     }
                 });
 
                 this._loading--;
             }).catch(error => {
-                if (!error.error) {
-                    console.log(error);
-                }
-                this._error = 'Error while fetching calendar: ' + error.error;
-                this._loading = 0;
-                throw new Error(this._error);
+                this._calendarErrors[currentCalendarNumber] = 'Error while fetching calendar "' + calendar.entity + '": ' + (error.error ?? 'Unknown error');
+                this._loading--;
             });
             calendarNumber++;
         });
@@ -799,9 +857,7 @@ export class WeekPlannerCard extends LitElement {
         let checkLoading = window.setInterval(() => {
             if (this._loading === 0) {
                 clearInterval(checkLoading);
-                if (!this._error) {
-                    this._updateCard();
-                }
+                this._updateCard();
                 this._updateLoader();
 
                 this._updateEventsTimeouts.push(
@@ -826,7 +882,7 @@ export class WeekPlannerCard extends LitElement {
             || calendarFilter && event.summary.match(calendarFilter);
     }
 
-    _addEvent(event, startDate, endDate, fullDay, calendar, calendarSorting) {
+    _addEvent(event, startDate, endDate, fullDay, calendar) {
         if (this._hideWeekend && startDate.weekday >= 6) {
             return;
         }
@@ -849,8 +905,8 @@ export class WeekPlannerCard extends LitElement {
             if (calendar.name && this._calendarEvents[eventKey].calendarNames.indexOf(calendar.name) === -1) {
                 this._calendarEvents[eventKey].calendarNames.push(calendar.name);
             }
-            if (calendarSorting < this._calendarEvents[eventKey].calendarSorting) {
-                this._calendarEvents[eventKey].calendarSorting = calendarSorting;
+            if (calendar.sorting < this._calendarEvents[eventKey].calendarSorting) {
+                this._calendarEvents[eventKey].calendarSorting = calendar.sorting;
             }
         } else {
             this._calendarEvents[eventKey] = {
@@ -865,7 +921,7 @@ export class WeekPlannerCard extends LitElement {
                 colors: [calendar.color ?? 'inherit'],
                 icon: calendar.icon ?? null,
                 calendars: [calendar.entity],
-                calendarSorting: calendarSorting,
+                calendarSorting: calendar.sorting,
                 calendarNames: [calendar.name],
                 class: this._getEventClass(startDate, endDate, fullDay)
             }
@@ -952,17 +1008,19 @@ export class WeekPlannerCard extends LitElement {
         return classes.join(' ');
     }
 
-    _handleMultiDayEvent(event, startDate, endDate, calendar, calendarSorting) {
+    _handleMultiDayEvent(event, startDate, endDate, calendar) {
         while (startDate < endDate) {
             let eventStartDate = startDate;
             startDate = startDate.plus({ days: 1 }).startOf('day');
             let eventEndDate = startDate < endDate ? startDate : endDate;
 
-            this._addEvent(event, eventStartDate, eventEndDate, this._isFullDay(eventStartDate, eventEndDate), calendar, calendarSorting);
+            this._addEvent(event, eventStartDate, eventEndDate, this._isFullDay(eventStartDate, eventEndDate), calendar);
         }
     }
 
     _updateCard() {
+        this._error = this._calendarErrors.join("\n").trim();
+
         let days = [];
 
         const weatherState = this._weather ? this.hass.states[this._weather.entity] : null;
@@ -974,24 +1032,44 @@ export class WeekPlannerCard extends LitElement {
             }
 
             const dateKey = DateTime.fromISO(forecast.datetime).toISODate();
+            const temperature = this._weather.roundTemperature ? Math.round(forecast.temperature) : forecast.temperature;
+            const templow = this._weather.roundTemperature ? Math.round(forecast.templow) : forecast.templow;
             weatherForecast[dateKey] = {
                 icon: this._getWeatherIcon(forecast),
                 condition: this.hass.formatEntityState(weatherState, forecast.condition),
-                temperature: this.hass.formatEntityAttributeValue(weatherState, 'temperature', forecast.temperature),
-                templow: this.hass.formatEntityAttributeValue(weatherState, 'templow', forecast.templow)
+                temperature: this.hass.formatEntityAttributeValue(weatherState, 'temperature', temperature),
+                templow: this.hass.formatEntityAttributeValue(weatherState, 'templow', templow)
             };
         });
 
         let startDate = this._startDate;
         let endDate = this._startDate.plus({ days: this._numberOfDays });
 
+        let targetMonth = null;
+        const startingDay = String(this._startingDay).toLowerCase().trim();
+
+        if (this._numberOfDaysIsMonth && ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'].includes(startingDay)) {
+            targetMonth = startDate.plus({ days: 7 }).month;
+
+            const weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+            const startWeekday = weekdays.indexOf(startingDay) + 1;
+            startDate = this._getWeekDayDate(startDate, startWeekday);
+
+            const monthEnd = this._startDate.endOf('month');
+            endDate = startDate;
+            while (endDate <= monthEnd) {
+                endDate = endDate.plus({ days: 7 });
+            }
+        }
+
         let numberOfEvents = 0;
         while (startDate < endDate) {
             if (!this._hideWeekend || startDate.weekday < 6) {
                 let events = [];
+                const isOutsideMonth = targetMonth !== null && startDate.month !== targetMonth;
 
                 const dateKey = startDate.toISODate();
-                if (this._events.hasOwnProperty(dateKey)) {
+                if (this._events.hasOwnProperty(dateKey) && !isOutsideMonth) {
                     events = this._events[dateKey].sort((event1, event2) => {
                         if (this._calendarEvents[event1].start === this._calendarEvents[event2].start) {
                             return this._calendarEvents[event1].calendarSorting < this._calendarEvents[event2].calendarSorting ? 1 : (this._calendarEvents[event1].calendarSorting > this._calendarEvents[event2].calendarSorting) ? -1 : 0;
@@ -1011,8 +1089,9 @@ export class WeekPlannerCard extends LitElement {
                 days.push({
                     date: startDate,
                     events: events,
-                    weather: weatherForecast[dateKey] ?? null,
-                    class: this._getDayClass(startDate)
+                    weather: isOutsideMonth ? null : (weatherForecast[dateKey] ?? null),
+                    class: this._getDayClass(startDate) + (isOutsideMonth ? ' outside-month' : ''),
+                    isOutsideMonth: isOutsideMonth
                 });
 
                 if (this._maxEvents > 0 && numberOfEvents >= this._maxEvents) {
@@ -1144,7 +1223,15 @@ export class WeekPlannerCard extends LitElement {
             }
         }
 
-        switch (alternativeStartingDay ?? this._startingDay) {
+        const startingDay = String(alternativeStartingDay ?? this._startingDay).toLowerCase().trim();
+
+        const isMonthViewWithWeekdayStart = this._numberOfDaysIsMonth && ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'].includes(startingDay);
+
+        if (isMonthViewWithWeekdayStart) {
+            startDate = startDate.startOf('month');
+        }
+
+        switch (startingDay) {
             case 'yesterday':
                 startDate = startDate.minus({ days: 1 })
                 break;
@@ -1152,39 +1239,52 @@ export class WeekPlannerCard extends LitElement {
                 startDate = startDate.plus({ days: 1 })
                 break;
             case 'sunday':
-                startDate = this._getWeekDayDate(startDate, 7);
+                if (!isMonthViewWithWeekdayStart) {
+                    startDate = this._getWeekDayDate(startDate, 7);
+                }
                 break;
             case 'monday':
-                startDate = this._getWeekDayDate(startDate, 1);
+                if (!isMonthViewWithWeekdayStart) {
+                    startDate = this._getWeekDayDate(startDate, 1);
+                }
                 break;
             case 'tuesday':
-                startDate = this._getWeekDayDate(startDate, 2);
+                if (!isMonthViewWithWeekdayStart) {
+                    startDate = this._getWeekDayDate(startDate, 2);
+                }
                 break;
             case 'wednesday':
-                startDate = this._getWeekDayDate(startDate, 3);
+                if (!isMonthViewWithWeekdayStart) {
+                    startDate = this._getWeekDayDate(startDate, 3);
+                }
                 break;
             case 'thursday':
-                startDate = this._getWeekDayDate(startDate, 4);
+                if (!isMonthViewWithWeekdayStart) {
+                    startDate = this._getWeekDayDate(startDate, 4);
+                }
                 break;
             case 'friday':
-                startDate = this._getWeekDayDate(startDate, 5);
+                if (!isMonthViewWithWeekdayStart) {
+                    startDate = this._getWeekDayDate(startDate, 5);
+                }
                 break;
             case 'saturday':
-                startDate = this._getWeekDayDate(startDate, 6);
+                if (!isMonthViewWithWeekdayStart) {
+                    startDate = this._getWeekDayDate(startDate, 6);
+                }
                 break;
             case 'month':
                 startDate = startDate.startOf('month');
                 break;
         }
 
-        if (this._startingDayOffset !== 0) {
+        if (this._startingDayOffset !== 0 && !isMonthViewWithWeekdayStart) {
             startDate = startDate.plus({ days: this._startingDayOffset });
         }
 
         if (this._hideWeekend && startDate.weekday >= 6) {
             startDate = this._getStartDate('monday');
         }
-
         return startDate.startOf('day');
     }
 

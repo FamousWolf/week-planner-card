@@ -39,7 +39,7 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
     Add:
     ```yaml
     resources:
-      - url: /local/week-planner-card.js?version=1.12.1
+      - url: /local/week-planner-card.js?version=1.13.0
     type: module
     ```
   - **Using the graphical editor**
@@ -92,6 +92,10 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 | `legendToggle`           | boolean          | false                                              | `false` \| `true`                                                                                                                           | Toggle calendars by clicking on the legend                                             | 1.11.0  |
 | `columns`                | object           | optional                                           | See [Columns](#columns)                                                                                                                     | Configuration to override the number of columns                                        | 1.11.0  |
 | `showNavigation`         | boolean          | false                                              | `false` \| `true`                                                                                                                           | Show navigational arrows to traverse additional dates on calendar.                     | 1.12.0  |
+| `showWeekDayText`        | boolean          | false                                              | `false` \| `true`                                                                                                                           | Display the weekday in a header instead of individual days when days >=7               | 1.13.0  |
+
+**Note regarding Month View:**
+When `days` is set to `month` and `startingDay` is configured as a specific weekday (e.g., `monday` to `sunday`), the calendar will align the display with the specified starting day of the week. In this mode, days falling outside the current month will be excluded from the view.
 
 ### Calendars
 
@@ -106,6 +110,7 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 | `filterText`       | string  | optional     | Any regular expression                        | Remove text from events                                | 1.10.0  |
 | `replaceTitleText` | object  | optional     | See [Replace title text](#replace-title-text) | Replace title text                                     | 1.12.0  |
 | `hideInLegend`     | boolean | false        | `false` \| `true`                             | Do not show the calendar in the legend                 | 1.8.0   |
+| `initiallyHidden`  | boolean | false        | `false` \| `true`                             | Initially hide the calendar                            | 1.13.0  |
 
 ### Texts
 
@@ -126,7 +131,7 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 | `saturday`   | string | Name of Saturday based on locale  | Any text          | Text used to override Saturdays                                                 | 1.1.0   |
 
 ### Actions
-See [Actions documentation](https://www.home-assistant.io/dashboards/actions/). Currently only the tab action is supported.
+See [Actions documentation](https://www.home-assistant.io/dashboards/actions/). Currently only the tap action is supported.
 
 ### Weather
 
@@ -279,6 +284,26 @@ card_mod:
   style: |
     .event.past {
       opacity: .3;
+    }
+```
+
+### Highlight Today with card_mod
+
+```yaml
+type: custom:week-planner-card
+calendars:
+  - entity: calendar.my_calendar_1
+    color: '#e6c229'
+  - entity: calendar.my_calendar_2
+    color: '#1a8fe3'
+card_mod:
+  style: |
+    .day.today {
+      box-sizing: border-box;
+      border: 2px solid #00ffff;
+      border-radius: 6px;
+      box-shadow: inset 0 0 5px #00ffff;
+      margin: 2px;
     }
 ```
 
