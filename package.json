@@ -30,7 +30,7 @@
   "devDependencies": {
     "@parcel/optimizer-data-url": "^2.12.0",
     "@parcel/transformer-inline-string": "^2.11.0",
-    "parcel": "^2.11.0",
+    "parcel": "^2.16.3",
     "svgo": "^3.3.2"
   },
   "dependencies": {
