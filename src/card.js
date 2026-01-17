@@ -1019,7 +1019,6 @@ export class WeekPlannerCard extends LitElement {
     }
 
     _updateCard() {
-        console.log(this._calendarErrors);
         this._error = this._calendarErrors.join("\n").trim();
 
         let days = [];
