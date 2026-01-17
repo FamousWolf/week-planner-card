@@ -63,6 +63,11 @@ export default css`
         flex-wrap: wrap;
         gap: var(--header-spacing);
     }
+    
+    .container .legend {
+        display: flex;
+        align-items: center;
+    }
 
     .container .legend ul {
         display: flex;
@@ -112,6 +117,7 @@ export default css`
     .container .navigation {
         display: flex;
         gap: var(--navigation-spacing);
+        align-items: center;
     }
 
     .container .navigation .month {
