@@ -222,6 +222,7 @@ export class WeekPlannerCard extends LitElement {
             },
             config.texts ?? {}
         );
+        this._calendarErrors = [];
     }
 
     _isNumberOfDaysMonth(numberOfDays) {
@@ -303,7 +304,7 @@ export class WeekPlannerCard extends LitElement {
             <ha-card class="${cardClasses.join(' ')}" style="${cardStyles.join(' ')}">
                 <div class="card-content">
                     ${this._error ?
-                        html`<ha-alert alert-type="error">${this._error}</ha-alert>` :
+                        html`<div class="errors"><ha-alert alert-type="error">${this._error}</ha-alert></div>` :
                         ''
                     }
                     ${this._title ?
@@ -779,7 +780,6 @@ export class WeekPlannerCard extends LitElement {
 
         this._clearUpdateEventsTimeouts();
 
-        this._error = '';
         this._events = {};
         this._calendarEvents = {};
 
@@ -814,6 +814,7 @@ export class WeekPlannerCard extends LitElement {
                     sorting: calendarNumber
                 }
             }
+            let currentCalendarNumber = calendarNumber;
             this._loading++;
             this.hass.callApi(
                 'get',
@@ -823,6 +824,8 @@ export class WeekPlannerCard extends LitElement {
                     this._loading--;
                     return;
                 }
+
+                this._calendarErrors[currentCalendarNumber] = '';
 
                 response.forEach(event => {
                     if (this._isFilterEvent(event, calendar.filter ?? '')) {
@@ -845,12 +848,8 @@ export class WeekPlannerCard extends LitElement {
 
                 this._loading--;
             }).catch(error => {
-                if (!error.error) {
-                    console.log(error);
-                }
-                this._error = 'Error while fetching calendar: ' + error.error;
-                this._loading = 0;
-                throw new Error(this._error);
+                this._calendarErrors[currentCalendarNumber] = 'Error while fetching calendar "' + calendar.entity + '": ' + (error.error ?? 'Unknown error');
+                this._loading--;
             });
             calendarNumber++;
         });
@@ -858,9 +857,7 @@ export class WeekPlannerCard extends LitElement {
         let checkLoading = window.setInterval(() => {
             if (this._loading === 0) {
                 clearInterval(checkLoading);
-                if (!this._error) {
-                    this._updateCard();
-                }
+                this._updateCard();
                 this._updateLoader();
 
                 this._updateEventsTimeouts.push(
@@ -1022,6 +1019,8 @@ export class WeekPlannerCard extends LitElement {
     }
 
     _updateCard() {
+        this._error = this._calendarErrors.join("\n").trim();
+
         let days = [];
 
         const weatherState = this._weather ? this.hass.states[this._weather.entity] : null;

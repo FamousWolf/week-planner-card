@@ -44,6 +44,10 @@ export default css`
         --weather-icon-size: 20px;
         --weather-temperature-font-size: 0.8em;
     }
+  
+    .errors {
+        white-space: pre-line;
+    }
 
     .container {
         container-name: weekplanner;
