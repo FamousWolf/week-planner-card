@@ -1071,7 +1071,7 @@ export class WeekPlannerCard extends LitElement {
                 const dateKey = startDate.toISODate();
                 if (this._events.hasOwnProperty(dateKey) && !isOutsideMonth) {
                     events = this._events[dateKey].sort((event1, event2) => {
-                        if (this._calendarEvents[event1].start === this._calendarEvents[event2].start) {
+                        if (this._calendarEvents[event1].start.toISO() === this._calendarEvents[event2].start.toISO()) {
                             return this._calendarEvents[event1].calendarSorting < this._calendarEvents[event2].calendarSorting ? 1 : (this._calendarEvents[event1].calendarSorting > this._calendarEvents[event2].calendarSorting) ? -1 : 0;
                         }
 
