@@ -182,6 +182,7 @@ export class WeekPlannerCard extends LitElement {
         this._showDescription = config.showDescription ?? false;
         this._showLocation = config.showLocation ?? false;
         this._hidePastEvents = config.hidePastEvents ?? false;
+        this._hideAllDayEvents = config.hideAllDayEvents ?? false;
         this._hideDaysWithoutEvents = config.hideDaysWithoutEvents ?? false;
         this._hideTodayWithoutEvents = config.hideTodayWithoutEvents ?? false;
         this._filter = config.filter ?? false;
@@ -887,7 +888,10 @@ export class WeekPlannerCard extends LitElement {
     }
 
     _addEvent(event, startDate, endDate, fullDay, calendar) {
-        if (this._hideWeekend && startDate.weekday >= 6) {
+        if (
+            this._hideWeekend && startDate.weekday >= 6
+            || fullDay && this._hideAllDayEvents
+        ) {
             return;
         }
 

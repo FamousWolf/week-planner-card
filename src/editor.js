@@ -126,6 +126,7 @@ export class WeekPlannerCardEditor extends LitElement {
                     html`
                         ${this.addTextField('maxEvents', 'Maximum number of events (0 is no maximum)', 'number', 0)}
                         ${this.addBooleanField('hidePastEvents', 'Hide past events')}
+                        ${this.addBooleanField('hideAllDayEvents', 'Hide all day events')}
                         ${this.addTextField('filter', 'Filter events (regex)')}
                         ${this.addTextField('filterText', 'Filter event text (regex)')}
                         ${this.addBooleanField('combineSimilarEvents', 'Combine similar events')}
