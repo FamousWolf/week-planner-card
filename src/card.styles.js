@@ -174,6 +174,9 @@ export default css`
     .container .day .weather .icon {
         display: inline-block;
         vertical-align: middle;
+        background-size: cover;
+        width: var(--weather-icon-size);
+        height: var(--weather-icon-size);
     }
 
     .container .day .weather .icon img {
