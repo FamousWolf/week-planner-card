@@ -350,7 +350,7 @@ This can not be done through the GUI editor, but has to be done in the YAML conf
 ```yaml
 type: custom:week-planner-card
 calendars:
-  - calendar.my_calendar_1
+  - entity: calendar.my_calendar_1
 texts:
   yesterday:
   today:
