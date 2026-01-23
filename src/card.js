@@ -466,11 +466,7 @@ export class WeekPlannerCard extends LitElement {
                                         ''
                                     }
                                     ${this._weather?.showCondition ?
-                                        html`
-                                            <div class="icon">
-                                                <img src="${day.weather.icon}" alt="${day.weather.condition}">
-                                            </div>
-                                        ` :
+                                        this._getWeatherIcon(day.weather.condition) :
                                         ''
                                     }
                                 </div>
@@ -732,14 +728,22 @@ export class WeekPlannerCard extends LitElement {
         }
     }
 
-    _getWeatherIcon(weatherState) {
-        const condition = weatherState?.condition;
+    _getWeatherIcon(condition) {
         if (!condition) {
             return null;
         }
 
         const state = condition.toLowerCase();
-        return ICONS[state];
+        const customWeatherIcon = getComputedStyle(this).getPropertyValue('--weather-icon-' + state).trim();
+        if (customWeatherIcon !== null && ['', 'none', 'inherit'].indexOf(customWeatherIcon) === -1) {
+            return html`<div class="icon" style="background-image: var(--weather-icon-${state})"></div>`;
+        }
+
+        return html`
+                <div class="icon">
+                    <img src="${ICONS[state]}" alt="${condition}">
+                </div>
+            `;
     }
 
     _waitForHassAndConfig() {
@@ -1035,7 +1039,6 @@ export class WeekPlannerCard extends LitElement {
             const temperature = this._weather.roundTemperature ? Math.round(forecast.temperature) : forecast.temperature;
             const templow = this._weather.roundTemperature ? Math.round(forecast.templow) : forecast.templow;
             weatherForecast[dateKey] = {
-                icon: this._getWeatherIcon(forecast),
                 condition: this.hass.formatEntityState(weatherState, forecast.condition),
                 temperature: this.hass.formatEntityAttributeValue(weatherState, 'temperature', temperature),
                 templow: this.hass.formatEntityAttributeValue(weatherState, 'templow', templow)
