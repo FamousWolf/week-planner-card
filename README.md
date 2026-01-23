@@ -342,3 +342,17 @@ calendars:
   - calendar.my_calendar_1
 dayFormat: '''<span class="number">''d''</span> <span class="month">''MMMM''</span>'''
 ```
+
+### Show day names instead of "Today", "Yesterday" and "Tomorrow"
+
+This can not be done through the GUI editor, but has to be done in the YAML configuration.
+
+```yaml
+type: custom:week-planner-card
+calendars:
+  - entity: calendar.my_calendar_1
+texts:
+  yesterday:
+  today:
+  tomorrow:
+```
