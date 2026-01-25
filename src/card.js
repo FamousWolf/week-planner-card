@@ -67,6 +67,8 @@ export class WeekPlannerCard extends LitElement {
     _weather;
     _dateFormat;
     _timeFormat;
+    _multiDayTimeFormat;
+    _multiDayMode;
     _locationLink;
     _startDate;
     _hideWeekend;
@@ -75,6 +77,7 @@ export class WeekPlannerCard extends LitElement {
     _weatherForecast = null;
     _showLocation;
     _hidePastEvents;
+    _hideAllDayEvents;
     _hideDaysWithoutEvents;
     _hideTodayWithoutEvents;
     _filter;
@@ -89,6 +92,7 @@ export class WeekPlannerCard extends LitElement {
     _showNavigation;
     _navigationOffset = 0;
     _updateEventsTimeouts = [];
+    _calendarErrors = [];
 
     /**
      * Get config element
@@ -177,11 +181,14 @@ export class WeekPlannerCard extends LitElement {
         this._dayFormat = config.dayFormat ?? null;
         this._dateFormat = config.dateFormat ?? 'cccc d LLLL yyyy';
         this._timeFormat = config.timeFormat ?? 'HH:mm';
+        this._multiDayTimeFormat = config._multiDayTimeFormat ?? 'd LLL HH:mm';
+        this._multiDayMode = config.multiDayMode ?? 'default';
         this._locationLink = config.locationLink ?? 'https://www.google.com/maps/search/?api=1&query=';
         this._showTitle = config.showTitle ?? true;
         this._showDescription = config.showDescription ?? false;
         this._showLocation = config.showLocation ?? false;
         this._hidePastEvents = config.hidePastEvents ?? false;
+        this._hideAllDayEvents = config.hideAllDayEvents ?? false;
         this._hideDaysWithoutEvents = config.hideDaysWithoutEvents ?? false;
         this._hideTodayWithoutEvents = config.hideTodayWithoutEvents ?? false;
         this._filter = config.filter ?? false;
@@ -222,7 +229,6 @@ export class WeekPlannerCard extends LitElement {
             },
             config.texts ?? {}
         );
-        this._calendarErrors = [];
     }
 
     _isNumberOfDaysMonth(numberOfDays) {
@@ -466,11 +472,7 @@ export class WeekPlannerCard extends LitElement {
                                         ''
                                     }
                                     ${this._weather?.showCondition ?
-                                        html`
-                                            <div class="icon">
-                                                <img src="${day.weather.icon}" alt="${day.weather.condition}">
-                                            </div>
-                                        ` :
+                                        this._getWeatherIcon(day.weather.condition) :
                                         ''
                                     }
                                 </div>
@@ -561,13 +563,7 @@ export class WeekPlannerCard extends LitElement {
                         })}
                         <div class="inner">
                             <div class="time">
-                                ${event.fullDay ?
-                                    html`${this._language.fullDay}` :
-                                    html`
-                                        ${event.start.toFormat(this._timeFormat)}
-                                        ${event.end ? ' - ' + event.end.toFormat(this._timeFormat) : ''}
-                                    `
-                                }
+                                ${this._renderEventTime(event)}
                             </div>
                             ${this._showTitle ?
                                     html`
@@ -615,6 +611,22 @@ export class WeekPlannerCard extends LitElement {
                 ''
             }
         `;
+    }
+
+    _renderEventTime(event) {
+        if (event.multiDay && this._multiDayMode !== 'default') {
+            return html`
+                ${event.originalStart.toFormat(this._multiDayTimeFormat)}
+                ${' - ' + event.originalEnd.toFormat(this._multiDayTimeFormat)}
+            `;
+        } else if (event.fullDay) {
+            return html`${this._language.fullDay}`;
+        } else {
+            return html`
+                ${event.start.toFormat(this._timeFormat)}
+                ${event.end ? ' - ' + event.end.toFormat(this._timeFormat) : ''}
+            `;
+        }
     }
 
     _renderNoEvents() {
@@ -732,14 +744,22 @@ export class WeekPlannerCard extends LitElement {
         }
     }
 
-    _getWeatherIcon(weatherState) {
-        const condition = weatherState?.condition;
+    _getWeatherIcon(condition) {
         if (!condition) {
             return null;
         }
 
         const state = condition.toLowerCase();
-        return ICONS[state];
+        const customWeatherIcon = getComputedStyle(this).getPropertyValue('--weather-icon-' + state).trim();
+        if (customWeatherIcon !== null && ['', 'none', 'inherit'].indexOf(customWeatherIcon) === -1) {
+            return html`<div class="icon" style="background-image: var(--weather-icon-${state})"></div>`;
+        }
+
+        return html`
+                <div class="icon">
+                    <img src="${ICONS[state]}" alt="${condition}">
+                </div>
+            `;
     }
 
     _waitForHassAndConfig() {
@@ -882,8 +902,13 @@ export class WeekPlannerCard extends LitElement {
             || calendarFilter && event.summary.match(calendarFilter);
     }
 
-    _addEvent(event, startDate, endDate, fullDay, calendar) {
-        if (this._hideWeekend && startDate.weekday >= 6) {
+    _addEvent(event, startDate, endDate, fullDay, calendar, multiDay) {
+        multiDay = multiDay ?? false;
+
+        if (
+            this._hideWeekend && startDate.weekday >= 6
+            || fullDay && this._hideAllDayEvents
+        ) {
             return;
         }
 
@@ -918,12 +943,13 @@ export class WeekPlannerCard extends LitElement {
                 end: endDate,
                 originalEnd: this._convertApiDate(event.end),
                 fullDay: fullDay,
+                multiDay: multiDay,
                 colors: [calendar.color ?? 'inherit'],
                 icon: calendar.icon ?? null,
                 calendars: [calendar.entity],
                 calendarSorting: calendar.sorting,
                 calendarNames: [calendar.name],
-                class: this._getEventClass(startDate, endDate, fullDay)
+                class: this._getEventClass(startDate, endDate, fullDay, multiDay)
             }
             this._events[dateKey].push(eventKey);
         }
@@ -961,11 +987,14 @@ export class WeekPlannerCard extends LitElement {
         return summary;
     }
 
-    _getEventClass(startDate, endDate, fullDay) {
+    _getEventClass(startDate, endDate, fullDay, multiDay) {
         let classes = [];
         let now = DateTime.now();
         if (fullDay) {
             classes.push('fullday');
+        }
+        if (multiDay) {
+            classes.push('multiday');
         }
         if (endDate < now) {
             classes.push('past');
@@ -1014,7 +1043,11 @@ export class WeekPlannerCard extends LitElement {
             startDate = startDate.plus({ days: 1 }).startOf('day');
             let eventEndDate = startDate < endDate ? startDate : endDate;
 
-            this._addEvent(event, eventStartDate, eventEndDate, this._isFullDay(eventStartDate, eventEndDate), calendar);
+            this._addEvent(event, eventStartDate, eventEndDate, this._isFullDay(eventStartDate, eventEndDate), calendar, true);
+
+            if (this._multiDayMode === 'single' && eventStartDate >= this._startDate) {
+                break;
+            }
         }
     }
 
@@ -1035,7 +1068,6 @@ export class WeekPlannerCard extends LitElement {
             const temperature = this._weather.roundTemperature ? Math.round(forecast.temperature) : forecast.temperature;
             const templow = this._weather.roundTemperature ? Math.round(forecast.templow) : forecast.templow;
             weatherForecast[dateKey] = {
-                icon: this._getWeatherIcon(forecast),
                 condition: this.hass.formatEntityState(weatherState, forecast.condition),
                 temperature: this.hass.formatEntityAttributeValue(weatherState, 'temperature', temperature),
                 templow: this.hass.formatEntityAttributeValue(weatherState, 'templow', templow)
