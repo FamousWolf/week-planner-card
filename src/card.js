@@ -472,7 +472,7 @@ export class WeekPlannerCard extends LitElement {
                                         ''
                                     }
                                     ${this._weather?.showCondition ?
-                                        this._getWeatherIcon(day.weather.condition) :
+                                        this._getWeatherIcon(day.weather.state, day.weather.condition) :
                                         ''
                                     }
                                 </div>
@@ -744,12 +744,11 @@ export class WeekPlannerCard extends LitElement {
         }
     }
 
-    _getWeatherIcon(condition) {
-        if (!condition) {
+    _getWeatherIcon(state, condition) {
+        if (!state) {
             return null;
         }
 
-        const state = condition.toLowerCase();
         const customWeatherIcon = getComputedStyle(this).getPropertyValue('--weather-icon-' + state).trim();
         if (customWeatherIcon !== null && ['', 'none', 'inherit'].indexOf(customWeatherIcon) === -1) {
             return html`<div class="icon" style="background-image: var(--weather-icon-${state})"></div>`;
@@ -1068,6 +1067,7 @@ export class WeekPlannerCard extends LitElement {
             const temperature = this._weather.roundTemperature ? Math.round(forecast.temperature) : forecast.temperature;
             const templow = this._weather.roundTemperature ? Math.round(forecast.templow) : forecast.templow;
             weatherForecast[dateKey] = {
+                state: forecast.condition,
                 condition: this.hass.formatEntityState(weatherState, forecast.condition),
                 temperature: this.hass.formatEntityAttributeValue(weatherState, 'temperature', temperature),
                 templow: this.hass.formatEntityAttributeValue(weatherState, 'templow', templow)
