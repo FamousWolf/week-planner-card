@@ -76,7 +76,9 @@ Custom Home Assistant card displaying a responsive overview of multiple days wit
 | `dayFormat`              | string           | optional                                           | See [Luxon format](https://moment.github.io/luxon/#/formatting?id=table-of-tokens)                                                          | Format of the date at the top of the day. This is not escaped, so HTML is allowed here | 1.6.0   |
 | `dateFormat`             | string           | `cccc d LLLL yyyy`                                 | See [Luxon format](https://moment.github.io/luxon/#/formatting?id=table-of-tokens)                                                          | Format of the date in event details                                                    | 1.0.0   |
 | `timeFormat`             | string           | `HH:mm`                                            | See [Luxon format](https://moment.github.io/luxon/#/formatting?id=table-of-tokens)                                                          | Format of the time                                                                     | 1.0.0   |
+| `multiDayTimeFormat`     | string           | `d LL HH:mm`                                       | See [Luxon format](https://moment.github.io/luxon/#/formatting?id=table-of-tokens)                                                          | Format of the time for multi day events                                                | 1.14.0  |
 | `locale`                 | string           | `en`                                               | Any locale string supported by Luxon                                                                                                        | Locale used for day and month texts                                                    | 1.1.0   |
+| `multiDayMode`           | string           | `default`                                          | See [Multi day mode](#multiDayMode)                                                                                                         | How to show multi day events                                                           | 1.14.0  |
 | `locationLink`           | string           | `https://www.google.com/maps/search/?api=1&query=` | Any URL                                                                                                                                     | Link used for event location in the detail popup                                       | 1.1.0   |
 | `showTitle`              | boolean          | true                                               | `false` \| `true`                                                                                                                           | Show event title in overview                                                           | 1.11.0  |
 | `showDescription`        | boolean          | false                                              | `false` \| `true`                                                                                                                           | Show event description in overview                                                     | 1.11.0  |
@@ -155,6 +157,17 @@ By default, the columns are based on the width of the card. You can use these se
 | `small`      | number  | optional | Any positive number | Number of columns when the card width is >= 640 pixels  | 1.11.0  |
 | `extraSmall` | number  | optional | Any positive number | Number of columns when the card width is < 640 pixels   | 1.11.0  |
 
+### Multi day mode
+
+Multi day mode determines how multi day events are displayed. The following options are available:
+
+- **default**   
+  On the first day, the start time is the start time of the event. On the last day, the end time is the end time of the event. Any middle days will be shown as full day events.
+- **single**   
+  The event is only shown on the first (available) day. `multiDayTimeFormat` is used for formatting of the time.
+- **multiple**   
+  The event is shown on all (available) days. `multiDayTimeFormat` is used for formatting of the time.
+
 ### Replace title text
 
 You can replace text in the title. For example:
@@ -201,12 +214,13 @@ Like with most cards, you can add custom styling to this card using [card_mod](h
 
 ### Event classes
 
-| Class     | Description              | Version |
-|-----------|--------------------------|---------|
-| `fullday` | Event lasts the full day | 1.5.0   |
-| `ongoing` | Currently ongoing        | 1.5.0   |
-| `future`  | Event in the future      | 1.5.0   |
-| `past`    | Event in the past        | 1.5.0   |
+| Class      | Description                | Version |
+|------------|----------------------------|---------|
+| `fullday`  | Event lasts the full day   | 1.5.0   |
+| `multiDay` | Event covers multiple days | 1.14.0  |
+| `ongoing`  | Currently ongoing          | 1.5.0   |
+| `future`   | Event in the future        | 1.5.0   |
+| `past`     | Event in the past          | 1.5.0   |
 
 ### Event data attributes
 
