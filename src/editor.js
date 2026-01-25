@@ -127,6 +127,18 @@ export class WeekPlannerCardEditor extends LitElement {
                         ${this.addTextField('maxEvents', 'Maximum number of events (0 is no maximum)', 'number', 0)}
                         ${this.addBooleanField('hidePastEvents', 'Hide past events')}
                         ${this.addBooleanField('hideAllDayEvents', 'Hide all day events')}
+                        ${this.addSelectField('multiDayMode', 'Multi day mode', [
+                            {
+                                value: 'default',
+                                label: 'Default',
+                            }, {
+                                value: 'multiple',
+                                label: 'Multiple',
+                            }, {
+                                value: 'single',
+                                label: 'Single',
+                            }
+                        ], true)}
                         ${this.addTextField('filter', 'Filter events (regex)')}
                         ${this.addTextField('filterText', 'Filter event text (regex)')}
                         ${this.addBooleanField('combineSimilarEvents', 'Combine similar events')}
@@ -143,6 +155,7 @@ export class WeekPlannerCardEditor extends LitElement {
                         ${this.addTextField('locale', 'Locale')}
                         ${this.addTextField('dateFormat', 'Date format')}
                         ${this.addTextField('timeFormat', 'Time format')}
+                        ${this.addTextField('multiDayTimeFormat', 'Multi day time format')}
                         ${this.addTextField('dayFormat', 'Override day number')}
                     `
                 )}
