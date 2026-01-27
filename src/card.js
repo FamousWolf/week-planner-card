@@ -545,9 +545,11 @@ export class WeekPlannerCard extends LitElement {
                         data-end-hour="${event.end.toFormat('H')}"
                         data-end-minute="${event.end.toFormat('mm')}"
                         style="--border-color: ${event.colors[0]}"
-                        @click="${() => {
-                            this._handleEventClick(event)
+                        @click="${(ev) => {
+                            ev.stopPropagation();
+                            this._fireEventClick(event);
                         }}"
+
                     >
                         ${event.colors.map((color) => {
                             if (doneColors.indexOf(color) > -1) {
@@ -636,7 +638,31 @@ export class WeekPlannerCard extends LitElement {
             </div>
         `;
     }
-
+    _fireEventClick(event) {
+        const detail = {
+            action: "tap",
+            config: {
+                tap_action: {
+                    action: "perform-action",
+                    perform_action: "script.show_movie_popup_tmdb",
+                    data: {
+                        title: event.summary || "",
+                        description: event.description || "",
+                        calendar: event.calendars?.[0] || "",
+                    },
+                },
+            },
+        };
+    
+        this.dispatchEvent(
+            new CustomEvent("hass-action", {
+                bubbles: true,
+                composed: true,
+                detail,
+            })
+        );
+    }
+  
     _renderEventDetailsDialog() {
         if (!this._currentEventDetails) {
             return html``;
