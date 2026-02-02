@@ -94,6 +94,22 @@ export class WeekPlannerCard extends LitElement {
     _updateEventsTimeouts = [];
     _calendarErrors = [];
 
+    // Calculate duration in minutes
+    _getEventDurationMinutes(start, end) {
+        if (!start || !end) return 0;
+        return Math.round(end.diff(start, 'minutes').minutes);
+    }
+
+    // Categorize duration type
+    _getDurationType(minutes) {
+        if (minutes < 30) return 'xs';
+        if (minutes < 60) return 'small';
+        if (minutes < 120) return 'medium';
+        if (minutes < 240) return 'large';
+        if (minutes < 360) return 'xl';
+        return 'xxl';
+    }
+
     /**
      * Get config element
      *
@@ -533,6 +549,7 @@ export class WeekPlannerCard extends LitElement {
         return html`
             ${dayEvents.map((event) => {
                 const doneColors = [event.colors[0]];
+                const durationMinutes = event.fullDay ? 24 * 60 : this._getEventDurationMinutes(event.start, event.end);
                 return html`
                     <div
                         class="event ${event.class}"
@@ -544,6 +561,7 @@ export class WeekPlannerCard extends LitElement {
                         data-start-minute="${event.start.toFormat('mm')}"
                         data-end-hour="${event.end.toFormat('H')}"
                         data-end-minute="${event.end.toFormat('mm')}"
+                        data-duration="${durationMinutes}"
                         style="--border-color: ${event.colors[0]}"
                         @click="${() => {
                             this._handleEventClick(event)
@@ -1002,6 +1020,10 @@ export class WeekPlannerCard extends LitElement {
         } else {
             classes.push('future');
         }
+        // Add duration class
+        const durationMinutes = fullDay ? 24 * 60 : this._getEventDurationMinutes(startDate, endDate);
+        const durationType = this._getDurationType(durationMinutes);
+        classes.push(`duration-${durationType}`);
         return classes.join(' ');
     }
 
