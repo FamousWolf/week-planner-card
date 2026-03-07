@@ -44,7 +44,119 @@ export default css`
         --weather-icon-size: 20px;
         --weather-temperature-font-size: 0.8em;
     }
-  
+
+    /* --- Skylight theme --- */
+    ha-card.skylight {
+        --event-border-width: 0px;
+        --event-border-radius: 10px;
+        --event-spacing: 6px;
+        --event-padding: 10px 12px;
+        --events-margin-top: 8px;
+        --day-date-number-font-size: 1.1em;
+        --day-date-text-font-size: 1em;
+    }
+
+    ha-card.compact.skylight {
+        --event-border-radius: 8px;
+        --event-padding: 4px 8px;
+    }
+
+    ha-card.skylight .container .day .date {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+    }
+
+    ha-card.skylight .container .day .date .skylight-day-header {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        width: 100%;
+    }
+
+    ha-card.skylight .container .day .date .day-label {
+        font-size: 1.1em;
+        font-weight: 700;
+    }
+
+    ha-card.skylight .container .day .date .add-event-text {
+        font-size: 0.85em;
+        color: var(--secondary-text-color, #888);
+        cursor: pointer;
+        opacity: 0.6;
+        transition: opacity 0.2s;
+        white-space: nowrap;
+        margin-left: auto;
+    }
+
+    ha-card.skylight .container .day .date .add-event-text:hover {
+        opacity: 1;
+        color: var(--primary-color, #03a9f4);
+    }
+
+    ha-card.skylight .container .day .add-event {
+        display: none;
+    }
+
+    ha-card.skylight .container .day .events .event {
+        border-left: none;
+        border-radius: var(--event-border-radius);
+        background-color: color-mix(in srgb, var(--event-bg-tint, #888) 15%, var(--card-background-color, white) 85%);
+    }
+
+    ha-card.skylight .container .day .events .event .additionalColor {
+        display: none;
+    }
+
+    ha-card.skylight .container .day .events .event .calendar-dot {
+        width: 10px;
+        height: 10px;
+        min-width: 10px;
+        border-radius: 50%;
+        background-color: var(--dot-color, var(--divider-color, #888));
+        align-self: center;
+        margin-right: 4px;
+        flex-shrink: 0;
+    }
+
+    ha-card.skylight .container .day .events .none,
+    ha-card.skylight .container .day .events .more {
+        border-radius: var(--event-border-radius);
+        background-color: transparent;
+    }
+
+    .card-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .card-header-row .card-title {
+        margin: 0;
+    }
+
+    .current-weather {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        font-size: var(--weather-temperature-font-size);
+    }
+
+    .current-weather .icon {
+        display: inline-block;
+        vertical-align: middle;
+        background-size: cover;
+        width: var(--weather-icon-size);
+        height: var(--weather-icon-size);
+    }
+
+    .current-weather .icon img {
+        max-width: var(--weather-icon-size);
+        max-height: var(--weather-icon-size);
+    }
+
     .errors {
         white-space: pre-line;
     }
@@ -144,6 +256,8 @@ export default css`
 
     .container .day {
         position: relative;
+        display: flex;
+        flex-direction: column;
         width: calc((100% - (var(--days-columns) - 1) * var(--days-spacing)) / var(--days-columns));
         margin: 0 0 var(--days-spacing) 0;
     }
@@ -160,6 +274,34 @@ export default css`
 
     .container .day .date .text {
         font-size: var(--day-date-text-font-size);
+    }
+
+    .container .day.header .date .text {
+        font-size: var(--day-header-font-size, var(--day-date-text-font-size));
+        color: var(--day-header-color, var(--primary-text-color));
+        font-weight: bold;
+        text-transform: capitalize;
+    }
+
+    .container .day .add-event {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        cursor: pointer;
+        opacity: 0.3;
+        transition: opacity 0.2s;
+        color: var(--primary-text-color);
+        --mdc-icon-size: 18px;
+        margin-left: auto;
+        margin-top: auto;
+        padding-top: 4px;
+    }
+
+    .container .day .add-event:hover {
+        opacity: 0.8;
     }
 
     .container .day .weather {
@@ -286,6 +428,115 @@ export default css`
         border-top: 1px solid var(--primary-text-color);
         margin-top: 16px;
         padding-top: 16px;
+    }
+
+    ha-dialog .event-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid var(--divider-color, #e0e0e0);
+    }
+
+    ha-dialog .event-actions .btn {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.9em;
+        --mdc-icon-size: 16px;
+    }
+
+    ha-dialog .event-actions .btn-edit {
+        background-color: var(--primary-color, #03a9f4);
+        color: var(--text-primary-color, #fff);
+    }
+
+    ha-dialog .event-actions .btn-delete {
+        background-color: var(--error-color, #db4437);
+        color: #fff;
+    }
+
+    ha-dialog .event-actions .btn:hover {
+        opacity: 0.9;
+    }
+
+    .create-event-form {
+        padding: 8px 0;
+    }
+
+    .create-event-form .form-row {
+        margin-bottom: 12px;
+    }
+
+    .create-event-form .form-row label {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 0.9em;
+        color: var(--secondary-text-color, #aaaaaa);
+    }
+
+    .create-event-form .form-input {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid var(--divider-color, #e0e0e0);
+        border-radius: 4px;
+        background-color: var(--card-background-color, #fff);
+        color: var(--primary-text-color);
+        font-size: 1em;
+        box-sizing: border-box;
+    }
+
+    .create-event-form .form-input:focus {
+        outline: none;
+        border-color: var(--primary-color, #03a9f4);
+    }
+
+    .create-event-form .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 16px;
+    }
+
+    .create-event-form .btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.9em;
+    }
+
+    .create-event-form .btn-delete {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        background-color: var(--error-color, #db4437);
+        color: #fff;
+        margin-right: auto;
+        --mdc-icon-size: 16px;
+    }
+
+    .create-event-form .btn-delete:hover {
+        opacity: 0.9;
+    }
+
+    .create-event-form .btn-cancel {
+        background-color: transparent;
+        color: var(--primary-text-color);
+    }
+
+    .create-event-form .btn-submit {
+        background-color: var(--primary-color, #03a9f4);
+        color: var(--text-primary-color, #fff);
+    }
+
+    .create-event-form .btn-submit:hover {
+        opacity: 0.9;
     }
 
     @keyframes loader {

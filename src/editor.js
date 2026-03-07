@@ -142,6 +142,10 @@ export class WeekPlannerCardEditor extends LitElement {
                         ${this.addTextField('filter', 'Filter events (regex)')}
                         ${this.addTextField('filterText', 'Filter event text (regex)')}
                         ${this.addBooleanField('combineSimilarEvents', 'Combine similar events')}
+                        ${this.addBooleanField('showDayName', 'Show day name')}
+                        ${this.addBooleanField('showDate', 'Show date in event details')}
+                        ${this.addBooleanField('showTime', 'Show time')}
+                        ${this.addBooleanField('showCalendarName', 'Show calendar name in event details')}
                         ${this.addBooleanField('showTitle', 'Show title in overview', true)}
                         ${this.addBooleanField('showDescription', 'Show description in overview')}
                         ${this.addBooleanField('showLocation', 'Show location in overview')}
@@ -163,6 +167,8 @@ export class WeekPlannerCardEditor extends LitElement {
                     'Weather',
                     html`
                         ${this.addEntityPickerField('weather.entity', 'Weather entity', ['weather'])}
+                        ${this.addBooleanField('showCurrentWeather', 'Show current weather in header')}
+                        ${this.addBooleanField('showWeather', 'Show weather in calendar', true)}
                         ${this.addBooleanField('weather.showCondition', 'Show condition icon')}
                         ${this.addBooleanField('weather.showTemperature', 'Show temperature')}
                         ${this.addBooleanField('weather.showLowTemperature', 'Show low temperature')}
@@ -184,6 +190,15 @@ export class WeekPlannerCardEditor extends LitElement {
                 ${this.addExpansionPanel(
                     'Appearance',
                     html`
+                        ${this.addSelectField('theme', 'Theme', [
+                            {
+                                value: 'default',
+                                label: 'Default',
+                            }, {
+                                value: 'skylight',
+                                label: 'Skylight',
+                            }
+                        ], true)}
                         ${this.addBooleanField('noCardBackground', 'No card background')}
                         ${this.addTextField('eventBackground', 'Override events background color')}
                         ${this.addBooleanField('compact', 'Compact mode')}
