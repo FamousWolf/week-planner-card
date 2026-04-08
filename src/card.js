@@ -646,8 +646,8 @@ export class WeekPlannerCard extends LitElement {
             <ha-dialog
                 open
                 @closed="${this._closeDialog}"
-                .heading="${this._renderEventDetailsDialogHeading()}"
             >
+                <span slot="headerTitle">${this._currentEventDetails.summary}</span>
                 <div class="content">
                     <div class="calendar">
                         <ha-icon icon="mdi:calendar-account"></ha-icon>
@@ -685,18 +685,6 @@ export class WeekPlannerCard extends LitElement {
         `;
     }
 
-    _renderEventDetailsDialogHeading() {
-        return html`
-            <div class="header_title">
-                <span>${this._currentEventDetails.summary}</span>
-                <ha-icon-button
-                    .label="${this.hass?.localize('ui.dialogs.generic.close') ?? 'Close'}"
-                    dialogAction="close"
-                    class="header_button"
-                ><ha-icon icon="mdi:close"></ha-icon></ha-icon-button>
-            </div>
-        `;
-    }
 
     _renderEventDetailsDate() {
         const start = this._currentEventDetails.originalStart;
