@@ -616,15 +616,15 @@ export class WeekPlannerCard extends LitElement {
     _renderEventTime(event) {
         if (event.multiDay && this._multiDayMode !== 'default') {
             return html`
-                ${event.originalStart.toFormat(this._multiDayTimeFormat)}
-                ${' - ' + event.originalEnd.toFormat(this._multiDayTimeFormat)}
+                <span class="start-time">${event.originalStart.toFormat(this._multiDayTimeFormat)}</span>
+                <span class="end-time">${' - ' + event.originalEnd.toFormat(this._multiDayTimeFormat)}</span>
             `;
         } else if (event.fullDay) {
             return html`${this._language.fullDay}`;
         } else {
             return html`
-                ${event.start.toFormat(this._timeFormat)}
-                ${event.end ? ' - ' + event.end.toFormat(this._timeFormat) : ''}
+                <span class="start-time">${event.start.toFormat(this._timeFormat)}</span>
+                ${event.end ? html`<span class="end-time">${' - ' + event.end.toFormat(this._timeFormat)}</span>` : ''}
             `;
         }
     }
