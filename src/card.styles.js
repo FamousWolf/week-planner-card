@@ -249,6 +249,12 @@ export default css`
         align-items: center;
     }
 
+    /* Inline events align center but additional color relies on stretch to
+     * fill the space, this overrides its alignment only.. */
+    ha-card.inlineAllDay .container .day .events .event .additionalColor {
+        align-self: stretch;
+    }
+
     ha-card.inlineAllDay .container .day .events .event.fullday .inner {
         display: flex;
         align-items: baseline;
