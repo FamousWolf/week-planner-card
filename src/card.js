@@ -189,6 +189,7 @@ export class WeekPlannerCard extends LitElement {
         this._showLocation = config.showLocation ?? false;
         this._hidePastEvents = config.hidePastEvents ?? false;
         this._hideAllDayEvents = config.hideAllDayEvents ?? false;
+        this._inlineAllDayEvents = config.inlineAllDayEvents ?? false;
         this._hideDaysWithoutEvents = config.hideDaysWithoutEvents ?? false;
         this._hideTodayWithoutEvents = config.hideTodayWithoutEvents ?? false;
         this._filter = config.filter ?? false;
@@ -285,6 +286,9 @@ export class WeekPlannerCard extends LitElement {
         }
         if (this._compact) {
             cardClasses.push('compact');
+        }
+        if (this._inlineAllDayEvents) {
+            cardClasses.push('inlineAllDay');
         }
 
         const cardStyles = [

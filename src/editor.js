@@ -127,6 +127,7 @@ export class WeekPlannerCardEditor extends LitElement {
                         ${this.addTextField('maxEvents', 'Maximum number of events (0 is no maximum)', 'number', 0)}
                         ${this.addBooleanField('hidePastEvents', 'Hide past events')}
                         ${this.addBooleanField('hideAllDayEvents', 'Hide all day events')}
+                        ${this.addBooleanField('inlineAllDayEvents', 'Inline all day events')}
                         ${this.addSelectField('multiDayMode', 'Multi day mode', [
                             {
                                 value: 'default',
