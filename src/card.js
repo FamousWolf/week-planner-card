@@ -72,6 +72,7 @@ export class WeekPlannerCard extends LitElement {
     _locationLink;
     _startDate;
     _hideWeekend;
+    _disableRelativeDayLabels;
     _startingDay;
     _startingDayOffset;
     _weatherForecast = null;
@@ -117,6 +118,7 @@ export class WeekPlannerCard extends LitElement {
             startingDayOffset: 0,
             showWeekDayText: true,
             hideWeekend: false,
+            disableRelativeDayLabels: false,
             noCardBackground: false,
             compact: false,
             weather: {
@@ -169,6 +171,7 @@ export class WeekPlannerCard extends LitElement {
         this._weather = this._getWeatherConfig(config.weather);
         this._numberOfDays = this._getNumberOfDays(config.days ?? 7);
         this._hideWeekend = config.hideWeekend ?? false;
+        this._disableRelativeDayLabels = config.disableRelativeDayLabels ?? false;
         this._showNavigation = config.showNavigation ?? false;
         this._startingDay = config.startingDay ?? 'today';
         this._startingDayOffset = config.startingDayOffset ?? 0;
@@ -1138,11 +1141,11 @@ export class WeekPlannerCard extends LitElement {
     }
 
     _getWeekDayText(date) {
-        if (this._language.today && this._isToday(date)) {
+        if (!this._disableRelativeDayLabels && this._language.today && this._isToday(date)) {
             return this._language.today;
-        } else if (this._language.tomorrow && this._isTomorrow(date)) {
+        } else if (!this._disableRelativeDayLabels && this._language.tomorrow && this._isTomorrow(date)) {
             return this._language.tomorrow;
-        } else if (this._language.yesterday && this._isYesterday(date)) {
+        } else if (!this._disableRelativeDayLabels && this._language.yesterday && this._isYesterday(date)) {
             return this._language.yesterday;
         } else {
             const weekDays = [
