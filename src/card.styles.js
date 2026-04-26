@@ -244,6 +244,42 @@ export default css`
         --mdc-icon-size: var(--event-icon-size);
     }
 
+    ha-card.compactAllDay .container .day .events .event.fullday {
+        --event-padding: 4px 8px;
+        align-items: center;
+    }
+
+    /* Inline events align center but additional color relies on stretch to
+     * fill the space, this overrides its alignment only.. */
+    ha-card.compactAllDay .container .day .events .event .additionalColor {
+        align-self: stretch;
+    }
+
+    ha-card.compactAllDay .container .day .events .event.fullday .inner {
+        display: flex;
+        align-items: baseline;
+        column-gap: 8px;
+        overflow: hidden;
+    }
+
+    ha-card.compactAllDay .container .day .events .event.fullday .inner .time {
+        margin: 0;
+        flex-shrink: 0;
+    }
+
+    ha-card.compactAllDay .container .day .events .event.fullday .inner .title {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    ha-card.compactAllDay .container .day .events .event.fullday .inner .description,
+    ha-card.compactAllDay .container .day .events .event.fullday .inner .location {
+        display: none;
+    }
+
     .loader {
         position: absolute;
         top: 16px;
