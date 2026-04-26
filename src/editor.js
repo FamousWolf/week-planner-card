@@ -263,23 +263,17 @@ export class WeekPlannerCardEditor extends LitElement {
     }
 
     addSelectField(name, label, options, clearable, defaultValue) {
+        const currentValue = this.getConfigValue(name, defaultValue);
         return html`
             <ha-select
                 name="${name}"
                 label="${label ?? name}"
-                value="${this.getConfigValue(name, defaultValue)}"
+                .value="${currentValue}"
                 .clearable="${clearable}"
-                @change="${this._valueChanged}"
+                .options="${options}"
+                @selected="${this._valueChanged}"
                 @closed="${(event) => { event.stopPropagation(); } /* Prevent a bug where the editor dialog also closes. See https://github.com/material-components/material-web/issues/1150 */}"
-            >
-                ${options.map((option) => {
-                    return html`
-                        <mwc-list-item
-                            value="${option.value}"
-                        >${option.label ?? option.value}</mwc-list-item>
-                    `;
-                })}
-            </ha-select>
+            ></ha-select>
         `;
     }
 
@@ -328,10 +322,15 @@ export class WeekPlannerCardEditor extends LitElement {
         let value = event.detail ? event.detail.value ?? target.value ?? '' : target.value ?? '';
 
         if (target.tagName === 'HA-SWITCH') {
-            value = target.checked;
+            value = target.checked ?? '';
         }
 
-        this.setConfigValue(target.attributes.name.value, value);
+        const name = target.attributes.name.value;
+        if (this.getConfigValue(name) === value) {
+            return;
+        }
+
+        this.setConfigValue(name, value);
     }
 
     getConfigValue(key, defaultValue) {
