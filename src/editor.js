@@ -127,7 +127,6 @@ export class WeekPlannerCardEditor extends LitElement {
                         ${this.addTextField('maxEvents', 'Maximum number of events (0 is no maximum)', 'number', 0)}
                         ${this.addBooleanField('hidePastEvents', 'Hide past events')}
                         ${this.addBooleanField('hideAllDayEvents', 'Hide all day events')}
-                        ${this.addBooleanField('inlineAllDayEvents', 'Inline all day events')}
                         ${this.addSelectField('multiDayMode', 'Multi day mode', [
                             {
                                 value: 'default',
@@ -187,7 +186,18 @@ export class WeekPlannerCardEditor extends LitElement {
                     html`
                         ${this.addBooleanField('noCardBackground', 'No card background')}
                         ${this.addTextField('eventBackground', 'Override events background color')}
-                        ${this.addBooleanField('compact', 'Compact mode')}
+                        ${this.addSelectField('displayMode', 'Display mode', [
+                            {
+                                value: 'default',
+                                label: 'Default',
+                            }, {
+                                value: 'compact',
+                                label: 'Compact mode',
+                            }, {
+                                value: 'compactAllDay',
+                                label: 'Compact all day events',
+                            }
+                        ], false, 'default')}
                     `
                 )}
                 ${this.addExpansionPanel(
@@ -200,7 +210,8 @@ export class WeekPlannerCardEditor extends LitElement {
                 ${this.addExpansionPanel(
                     'Texts',
                     html`
-                        ${this.addTextField('texts.fullDay', 'Entire day')}
+                        ${this.addBooleanField('hideEntireDayLabel', 'Hide entire day label')}
+                        ${this.addTextField('texts.fullDay', 'Entire day', 'text', undefined, this.getConfigValue('hideEntireDayLabel'))}
                         ${this.addTextField('texts.noEvents', 'No events')}
                         ${this.addTextField('texts.moreEvents', 'More events')}
                         ${this.addTextField('texts.today', 'Today')}
@@ -225,13 +236,14 @@ export class WeekPlannerCardEditor extends LitElement {
         `;
     }
 
-    addTextField(name, label, type, defaultValue) {
+    addTextField(name, label, type, defaultValue, disabled) {
         return html`
             <ha-textfield
                 name="${name}"
                 label="${label ?? name}"
                 type="${type ?? 'text'}"
                 value="${this.getConfigValue(name, defaultValue)}"
+                ?disabled="${disabled ?? false}"
                 @keyup="${this._valueChanged}"
                 @change="${this._valueChanged}"
             />

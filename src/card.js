@@ -62,7 +62,8 @@ export class WeekPlannerCard extends LitElement {
     _updateInterval;
     _noCardBackground;
     _eventBackground;
-    _compact;
+    _displayMode;
+    _hideEntireDayLabel;
     _language;
     _weather;
     _dateFormat;
@@ -118,7 +119,7 @@ export class WeekPlannerCard extends LitElement {
             showWeekDayText: true,
             hideWeekend: false,
             noCardBackground: false,
-            compact: false,
+            displayMode: 'default',
             weather: {
                 showCondition: true,
                 showTemperature: false,
@@ -177,7 +178,10 @@ export class WeekPlannerCard extends LitElement {
         this._updateInterval = config.updateInterval ?? 60;
         this._noCardBackground = config.noCardBackground ?? false;
         this._eventBackground = config.eventBackground ?? 'var(--card-background-color, inherit)';
-        this._compact = config.compact ?? false;
+        // `compact: true` is supported as a fallback for cards saved before
+        // displayMode existed. New cards should set displayMode directly.
+        this._displayMode = config.displayMode ?? (config.compact ? 'compact' : 'default');
+        this._hideEntireDayLabel = config.hideEntireDayLabel ?? false;
         this._dayFormat = config.dayFormat ?? null;
         this._dateFormat = config.dateFormat ?? 'cccc d LLLL yyyy';
         this._timeFormat = config.timeFormat ?? 'HH:mm';
@@ -189,7 +193,6 @@ export class WeekPlannerCard extends LitElement {
         this._showLocation = config.showLocation ?? false;
         this._hidePastEvents = config.hidePastEvents ?? false;
         this._hideAllDayEvents = config.hideAllDayEvents ?? false;
-        this._inlineAllDayEvents = config.inlineAllDayEvents ?? false;
         this._hideDaysWithoutEvents = config.hideDaysWithoutEvents ?? false;
         this._hideTodayWithoutEvents = config.hideTodayWithoutEvents ?? false;
         this._filter = config.filter ?? false;
@@ -284,11 +287,10 @@ export class WeekPlannerCard extends LitElement {
         if (this._noCardBackground) {
             cardClasses.push('nobackground');
         }
-        if (this._compact) {
+        if (this._displayMode === 'compact') {
             cardClasses.push('compact');
-        }
-        if (this._inlineAllDayEvents) {
-            cardClasses.push('inlineAllDay');
+        } else if (this._displayMode === 'compactAllDay') {
+            cardClasses.push('compactAllDay');
         }
 
         const cardStyles = [
@@ -566,9 +568,11 @@ export class WeekPlannerCard extends LitElement {
                             `
                         })}
                         <div class="inner">
-                            <div class="time">
-                                ${this._renderEventTime(event)}
-                            </div>
+                            ${event.fullDay && this._hideEntireDayLabel ? '' : html`
+                                <div class="time">
+                                    ${this._renderEventTime(event)}
+                                </div>
+                            `}
                             ${this._showTitle ?
                                     html`
                                         <div class="title">
