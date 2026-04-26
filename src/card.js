@@ -616,15 +616,15 @@ export class WeekPlannerCard extends LitElement {
     _renderEventTime(event) {
         if (event.multiDay && this._multiDayMode !== 'default') {
             return html`
-                ${event.originalStart.toFormat(this._multiDayTimeFormat)}
-                ${' - ' + event.originalEnd.toFormat(this._multiDayTimeFormat)}
+                <span class="start-time">${event.originalStart.toFormat(this._multiDayTimeFormat)}</span>
+                <span class="end-time">${' - ' + event.originalEnd.toFormat(this._multiDayTimeFormat)}</span>
             `;
         } else if (event.fullDay) {
             return html`${this._language.fullDay}`;
         } else {
             return html`
-                ${event.start.toFormat(this._timeFormat)}
-                ${event.end ? ' - ' + event.end.toFormat(this._timeFormat) : ''}
+                <span class="start-time">${event.start.toFormat(this._timeFormat)}</span>
+                ${event.end ? html`<span class="end-time">${' - ' + event.end.toFormat(this._timeFormat)}</span>` : ''}
             `;
         }
     }
@@ -646,8 +646,8 @@ export class WeekPlannerCard extends LitElement {
             <ha-dialog
                 open
                 @closed="${this._closeDialog}"
-                .heading="${this._renderEventDetailsDialogHeading()}"
             >
+                <span slot="headerTitle">${this._currentEventDetails.summary}</span>
                 <div class="content">
                     <div class="calendar">
                         <ha-icon icon="mdi:calendar-account"></ha-icon>
@@ -685,18 +685,6 @@ export class WeekPlannerCard extends LitElement {
         `;
     }
 
-    _renderEventDetailsDialogHeading() {
-        return html`
-            <div class="header_title">
-                <span>${this._currentEventDetails.summary}</span>
-                <ha-icon-button
-                    .label="${this.hass?.localize('ui.dialogs.generic.close') ?? 'Close'}"
-                    dialogAction="close"
-                    class="header_button"
-                ><ha-icon icon="mdi:close"></ha-icon></ha-icon-button>
-            </div>
-        `;
-    }
 
     _renderEventDetailsDate() {
         const start = this._currentEventDetails.originalStart;
