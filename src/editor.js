@@ -322,11 +322,7 @@ export class WeekPlannerCardEditor extends LitElement {
         let value = event.detail ? event.detail.value ?? target.value ?? '' : target.value ?? '';
 
         if (target.tagName === 'HA-SWITCH') {
-            value = target.checked;
-        }
-
-        if (value === undefined) {
-            value = '';
+            value = target.checked ?? '';
         }
 
         const name = target.attributes.name.value;
